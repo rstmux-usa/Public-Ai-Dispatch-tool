@@ -1,0 +1,304 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Font Lab</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow+Semi+Condensed:wght@400;500;600&family=Inter:opsz,wght@14..32,400..700&family=Geist:wght@400..700&display=swap">
+<style>
+/* Font Lab (Oct 12, 2026): the fonts we tried before deciding to keep Barlow. See README.md.
+   Tries each candidate on the real board (iframe of ../../prototype/index.html, same origin),
+   then compare close-ups. Tokens copied from index.html so the page reads like the board. */
+:root {
+  --board: #eceff3; --panel: #ffffff; --raised: #eef1f5; --hover: #f5f7fa;
+  --line: #e2e7ee; --line-strong: #cdd5e0;
+  --text: #132030; --text-2: #3e4d61; --text-3: #5e6d82;
+  --flap: #132030; --flap-text: #f4f6f9; --flap-split: rgba(255, 255, 255, 0.18);
+  --ontime: #16703f; --delayed: #9a5800; --delayed-tint: #fcf0dd; --inair: #1a68a6;
+  --bar-h: 104px;
+  --f-ui: "Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif;
+  --f-num: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --num-stretch: normal;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--board); color: var(--text); font: 400 14px/20px var(--f-ui); -webkit-font-smoothing: antialiased; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.num { font-family: var(--f-num); font-stretch: var(--num-stretch); font-variant-numeric: tabular-nums; }
+
+/* Top bar */
+.bar { position: sticky; top: 0; z-index: 5; height: var(--bar-h); padding: 12px 20px 0; background: var(--panel); border-bottom: 1px solid var(--line); }
+.bar-top { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.bar-top h1 { margin: 0; flex: none; font-weight: 600; font-size: 17px; line-height: 22px; }
+.opts { display: flex; gap: 4px; padding: 3px; border-radius: 8px; background: var(--raised); overflow-x: auto; scrollbar-width: none; }
+.opt { position: relative; display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 12px 0 6px; border-radius: 6px; font-weight: 500; font-size: 14px; white-space: nowrap; color: var(--text-2); }
+.opt:hover { background: var(--hover); color: var(--text); }
+.opt kbd { display: inline-grid; place-items: center; width: 18px; height: 18px; border: 1px solid var(--line-strong); border-radius: 4px; font: 600 11px/1 var(--f-ui); color: var(--text-3); background: var(--panel); }
+.opt.on { background: var(--flap); color: var(--flap-text); font-weight: 600; }
+.opt.on kbd { border-color: rgba(255, 255, 255, 0.3); background: transparent; color: var(--flap-text); }
+.opt .tag { font-weight: 500; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ontime); }
+.opt.on .tag { color: #8fd9ad; }
+.bar-top a { margin-left: auto; flex: none; color: var(--text-2); font-weight: 500; text-decoration: none; white-space: nowrap; }
+.bar-top a:hover { color: var(--text); text-decoration: underline; }
+.info { display: flex; align-items: baseline; gap: 6px 18px; flex-wrap: wrap; margin-top: 10px; color: var(--text-2); font-size: 13px; line-height: 18px; }
+.info b { color: var(--text); font-weight: 600; }
+.info .warn { color: var(--delayed); font-weight: 500; }
+
+/* Live board */
+.live { position: relative; height: calc(100vh - var(--bar-h)); min-height: 560px; }
+.live iframe { display: block; width: 100%; height: 100%; border: 0; background: var(--board); }
+.live .blocked { position: absolute; inset: 0; display: none; place-content: center; gap: 6px; padding: 24px; text-align: center; color: var(--text-2); }
+.live.no-access iframe { visibility: hidden; }
+.live.no-access .blocked { display: grid; }
+.blocked b { color: var(--text); font-size: 16px; }
+
+/* Close-ups */
+.close { padding: 40px 20px 64px; scroll-margin-top: var(--bar-h); }
+.close-h { max-width: 1320px; margin: 0 auto 16px; }
+.close-h h2 { margin: 0 0 4px; font-weight: 600; font-size: 20px; line-height: 26px; }
+.close-h p { margin: 0; color: var(--text-2); }
+.strip { display: grid; grid-template-columns: 236px minmax(0, 1fr); gap: 24px; max-width: 1320px; margin: 0 auto 12px; padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+.strip.on { border-color: var(--flap); box-shadow: inset 0 0 0 1px var(--flap); }
+.meta h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; font: 600 18px/24px var(--f-ui); }
+.meta h3 kbd { display: inline-grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--line-strong); border-radius: 4px; font: 600 11px/1 system-ui, sans-serif; color: var(--text-3); }
+.meta p { margin: 0 0 10px; color: var(--text-2); font-size: 13px; line-height: 18px; }
+.facts { margin: 0; padding: 0; list-style: none; font-size: 13px; line-height: 18px; }
+.facts li { display: grid; grid-template-columns: 58px 1fr; gap: 6px; padding: 5px 0; border-top: 1px solid var(--line); }
+.facts li span:first-child { color: var(--text-3); }
+.facts .warn { color: var(--delayed); }
+.meta, .facts { font-family: "Barlow Semi Condensed", Arial, sans-serif; }
+
+/* Samples inherit the strip's own --f-ui / --f-num */
+.samples { display: grid; gap: 16px; min-width: 0; font-family: var(--f-ui); }
+.s-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.s-head b { font-weight: 600; font-size: 17px; line-height: 22px; }
+.s-head .act { color: var(--text-3); font-size: 13px; }
+.flaps { display: inline-flex; align-items: center; gap: 2px; }
+.flap { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 28px; border-radius: 3px; background: var(--flap); color: var(--flap-text); font: 600 20px/24px var(--f-num); font-stretch: var(--num-stretch); font-variant-numeric: tabular-nums; }
+.flap::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--flap-split); }
+.colon { font: 600 20px/24px var(--f-num); padding: 0 1px; }
+.grow { display: flex; align-items: center; gap: 16px; width: max-content; max-width: 100%; height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; white-space: nowrap; overflow: hidden; }
+.grow .pickup { font: 600 17px/20px var(--f-num); font-stretch: var(--num-stretch); }
+.grow .flight, .grow .place { font: 600 16px/20px var(--f-num); font-stretch: var(--num-stretch); }
+.grow .party { font-weight: 500; }
+.grow .t2 { color: var(--text-2); font-size: 15px; }
+.rs { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px 0 6px; border-radius: 11px; background: var(--raised); font-weight: 500; font-size: 13px; line-height: 18px; }
+.rs i { width: 7px; height: 7px; border-radius: 50%; background: var(--ontime); }
+.land { display: inline-flex; align-items: center; height: 22px; padding: 0 5px; border-radius: 3px; background: var(--flap); color: var(--flap-text); font: 600 16px/20px var(--f-num); font-stretch: var(--num-stretch); }
+.fs { color: var(--text-2); font-size: 15px; }
+.para { max-width: 520px; margin: 0; font-size: 14px; line-height: 20px; color: var(--text-2); }
+.para b { color: var(--text); font-weight: 600; }
+.conf { display: flex; gap: 20px; flex-wrap: wrap; align-items: baseline; }
+.conf span { font-size: 16px; }
+.conf .num { font-weight: 600; font-stretch: var(--num-stretch); }
+.conf small { margin-right: 6px; color: var(--text-3); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; font-family: "Barlow Semi Condensed", Arial, sans-serif; }
+.wbar { display: grid; grid-template-columns: minmax(0, 1fr) 170px; gap: 12px; align-items: center; font-family: "Barlow Semi Condensed", Arial, sans-serif; font-size: 13px; color: var(--text-3); }
+.wbar .track { position: relative; height: 8px; border-radius: 4px; background: var(--raised); }
+.wbar .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--text-3); }
+.wbar .base { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--text); }
+.wbar b { color: var(--text); font-weight: 600; }
+.probe { position: absolute; visibility: hidden; white-space: nowrap; font-size: 14px; }
+
+@media (max-width: 860px) {
+  :root { --bar-h: 124px; }
+  .bar { padding: 10px 16px 0; }
+  .bar-top { flex-wrap: wrap; gap: 8px; }
+  .bar-top a { display: none; }
+  .opts { width: 100%; }
+  .close { padding: 32px 16px 48px; }
+  .strip { grid-template-columns: 1fr; gap: 16px; padding: 16px; }
+}
+</style>
+
+<header class="bar">
+  <div class="bar-top">
+    <h1>Font Lab</h1>
+    <div class="opts" id="opts" role="tablist" aria-label="Font options"></div>
+    <a href="#close">Close-ups ↓</a>
+  </div>
+  <div class="info" id="info"></div>
+</header>
+
+<section class="live" id="live">
+  <iframe id="board" src="../../prototype/index.html" title="Dispatch board in the chosen font"></iframe>
+  <div class="blocked"><b>The live board needs the local server</b><span>Serve the project folder (python3 -m http.server from the project root) and open /case-study/font/font-lab.html. The close-ups below work anywhere.</span></div>
+</section>
+
+<section class="close" id="close">
+  <div class="close-h">
+    <h2>Side by side</h2>
+    <p>The same board pieces in each font. The bar at the bottom of each card is the width of the same sentence, measured in this browser. The black tick is today's width.</p>
+  </div>
+  <div id="strips"></div>
+</section>
+
+<script>
+const SF = '-apple-system, BlinkMacSystemFont, system-ui';
+const FONTS = [
+  { id: 'today', name: 'Barlow', tag: 'Chosen',
+    ui: '"Barlow Semi Condensed", "Arial Narrow", Arial, sans-serif',
+    num: '"Barlow Condensed", "Arial Narrow", Arial, sans-serif',
+    blurb: 'Narrow and sporty, like an airport board. Fits the most text per row.',
+    shows: 'Every computer', figma: 'Built in' },
+  { id: 'sf', name: 'SF Pro', needsSF: true,
+    ui: `${SF}, sans-serif`, num: `${SF}, sans-serif`,
+    blurb: 'The macOS and iPhone font. Calm and familiar, but every column gets wider.',
+    shows: 'Apple devices only. Windows PCs show Segoe UI.', showsWarn: true, figma: 'Free download from Apple' },
+  { id: 'sfc', name: 'SF Pro + Condensed', needsSF: true, needsCond: true,
+    ui: `${SF}, sans-serif`, num: `${SF}, sans-serif`, stretch: 'condensed',
+    blurb: 'SF Pro for words. SF Pro Condensed, from the same font, for times, flights and places, so the grid stays tight.',
+    shows: 'Apple devices only. Elsewhere we fall back to Inter.', showsWarn: true, figma: 'Free download from Apple' },
+  { id: 'inter', name: 'Inter',
+    ui: 'Inter, Arial, sans-serif', num: 'Inter, Arial, sans-serif',
+    blurb: 'The closest free look-alike of SF Pro. It looks the same on every computer.',
+    shows: 'Every computer', figma: 'Built in' },
+  { id: 'geist', name: 'Geist',
+    ui: 'Geist, Arial, sans-serif', num: 'Geist, Arial, sans-serif',
+    blurb: 'Close to SF Pro, but a little rounder and more “tech”. Made by Vercel.',
+    shows: 'Every computer', figma: 'Built in (Google Fonts)' },
+];
+
+const SENTENCE = 'AS 920 is 39 min late and now lands at 11:35. The Cartwright, Hartwell and Ostrander families land by 10:30 and are ready at 11:00.';
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let cur = 'today';
+
+/* Can this browser show SF Pro, and its Condensed width? */
+function widthOf(font, stretch = 'normal') {
+  const s = document.createElement('span');
+  s.className = 'probe';
+  s.style.fontFamily = font; s.style.fontStretch = stretch;
+  s.textContent = 'Hartwell Ostrander 10:30 AS 3286';
+  document.body.appendChild(s);
+  const w = s.getBoundingClientRect().width; s.remove(); return w;
+}
+const HAS_SF = widthOf('-apple-system, BlinkMacSystemFont, monospace') !== widthOf('monospace');
+const HAS_COND = HAS_SF && widthOf(SF) - widthOf(SF, 'condensed') > 4;
+
+/* Top bar */
+$('#opts').innerHTML = FONTS.map((f, i) =>
+  `<button class="opt" role="tab" data-id="${f.id}"><kbd>${i + 1}</kbd>${esc(f.name)}${f.tag ? ` <span class="tag">${f.tag}</span>` : ''}</button>`).join('');
+$('#opts').addEventListener('click', e => { const b = e.target.closest('.opt'); if (b) pick(b.dataset.id); });
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey || /input|textarea|select/i.test(e.target.tagName)) return;
+  const f = FONTS[+e.key - 1]; if (f) pick(f.id);
+});
+
+/* Close-ups */
+$('#strips').innerHTML = FONTS.map((f, i) => `
+  <article class="strip" id="s-${f.id}" style='--f-ui:${f.ui};--f-num:${f.num};--num-stretch:${f.stretch || 'normal'}'>
+    <div class="meta">
+      <h3><kbd>${i + 1}</kbd>${esc(f.name)}</h3>
+      <p>${esc(f.blurb)}</p>
+      <ul class="facts">
+        <li><span>Shows on</span><span class="${f.showsWarn ? 'warn' : ''}">${esc(f.shows)}</span></li>
+        <li><span>Figma</span><span>${esc(f.figma)}</span></li>
+        ${f.needsSF && !HAS_SF ? '<li><span>Here</span><span class="warn">This browser has no SF Pro, so you are seeing a stand-in.</span></li>' : ''}
+        ${f.needsCond && HAS_SF && !HAS_COND ? '<li><span>Here</span><span class="warn">This browser can’t show SF Pro Condensed.</span></li>' : ''}
+      </ul>
+    </div>
+    <div class="samples">
+      <div class="s-head">
+        <b>Group 3 van broke</b><span class="act">act by <span class="num">10:40</span></span>
+        <span class="flaps"><span class="flap">0</span><span class="flap">9</span><span class="colon num">:</span><span class="flap">5</span><span class="flap">0</span></span>
+        <span class="act">PDT</span>
+      </div>
+      <div class="grow">
+        <span class="pickup">09:51</span>
+        <span class="rs"><i></i>Arrived</span>
+        <span class="party">Colleen Brady</span>
+        <span class="t2 num">4</span>
+        <span class="flight">DL 3740</span><span class="land">09:21</span><span class="fs">Landed</span>
+        <span class="place">Fairmont Olympic</span>
+        <span class="t2">SUV</span><span class="t2">Tarun</span>
+      </div>
+      <p class="para"><b>AS 920</b> is 39 min late and now lands at 11:35. The Cartwright, Hartwell and Ostrander families land by 10:30 and are ready at 11:00. They would wait 65 min for Kelli Rae’s family. Our limit is 25.</p>
+      <div class="conf">
+        <span><small>Look-alikes</small>Il1 O0 rn m</span>
+        <span><small>Conf #</small><span class="num">A1I0-7lO</span></span>
+        <span><small>Flights</small><span class="num">AS 3286 · DL 889 · UA 1170</span></span>
+      </div>
+      <div class="wbar"><div class="track"><div class="fill"></div><div class="base"></div></div><span class="pct">…</span></div>
+      <span class="probe w-ui">${esc(SENTENCE)}</span>
+      <span class="probe w-num num" style="font-weight:600;font-size:16px">09:51 10:30 AS 3286 DL 889 Pier 91 SEA</span>
+    </div>
+  </article>`).join('');
+
+const widths = {};
+function measure() {
+  for (const f of FONTS) {
+    const s = $(`#s-${f.id}`);
+    widths[f.id] = { ui: s.querySelector('.w-ui').getBoundingClientRect().width, num: s.querySelector('.w-num').getBoundingClientRect().width };
+  }
+  const base = widths.today, max = Math.max(...FONTS.map(f => widths[f.id].ui)) * 1.04;
+  for (const f of FONTS) {
+    const s = $(`#s-${f.id}`), w = widths[f.id];
+    s.querySelector('.fill').style.width = `${(w.ui / max) * 100}%`;
+    s.querySelector('.base').style.left = `${(base.ui / max) * 100}%`;
+    s.querySelector('.pct').innerHTML = f.id === 'today' ? '<b>Today’s width</b>' : `Words <b>${pct(w.ui, base.ui)}</b> · numbers <b>${pct(w.num, base.num)}</b>`;
+  }
+  renderInfo();
+}
+
+function pct(a, b) { const p = Math.round((a / b - 1) * 100); return `${p > 0 ? '+' : ''}${p}%`; }
+function renderInfo() {
+  const f = FONTS.find(x => x.id === cur), w = widths[cur], base = widths.today;
+  const bits = [`<b>${esc(f.name)}</b><span>${esc(f.blurb)}</span>`];
+  if (w && cur !== 'today') bits.push(`<span>Words <b>${pct(w.ui, base.ui)}</b> · times and flights <b>${pct(w.num, base.num)}</b> vs today</span>`);
+  bits.push(`<span class="${f.showsWarn ? 'warn' : ''}">Shows on: ${esc(f.shows)}</span>`);
+  if (f.needsSF && !HAS_SF) bits.push('<span class="warn">No SF Pro in this browser, so this is a stand-in.</span>');
+  else if (f.needsCond && !HAS_COND) bits.push('<span class="warn">This browser can’t show SF Pro Condensed.</span>');
+  $('#info').innerHTML = bits.join('');
+}
+
+/* Live board: swap the board's two font tokens inside the iframe. */
+const frame = $('#board');
+let numSel = null;
+/* Every rule that sets var(--f-num). Read from the raw <style> text, because the CSSOM
+   drops shorthand values that contain var() once a longhand follows them. */
+function numSelectors(doc) {
+  const sels = new Set(['.num']);
+  const css = [...doc.querySelectorAll('style:not(#font-lab)')].map(s => s.textContent).join('\n').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) if (m[2].includes('var(--f-num')) sels.add(m[1].trim());
+  return [...sels].join(',\n');
+}
+function applyToBoard() {
+  let doc;
+  try { doc = frame.contentDocument; } catch (e) { doc = null; }
+  if (!doc || !doc.head) { $('#live').classList.add('no-access'); return; }
+  $('#live').classList.remove('no-access');
+  if (!doc.getElementById('font-lab-fonts')) {
+    numSel = numSelectors(doc);
+    const l = doc.createElement('link');
+    l.id = 'font-lab-fonts'; l.rel = 'stylesheet';
+    l.href = 'https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Geist:wght@400..700&display=swap';
+    doc.head.appendChild(l);
+  }
+  let st = doc.getElementById('font-lab');
+  if (!st) { st = doc.createElement('style'); st.id = 'font-lab'; doc.head.appendChild(st); }
+  const f = FONTS.find(x => x.id === cur);
+  st.textContent = cur === 'today' ? '' :
+    `:root { --f-ui: ${f.ui}; --f-num: ${f.num}; }` +
+    (f.stretch ? `\n${numSel} { font-stretch: ${f.stretch} !important; }` : '');
+}
+frame.addEventListener('load', applyToBoard);
+
+function pick(id) {
+  cur = id;
+  const f = FONTS.find(x => x.id === id);
+  document.querySelectorAll('.opt').forEach(b => { const on = b.dataset.id === id; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+  document.querySelectorAll('.strip').forEach(s => s.classList.toggle('on', s.id === `s-${id}`));
+  const root = document.documentElement.style;
+  root.setProperty('--f-ui', f.ui); root.setProperty('--f-num', f.num); root.setProperty('--num-stretch', f.stretch || 'normal');
+  if (location.hash.slice(1) !== id && !location.hash.startsWith('#close')) history.replaceState(null, '', `#${id}`);
+  try { localStorage.setItem('fontlab', id); } catch (e) {}
+  renderInfo();
+  applyToBoard();
+}
+
+let start = location.hash.slice(1);
+if (!FONTS.some(f => f.id === start)) { try { start = localStorage.getItem('fontlab'); } catch (e) { start = null; } }
+pick(FONTS.some(f => f.id === start) ? start : 'today');
+document.fonts.ready.then(measure);
+</script>

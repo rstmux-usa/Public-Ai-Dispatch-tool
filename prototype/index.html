@@ -1822,6 +1822,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .tour-dots i.on { width: 16px; background: var(--flap); }
 /* The tour presses the assistant's Show me itself: a quick push, then the fix plays. */
 .tour-press { transform: scale(0.94); box-shadow: 0 0 0 4px rgba(43, 42, 90, 0.16); transition: transform 0.12s ease, box-shadow 0.12s ease; }
+.nav-item.tour-press { background: rgba(255, 255, 255, 0.24); box-shadow: none; }
 @media (prefers-reduced-motion: reduce) { .si-bar { display: none; } }
 
 /* ---------- Narrow screens ---------- */
@@ -8481,7 +8482,7 @@ const TOUR_STEPS = [
     },
     leave() { rail.querySelector('.tour-press')?.classList.remove('tour-press'); },
     title: () => 'The assistant suggests the fix',
-    body: t => `${t.dec ? 'Show me plays it on the grid; nothing is saved.' : 'When a late flight breaks a ride, the fix shows up here.'} Approve when it looks right; Undo takes it back.`,
+    body: () => `${HAND && aiDecisions().length ? 'Show me plays it on the grid; nothing is saved.' : 'When a late flight breaks a ride, the fix shows up here.'} Approve when it looks right; Undo takes it back.`,
     holes: t => {
       const card = t.dec && rail.querySelector(`[data-aicard="${t.dec}"]`);
       if (!card) return [rail];
@@ -8549,29 +8550,52 @@ function tourGo(i) {
   const t = TOUR;
   if (!t || i < 0 || i >= TOUR_STEPS.length) return;
   t.timers.forEach(clearTimeout); t.timers = [];
+  hdr.querySelector('.nav-item.tour-press')?.classList.remove('tour-press');
   if (t.i >= 0) TOUR_STEPS[t.i].leave?.(t);
-  t.i = i;
+  const first = t.i < 0;
+  t.i = i; t.nav = null;
   const st = TOUR_STEPS[i], n = TOUR_STEPS.length, c = t.card;
-  if (S.view !== st.view) { S.view = st.view; S.menu = null; closeMega(); renderAll(); }
-  st.enter?.(t);
-  const title = st.title(t), body = st.body(t);
-  c.querySelector('#tourT').textContent = title;
-  c.querySelector('#tourB').textContent = body;
-  c.querySelector('#tourLive').textContent = `Step ${i + 1} of ${n}. ${title}. ${body}`;
+  const say = () => {
+    const title = st.title(t), body = st.body(t);
+    if (c.querySelector('#tourT').textContent === title && c.querySelector('#tourB').textContent === body) return;
+    c.querySelector('#tourT').textContent = title;
+    c.querySelector('#tourB').textContent = body;
+    c.querySelector('#tourLive').textContent = `Step ${i + 1} of ${n}. ${title}. ${body}`;
+    c.classList.remove('fresh'); void c.offsetWidth; c.classList.add('fresh');
+  };
+  if (S.view === st.view || first) { if (S.view !== st.view) tourView(st.view); st.enter?.(t); say(); }
+  else {
+    // A new page: the spotlight goes to its tab in the top menu, the tour presses it, and the page comes in from that
+    // side, so it reads as "we went from the Grid to the Map".
+    const tab = hdr.querySelector(`.nav-item[data-a="view"][data-v="${st.view}"]`);
+    t.nav = tab; placePill(tab); say();
+    t.later(onbStill() ? 500 : 800, () => {
+      tab?.classList.add('tour-press');
+      t.later(200, () => { tab?.classList.remove('tour-press'); t.nav = null; tourView(st.view); st.enter?.(t); say(); });
+    });
+  }
   const dots = c.querySelector('.tour-dots');
   dots.innerHTML = TOUR_STEPS.map((_, k) => `<i class="${k === i ? 'on' : k < i ? 'past' : ''}"></i>`).join('');
   dots.setAttribute('aria-label', `Step ${i + 1} of ${n}`);
   c.querySelector('[data-t="back"]').hidden = i === 0;
   c.querySelector('[data-t="skip"]').hidden = i === n - 1;
   c.querySelector('[data-t="next"]').textContent = st.next || 'Next';
-  c.classList.remove('fresh'); void c.offsetWidth; c.classList.add('fresh');
   c.querySelector('[data-t="next"]').focus({ preventScroll: true });
+}
+// Switches the page the way the top menu would, and slides the new one in from its tab's side (right = further along).
+function tourView(v) {
+  const order = ['grid', 'timeline', 'map', 'sms'], dir = Math.sign(order.indexOf(v) - order.indexOf(S.view)) || 1;
+  S.view = v; S.menu = null; closeMega(); renderAll();
+  const page = v === 'map' ? $('mapPage') : v === 'sms' ? $('smsPage') : mainEl;
+  if (!onbStill()) page.animate([{ opacity: 0, transform: `translateX(${dir * 48}px)` }, { opacity: 1, transform: 'none' }], { duration: 520, easing: 'cubic-bezier(.2,.7,.2,1)' });
 }
 function tourNext() { if (TOUR) TOUR.i === TOUR_STEPS.length - 1 ? tourEnd(true) : tourGo(TOUR.i + 1); }
 function tourEnd(done) {
   const t = TOUR;
   if (!t) return;
   t.timers.forEach(clearTimeout); cancelAnimationFrame(t.raf);
+  hdr.querySelector('.nav-item.tour-press')?.classList.remove('tour-press');
+  if (done && t.nav) tourView(TOUR_STEPS[t.i].view); // finished while its tab was lit: land on the page anyway
   TOUR_STEPS[t.i]?.leave?.(t);
   TOUR = null;
   onbInert(false);
@@ -8583,10 +8607,10 @@ function tourEnd(done) {
 // Dim everything but the holes, ring them, and set the card beside the anchor where it fits (never over a hole).
 function tourPlace() {
   const t = TOUR, st = TOUR_STEPS[t.i], W = innerWidth, H = innerHeight, PAD = 6, M = 16, GAP = 12;
-  const holes = st.holes(t).map(trRect).filter(Boolean)
+  const holes = (t.nav ? [t.nav] : st.holes(t)).map(trRect).filter(Boolean)
     .map(q => ({ l: Math.max(2, q.l - PAD), t: Math.max(2, q.t - PAD), r: Math.min(W - 2, q.r + PAD), b: Math.min(H - 2, q.b + PAD) }))
     .filter(q => q.r - q.l > 4 && q.b - q.t > 4).slice(0, 2);
-  const a = trRect(st.anchor(t)) || holes[0] || { l: W / 2, r: W / 2, t: H / 2, b: H / 2 };
+  const a = trRect(t.nav || st.anchor(t)) || holes[0] || { l: W / 2, r: W / 2, t: H / 2, b: H / 2 };
   const ax = (a.l + a.r) / 2, ay = (a.t + a.b) / 2;
   const near = holes.find(q => ax >= q.l && ax <= q.r && ay >= q.t && ay <= q.b) || a;
   const c = t.card, w = c.offsetWidth, h = c.offsetHeight;
@@ -8596,7 +8620,7 @@ function tourPlace() {
     right: () => ({ x: near.r + GAP, y: cy(ay - h / 2) }), left: () => ({ x: near.l - GAP - w, y: cy(ay - h / 2) }),
   };
   const fits = p => p.x >= M - 1 && p.y >= M - 1 && p.x + w <= W - M + 1 && p.y + h <= H - M + 1 && !holes.some(q => p.x < q.r && p.x + w > q.l && p.y < q.b && p.y + h > q.t);
-  const side = [st.side, 'bottom', 'top', 'right', 'left'].find(s => fits(at[s]()));
+  const side = [t.nav ? 'bottom' : st.side, 'bottom', 'top', 'right', 'left'].find(s => fits(at[s]()));
   const p = side ? at[side]() : { x: cx(near.r - w - 24), y: cy(near.b - h - 24) }; // no room outside: inside the hole's corner
   // Two holes always, so the dim morphs from one step's shape to the next.
   const R = n => Math.round(n * 10) / 10, all = holes.length ? holes.slice() : [{ l: ax, r: ax, t: ay, b: ay }];

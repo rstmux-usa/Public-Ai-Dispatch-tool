@@ -6616,16 +6616,25 @@ function mpInit(el) {
 // ----- Drawing: routes and traffic as map layers, cars and pins as HTML on top -----
 const mpFC = features => ({ type: 'FeatureCollection', features });
 const mpLine = (coordinates, properties = {}) => ({ type: 'Feature', properties, geometry: { type: 'LineString', coordinates } });
+// The ride picked in the list or a place card ("r:<id>"), if it is still on the map.
+const mpSelRide = (sel, pick) => sel && sel.startsWith('r:') ? pick.list.find(r => r.id === sel.slice(2)) || null : null;
+// A ride's own drive, pickup to drop-off, in today's traffic.
+function mpTrip(r) {
+  const leg = mpLeg(r.pu, r.do), left = mpLeft(leg, 0);
+  return { leg, runs: mpRest(leg, 0), time: leg.time, dist: leg.dist, extra: left.extra, jams: left.jams, drop: r.pickup + leg.time / 60 };
+}
 function mpGeo(cars, pick) {
-  const sel = S.mp.sel, routes = [], next = [];
+  const sel = S.mp.sel, ride = mpSelRide(sel, pick), routes = [], next = [];
   for (const c of cars) {
     if (!c.leg || !c.leg.dist) continue;
-    const on = sel === c.name;
+    const on = sel === c.name || (ride && c.cur === ride); // a picked ride keeps its own car's road in view
     for (const run of mpRest(c.leg, c.t)) if (run.pts.length > 1) routes.push(mpLine(run.pts, { car: c.name, lvl: run.lvl, sel: on, dim: !!sel && !on }));
-    if (on) for (const l of mpPlan(c).legs) if (l.dist) next.push(mpLine(l.pts));
+    if (sel === c.name) for (const l of mpPlan(c).legs) if (l.dist) next.push(mpLine(l.pts));
   }
-  if (sel && sel.startsWith('p:')) { const g = pick.groups.find(x => x.k === sel.slice(2)); if (g) for (const r of g.rs) next.push(mpLine(mpLeg(r.pu, r.do).pts)); }
-  else if (sel && !sel.startsWith('j:')) { const c = cars.find(x => x.name === sel); if (c && !c.leg) for (const l of mpPlan(c).legs) if (l.dist) next.push(mpLine(l.pts)); }
+  // A picked ride, or every ride at a picked place: the road it will take, colored by today's traffic.
+  const trips = ride ? [ride] : sel && sel.startsWith('p:') ? (pick.groups.find(x => x.k === sel.slice(2)) || { rs: [] }).rs : [];
+  for (const r of trips) for (const run of mpTrip(r).runs) if (run.pts.length > 1) routes.push(mpLine(run.pts, { lvl: run.lvl, sel: true, dim: false }));
+  if (!trips.length && sel && !sel.startsWith('j:')) { const c = cars.find(x => x.name === sel); if (c && !c.leg) for (const l of mpPlan(c).legs) if (l.dist) next.push(mpLine(l.pts)); }
   return { routes: mpFC(routes), next: mpFC(next), jams: mpFC(MP.jams.map(j => mpLine(j.pts, { lvl: j.lvl, id: j.id }))) };
 }
 function mpMarker(key, ll, html, o = {}) {
@@ -6644,9 +6653,9 @@ function mpMarker(key, ll, html, o = {}) {
 const mpArrow = brg => `<svg width="15" height="15" viewBox="0 0 24 24" style="transform:rotate(${Math.round(brg)}deg)" aria-hidden="true"><path d="M12 2.5 20 21l-8-4.6L4 21Z" fill="currentColor"/></svg>`;
 function mpMarkers(cars, pick) {
   for (const mk of MP.markers.values()) mk._seen = false;
-  const sel = S.mp.sel, pins = [];
+  const sel = S.mp.sel, ride = mpSelRide(sel, pick), pins = [];
   for (const g of pick.groups) {
-    const p = PL[g.k], n = g.rs.length, on = sel === `p:${g.k}`, ll = mpLL(g.k);
+    const p = PL[g.k], n = g.rs.length, on = sel === `p:${g.k}` || (ride && ride.pu === g.k), ll = mpLL(g.k);
     pins.push(ll);
     const label = n > 1 ? esc(p.code || p.name) : `<span class="num">${fmt(g.rs[0].pickup)}</span> ${esc(mpWho(g.rs[0]))}`;
     mpMarker(`p:${g.k}`, ll, `<button class="mp-pin ${on ? 'on' : ''}" data-a="mp-sel" data-v="p:${g.k}" aria-label="${esc(p.name)}: ${n} ${n === 1 ? 'pickup' : 'pickups'}"><span class="mp-pin-h">${ic(mpIcon(g.k), 14)}</span>${n > 1 ? `<b class="mp-pin-n">${n}</b>` : ''}<span class="mp-pin-t">${label}</span></button>`, { anchor: 'bottom', z: on ? 30 : 10 });
@@ -6655,7 +6664,7 @@ function mpMarkers(cars, pick) {
   const spots = new Map();
   for (const c of cars) { const k = c.pos.map(v => v.toFixed(3)).join(); if (!spots.has(k)) spots.set(k, []); spots.get(k).push(c); }
   for (const cs of spots.values()) cs.forEach((c, i) => {
-    const on = sel === c.name, under = pins.some(p => mpDist(p, c.pos) < 150);
+    const on = sel === c.name || (ride && ride.driver === c.name), under = pins.some(p => mpDist(p, c.pos) < 150);
     const dy = under ? 22 + i * 36 : (i - (cs.length - 1) / 2) * 36;
     const moving = c.state === 'ontheway' || c.state === 'customerin';
     mpMarker(`c:${c.name}`, c.pos, `<button class="mp-car st-${c.state} ${c.ring} ${c.state === 'arrived' ? 'wait' : ''} ${on ? 'on' : ''}" data-a="mp-sel" data-v="${c.name}" aria-label="${esc(c.name)}, ${CAR_STATE[c.state]}${c.late ? `, ${c.late} min late` : ''}">
@@ -6666,6 +6675,9 @@ function mpMarkers(cars, pick) {
   if (c && c.leg && c.left.time > 30) {
     const pt = mpPointAt(mpRest(c.leg, c.t), 0.5), late = c.state === 'ontheway' ? drvLate(c.cur) : 0;
     if (pt) mpMarker('bub', pt, `<div class="mp-bub ${late ? (lateBad(c.cur) ? 'bad' : 'late') : ''}"><b>${mpMin(c.left.time)} min</b><span>${late ? `${late} min late` : `${c.state === 'customerin' ? 'Drop' : 'Arrives'} ${fmt(Math.round(c.eta))}`}</span></div>`, { anchor: 'bottom-left', offset: [6, -6], z: 45 });
+  } else if (ride) { // a picked ride: how long its own drive takes in today's traffic
+    const t = mpTrip(ride), pt = t.dist ? mpPointAt(t.runs, 0.5) : null;
+    if (pt) mpMarker('bub', pt, `<div class="mp-bub"><b>${mpMin(t.time)} min</b><span>Drop ${fmt(Math.round(t.drop))}</span></div>`, { anchor: 'bottom-left', offset: [6, -6], z: 45 });
   }
   if (S.mp.traffic && isLive()) for (const j of MP.jams) if (j.at) mpMarker(`j:${j.id}`, [j.at[1], j.at[0]], `<button class="mp-inc ${j.lvl}" data-a="mp-sel" data-v="j:${j.id}" aria-label="${esc(j.road)}: ${esc(j.why)}">${ic('alert', 14)}</button>`, { z: 22 });
   for (const [k, mk] of MP.markers) if (!mk._seen) { mk.remove(); MP.markers.delete(k); }
@@ -6720,12 +6732,27 @@ function mpTrafficCard(cars) {
 function mpPlaceCard(g) {
   const p = PL[g.k];
   return `<div class="mp-card" role="dialog" aria-label="${esc(p.name)}"><div class="mp-card-h"><span class="mp-ico">${ic(mpIcon(g.k), 13)}</span><b>${esc(p.code || p.name)}</b><span class="mp-sub">${g.rs.length} ${g.rs.length === 1 ? 'pickup' : 'pickups'} ${S.mp.win === 'soon' && isLive() ? 'in 2 hours' : isLive() ? 'today' : `on ${dayLabel(viewDate())}`}</span><button class="mp-x" data-a="mp-sel" data-v="" aria-label="Close">${ic('x', 15)}</button></div>
-    <div class="mp-card-b">${p.code ? `<p class="mp-lead">${esc(p.name)}</p>` : `<p class="mp-lead">${esc(p.addr)}</p>`}<ul class="mp-list">${g.rs.map(r => `<li><button data-a="mp-open" data-v="${r.id}"><b class="num">${fmt(r.pickup)}</b><span>${esc(mpWho(r))}${r.flight ? ` · ${esc(r.flight)}` : ''} → ${esc(mpShort(r.do))}</span><span class="t3">${esc(r.driver && r.driver !== '—' ? r.driver : 'No driver yet')}</span></button></li>`).join('')}</ul></div></div>`;
+    <div class="mp-card-b">${p.code ? `<p class="mp-lead">${esc(p.name)}</p>` : `<p class="mp-lead">${esc(p.addr)}</p>`}<ul class="mp-list">${g.rs.map(r => `<li><button data-a="mp-sel" data-v="r:${r.id}"><b class="num">${fmt(r.pickup)}</b><span>${esc(mpWho(r))}${r.flight ? ` · ${esc(r.flight)}` : ''} → ${esc(mpShort(r.do))}</span><span class="t3">${esc(r.driver && r.driver !== '—' ? r.driver : 'No driver yet')} · <span class="num">${mpMin(mpTrip(r).time)} min</span></span></button></li>`).join('')}</ul></div></div>`;
+}
+// One ride: where it goes, the road it takes, and how long that is in today's traffic.
+function mpRideCard(r, pick) {
+  const t = mpTrip(r), total = t.runs.reduce((n, x) => n + x.len, 0) || 1, here = pick.groups.find(g => g.k === r.pu);
+  const byRoad = new Map(); // two jams on the same road read as one: "I-5 N +16"
+  for (const [id, d] of t.jams) { const road = MP.jams.find(j => j.id === id).road; byRoad.set(road, (byRoad.get(road) || 0) + d); }
+  const jams = [...byRoad].filter(([, d]) => d >= 30).map(([road, d]) => `${road} +${mpMin(d)}`);
+  const who = r.driver && r.driver !== '—' ? driverSaid(r) + (DRIVERS[r.driver] ? ` · ${carLabel(DRIVERS[r.driver])}` : '') : 'No driver yet';
+  return `<div class="mp-card" role="dialog" aria-label="${esc(mpWho(r))}"><div class="mp-card-h"><span class="mp-ico">${ic(mpIcon(r.pu), 13)}</span><b><span class="num">${fmt(r.pickup)}</span> ${esc(mpWho(r))}</b><span class="mp-sub">${esc(cf(r))}</span><button class="mp-x" data-a="mp-sel" data-v="" aria-label="Close">${ic('x', 15)}</button></div>
+    <div class="mp-card-b"><p class="mp-lead">${esc(mpShort(r.pu))}${r.flight ? ` · ${esc(r.flight)}` : ''} → ${esc(PL[r.do].name)}<br>${esc(who)}</p>
+    ${t.dist ? `<div class="mp-eta"><div class="mp-eta-row"><b class="big num">${fmt(Math.round(t.drop))}</b><span class="to">drop at ${esc(mpShort(r.do))}</span><span class="r">${mpMin(t.time)} min · ${mpMi(t.dist)} mi</span></div>
+      <div class="mp-bar" aria-hidden="true">${t.runs.map(x => `<i class="${x.lvl}" style="flex:${(x.len / total).toFixed(4)}"></i>`).join('')}</div>
+      <p class="mp-note">${t.leg.via ? `Via ${esc(t.leg.via)}. ` : ''}${jams.length ? `Traffic adds <b>${mpMin(t.extra)} min</b>: ${esc(jams.join(', '))}.` : 'No traffic on the way.'}</p></div>` : ''}</div>
+    <div class="mp-acts"><button class="mp-btn" data-a="mp-open" data-v="${r.id}">Open reservation</button>${here && here.rs.length > 1 ? `<button class="mp-btn" data-a="mp-sel" data-v="p:${r.pu}">All ${here.rs.length} at ${esc(mpShort(r.pu))}</button>` : ''}</div></div>`;
 }
 function mpUi(cars, pick) {
   const sel = S.mp.sel, live = isLive(), th = mpThemeNow();
   let card = '';
   if (sel && sel.startsWith('p:')) { const g = pick.groups.find(x => x.k === sel.slice(2)); if (g) card = mpPlaceCard(g); }
+  else if (sel && sel.startsWith('r:')) { const r = mpSelRide(sel, pick); if (r) card = mpRideCard(r, pick); }
   else if (sel && sel.startsWith('j:')) { const j = MP.jams.find(x => x.id === sel.slice(2)); if (j) card = mpJamCard(j, cars); }
   else if (sel) { const c = cars.find(x => x.name === sel); if (c) card = mpCarCard(c); }
   else if (live && S.mp.traffic) card = mpTrafficCard(cars);
@@ -6745,7 +6772,7 @@ function mpDraw() {
   box.classList.toggle('night', th === 'night');
   if (th !== MP.theme) { MP.theme = th; m.setStyle(mpStyle(th)); }
   const cars = MP.cars = mpCars(), pick = MP.pick = mpPickups(), sel = S.mp.sel;
-  const there = !sel || (sel.startsWith('p:') ? pick.groups.some(g => `p:${g.k}` === sel) : sel.startsWith('j:') ? isLive() && MP.jams.some(j => `j:${j.id}` === sel) : cars.some(c => c.name === sel));
+  const there = !sel || (sel.startsWith('p:') ? pick.groups.some(g => `p:${g.k}` === sel) : sel.startsWith('r:') ? !!mpSelRide(sel, pick) : sel.startsWith('j:') ? isLive() && MP.jams.some(j => `j:${j.id}` === sel) : cars.some(c => c.name === sel));
   if (!there) { S.mp.sel = null; renderMapSide(); } // picked on another day, or the pickup has gone
   MP.geo = mpGeo(cars, pick);
   for (const k of ['jams', 'next', 'routes']) m.getSource(k)?.setData(MP.geo[k]);
@@ -6758,7 +6785,8 @@ function mpDraw() {
 function mpFit(v) {
   if (!MP.map || !v) return;
   const pts = [];
-  if (v.startsWith('p:')) { pts.push(mpLL(v.slice(2))); const g = MP.pick.groups.find(x => x.k === v.slice(2)); if (g) for (const r of g.rs) pts.push(mpLL(r.do)); }
+  if (v.startsWith('p:')) { pts.push(mpLL(v.slice(2))); const g = MP.pick.groups.find(x => x.k === v.slice(2)); if (g) for (const r of g.rs) for (const run of mpTrip(r).runs) pts.push(...run.pts); }
+  else if (v.startsWith('r:')) { const r = mpSelRide(v, MP.pick); if (r) for (const run of mpTrip(r).runs) pts.push(...run.pts); }
   else if (v.startsWith('j:')) { const j = MP.jams.find(x => x.id === v.slice(2)); if (j) pts.push(...j.pts); }
   else {
     const c = MP.cars.find(x => x.name === v);
@@ -6788,7 +6816,7 @@ function mpSideHTML() {
   const order = { customerin: 0, ontheway: 1, arrived: 2, free: 3 };
   const carRows = cars.slice().sort((a, b) => order[a.state] - order[b.state] || a.name.localeCompare(b.name)).map(c => `<button class="mp-row ${sel === c.name ? 'on' : ''}" data-a="mp-sel" data-v="${c.name}">
       <span class="mp-row-t"><span class="mp-row-h"><b>${esc(c.name)} <span class="t3">· ${esc(c.car)}</span>${c.late ? ` <span class="lt ${c.bad ? 'bad' : ''}">+${c.late}</span>` : ''}</b>${c.cur ? mpChip(c.cur) : `<span class="rs assigned">${ic('car', 12)}<span>Free</span></span>`}</span><span>${esc(c.text)}</span></span></button>`).join('');
-  const pickRows = pick.list.slice(0, 40).map(r => `<button class="mp-row ${sel === `p:${r.pu}` ? 'on' : ''}" data-a="mp-sel" data-v="p:${r.pu}">
+  const pickRows = pick.list.slice(0, 40).map(r => `<button class="mp-row ${sel === `r:${r.id}` || sel === `p:${r.pu}` ? 'on' : ''}" data-a="mp-sel" data-v="r:${r.id}">
       <b class="num mp-time">${fmt(r.pickup)}</b><span class="mp-row-t"><b>${esc(mpWho(r))}</b><span>${esc(PL[r.pu].code ? `${PL[r.pu].code}${r.flight ? ` · ${r.flight}` : ''}` : PL[r.pu].name)} · ${esc(r.driver && r.driver !== '—' ? r.driver : 'No driver yet')}</span></span></button>`).join('');
   const counts = Object.fromEntries(Object.keys(CAR_STATE).map(k => [k, cars.filter(c => c.state === k).length]));
   return `<header class="mp-sh"><h2>Live map</h2><p>${live ? `${dayLabel(TODAY)} · ${fmt(NOW)} Seattle time. Cars update from the driver app; traffic is live.` : `${dayLabel(viewDate())}. Cars show on the day of the ride; these are the day’s pickups.`}</p></header>
@@ -6813,9 +6841,9 @@ function renderMap() {
     el.innerHTML = `<aside class="mp-side" aria-label="Cars and pickups"></aside>
       <section class="mp-map ${mpThemeNow() === 'night' ? 'night' : ''}" id="mpMap" aria-label="Map of the Northwest with cars, routes and traffic"><div class="mp-canvas" id="mpCanvas"></div><div class="mp-loading" id="mpLoading">Loading the map…</div><div id="mpUi"></div></section>`;
   }
-  if (S.mp.focus) { // "Show on map" from a ride: its car if it is driving it, else its pickup
+  if (S.mp.focus) { // "Show on map" from a ride: its car if it is driving it, else the ride and its road
     const r = findAny(S.mp.focus), c = r && mpCars().find(x => x.cur === r);
-    S.mp.sel = c ? c.name : r ? `p:${r.pu}` : null;
+    S.mp.sel = c ? c.name : r ? `r:${r.id}` : null;
     if (r && !c && !mpPickups().list.includes(r)) S.mp.win = 'day'; // a later pickup: show the rest of the day so it is in the list
     S.mp.focus = null; MP.fitPending = S.mp.sel;
   }

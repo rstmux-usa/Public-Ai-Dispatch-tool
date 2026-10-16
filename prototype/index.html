@@ -6281,6 +6281,7 @@ const GEO = {
 };
 const CITY_GEO = { Seattle: [47.6062, -122.3321], Bellevue: [47.6101, -122.2015], Redmond: [47.6740, -122.1215], Kirkland: [47.6815, -122.2087], Renton: [47.4829, -122.2171], Tacoma: [47.2529, -122.4443], Everett: [47.9790, -122.2021], Bothell: [47.7601, -122.2054], Woodinville: [47.7543, -122.1635], Kent: [47.3809, -122.2348] };
 const GARAGE = [47.5480, -122.3210]; // Georgetown, where the cars sleep
+const SEA_LOT = [47.4547, -122.2992]; // the lot by SeaTac where a free car waits for its next airport job
 function geoOf(key) {
   if (GEO[key]) return GEO[key];
   const p = PL[key], city = p ? p.addr.split(', ').slice(-2, -1)[0] : 'Seattle';
@@ -6305,8 +6306,8 @@ const MP = { map: null, tiers: 0, boot: null, routes: null, legs: {}, jams: [], 
 const mpNow = () => NOW + S.mp.drift;
 // Day and night follow the board clock (day from 06:30 to 19:30) until the dispatcher picks one.
 const mpThemeNow = () => S.mp.theme !== 'auto' ? S.mp.theme : mpNow() >= 390 && mpNow() < 1170 ? 'day' : 'night';
-const mpLL = key => { const g = key === 'GARAGE' ? GARAGE : geoOf(key); return [g[1], g[0]]; };
-const mpShort = key => key === 'GARAGE' ? 'Garage' : PL[key].code || PL[key].name;
+const mpLL = key => { const g = key === 'GARAGE' ? GARAGE : key === 'SEALOT' ? SEA_LOT : geoOf(key); return [g[1], g[0]]; };
+const mpShort = key => key === 'GARAGE' ? 'Garage' : key === 'SEALOT' ? 'SEA lot' : PL[key].code || PL[key].name;
 const mpWho = r => { const s = rideSaid(r); return /’s ride$/.test(s) ? r.party : s; };
 const mpIcon = key => key.startsWith('pier') ? 'anchor' : PL[key]?.code ? 'plane' : key.startsWith('h_') ? 'user' : 'building';
 const mpMin = s => Math.max(1, Math.round(s / 60));
@@ -6423,7 +6424,8 @@ function mpPointAt(runs, frac) {
 }
 
 // Where each car is right now, from its rides. A car on the way sits where the drive left, in today's traffic,
-// lands it when the board says: a few minutes early, or as late as the ride's late note.
+// lands it when the board says: a few minutes early, or as late as the ride's late note. A free car waits by
+// SeaTac for its next airport job; one that is en route is always out on the road, never parked at the garage.
 function mpCars() {
   if (!isLive()) return [];
   const now = mpNow();
@@ -6440,7 +6442,12 @@ function mpCars() {
     } else if (cur && cur.ride === 'arrived') { c.state = 'arrived'; c.pos = mpLL(cur.pu); }
     else if (cur) {
       c.state = 'ontheway'; c.to = cur.pu; c.leg = mpLeg(c.base, cur.pu);
-      c.t = Math.max(0, c.leg.time - Math.max(90, (cur.pickup + (drvLate(cur) || -4) - now) * 60));
+      // It leaves to land when the board says. En route means it already left, so when that time is still ahead,
+      // it set off early and is a third of the way by 09:50, then waits at the pickup.
+      const arrive = cur.pickup + (drvLate(cur) || -4), leave = Math.min(arrive - c.leg.time / 60, NOW - c.leg.time * 0.35 / 60);
+      c.t = Math.max(0, Math.min(c.leg.time - 90, (now - leave) * 60));
+    } else if (c.base === 'GARAGE' || c.base === 'SEA' || (later[0] && later[0].pu === 'SEA')) {
+      c.base = 'SEALOT'; c.pos = mpLL('SEALOT'); // nothing driven yet, just dropped at SEA, or the next job is there
     }
     if (c.leg) { const at = mpAlong(c.leg, c.t); c.pos = at.pos; c.brg = at.brg; c.left = mpLeft(c.leg, c.t); c.eta = now + c.left.time / 60; }
     // Late: the ride the car is heading to, or the next one if the current ride runs into it.
@@ -6456,7 +6463,8 @@ function mpCarText(c) {
   if (c.state === 'customerin') return `With ${mpWho(r)} · drops at ${mpShort(r.do)} around ${fmt(Math.round(c.eta))}`;
   if (c.state === 'arrived') return `Waiting for ${mpWho(r)} at ${mpShort(r.pu)}`;
   if (c.state === 'ontheway') return `To ${mpWho(r)} at ${mpShort(r.pu)} · arrives ${fmt(Math.round(c.eta))}`;
-  return nx ? `Free · next ${fmt(nx.pickup)} at ${mpShort(nx.pu)}` : 'Free · nothing else booked today';
+  const at = c.base === 'SEALOT' ? ' at the SEA lot' : '';
+  return nx ? `Free${at} · next ${fmt(nx.pickup)} at ${mpShort(nx.pu)}` : `Free${at} · nothing else booked today`;
 }
 // The car's stops from here: the one it's driving to, then the rest of its day.
 function mpPlan(c) {

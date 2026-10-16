@@ -18,7 +18,7 @@ All fonts were measured at the same size in Chrome on macOS. "Words" is one sent
 
 ## Why Barlow won
 
-1. **The grid is the job.** A dispatcher scans 60+ rides a day in one table. With every SF-style font, names and addresses started getting cut off at the same size. In SF Pro, "Lakeside Clinic Bellevue" lost its town ("Bellev…"), Inter cut the driver name "Manveer", and the long home address lost more text. See `shots/compare-barlow-vs-sf-pro.png`.
+1. **The grid is the job.** A dispatcher scans 60+ rides a day in one table. With every SF-style font, places and addresses started getting cut off at the same size. In SF Pro, Inter and Geist, "Lakeside Clinic Bellevue" lost its town ("Bellev…"), and the long home address lost more text. See `shots/compare-barlow-vs-sf-pro.png`.
 2. **It fits the theme.** The board borrows from airport departure boards: a split-flap clock, landing-time chips and flight numbers. Barlow's narrow, DIN-like shapes belong to that world. SF Pro is a general-purpose system font, so it doesn't carry that feel.
 3. **One family, two widths.** Semi Condensed for reading and Condensed for numbers. It reads as one voice, the way SF Pro and SF Pro Condensed would.
 4. **It looks the same everywhere.** Barlow is a free Google Font and built into Figma. Apple's license doesn't allow putting SF Pro on a website, so a browser only borrows it from an Apple device. Windows PCs, which many dispatch desks run, would see Segoe UI instead.

@@ -22,7 +22,7 @@ What this asks for:
 - The panel sits beside the grid on purpose: the assistant should **show** on the grid which rides it will combine, as an animation, instead of describing it in words.
 - Not raised (my guesses, not confirmed): "van broke" read as a breakdown, "Group 3" / "Sprinter 1" as internal numbers, "act by 10:40" with no reason, Cost line vs the $0 option.
 
-Reaction to the proposed grid animation (Kelli Rae's family lifts out of the van row into its own SUV row with Nate):
+Reaction to the proposed grid animation (Kelli Rae's family lifts out of the van row into its own SUV row with Kyle):
 
 > "Card 1 good, super simple."
 
@@ -33,7 +33,7 @@ Reaction to the proposed grid animation (Kelli Rae's family lifts out of the van
 - **The title names the wrong thing.** "No driver for Kevin Doyle" is the symptom, but the move is Brandi Sutton and Diane Prescott riding together. The title should say the move.
 - The facts (Kevin ready 13:11, nobody assigned; two Lumora couples in two sedans; they land six minutes apart) are good, but they belong in the details.
 - The story order: title = the move, then very little text, then the details say why and what.
-- My proposed animation ("Brandi Sutton's row slides into Diane Prescott's row, and the two become one SUV. Then Jaswant's name drops into Kevin Doyle's empty driver cell.") was rated **bad**. It should read as one simple picture: Brandi and Diane combine, and Kevin's problem goes away.
+- My proposed animation ("Brandi Sutton's row slides into Diane Prescott's row, and the two become one SUV. Then Mike's name drops into Kevin Doyle's empty driver cell.") was rated **bad**. It should read as one simple picture: Brandi and Diane combine, and Kevin's problem goes away.
 
 ## Stopped at card 3: the problem is the schedule, not the cards
 

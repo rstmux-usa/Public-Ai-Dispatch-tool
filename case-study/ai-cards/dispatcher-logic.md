@@ -50,7 +50,7 @@ This is the last step before an affiliate or Uber Black.
 
 ## Which driver can take a ride: bigger is fine, smaller never (Oct 14)
 
-> "For example, Tarun drives a Cadillac Escalade. Even if the ride is booked for an MKT, if that job is good and on time for Tarun, we will send it to the customers as a free upgrade, so they're getting an Escalade for the price of an MKT. The schedule is not super strict when it comes to assigning drivers. But the key part is not to send a smaller vehicle. For example, if the ride is booked for an MKT and Manveer is the one who's driving, then we cannot send him, because simply the luggage would not fit. Usually that's why people are booking bigger cars."
+> "For example, Tony drives a Cadillac Escalade. Even if the ride is booked for an MKT, if that job is good and on time for Tony, we will send it to the customers as a free upgrade, so they're getting an Escalade for the price of an MKT. The schedule is not super strict when it comes to assigning drivers. But the key part is not to send a smaller vehicle. For example, if the ride is booked for an MKT and Chris is the one who's driving, then we cannot send him, because simply the luggage would not fit. Usually that's why people are booking bigger cars."
 
 - The booked vehicle sets the price. The car that goes can be the same size or bigger.
 - **Bigger is a free upgrade.** The customer pays the booked price.
@@ -67,10 +67,10 @@ This is the last step before an affiliate or Uber Black.
 
 | Driver | Car | Class |
 |---|---|---|
-| Mila, Manveer, Daria | Cadillac XTS | luxury sedan |
-| Oleg, Jaswant, Nate | Chevy Suburban | luxury SUV |
-| Tarun, Levon | Cadillac Escalade | executive SUV |
-| Teo | Mercedes Sprinter | van |
+| Emily, Chris, Sarah | Cadillac XTS | luxury sedan |
+| Jason, Mike, Kyle | Chevy Suburban | luxury SUV |
+| Tony, Brian | Cadillac Escalade | executive SUV |
+| Danny | Mercedes Sprinter | van |
 
 - **No shared cars**, so an MKT job always goes out as a free upgrade in a Suburban or an Escalade.
 
@@ -78,7 +78,7 @@ This is the last step before an affiliate or Uber Black.
 
 > "A sedan can be fine for 3 people if they would like to book it. We have customers who say we don't have any checked bags, three passengers, and we're booking a sedan, so one of them sits in the front, two in the back. But if a passenger booked an MKT, we cannot send a sedan; we'll have to send either an MKT or an SUV."
 
-On the Sep 4 grid, Gregory Lamb's MKT job (3 people, 22:07) sits on Manveer's XTS. The board marks it red as a ride that can't go as assigned.
+On the Sep 4 grid, Gregory Lamb's MKT job (3 people, 22:07) sits on Chris's XTS. The board marks it red as a ride that can't go as assigned.
 - **Affiliates** (Cedar, Alder, Madrona) follow the same rule: the booked size or bigger, never smaller. Their actual cars aren't known.
 
 ## Codes instead of names
@@ -92,9 +92,9 @@ On the Sep 4 grid, Gregory Lamb's MKT job (3 people, 22:07) sits on Manveer's XT
 
 ## The two cases on the Sep 4 board (prototype, by-hand mode)
 
-- **Case 1.** DL 889 took off 40 min late, so 10B would wait 40 min for 10D + 10E. 13A is a sedan job in Oleg's SUV, ready 14:06. Fix: 10D + 10E ride with 13A, 6 of 6 seats, and Group 10's van leaves at 13:35.
-- **Case 2.** UA 2089 is also 40 min late, so 8A + 8B are both late and Teo would be 35 min late for 27A at 14:21. 9A is a party of 6 in Alder's Sprinter. Fix: 8A + 8B ride with 9A, 10 of 14 seats, and Teo makes 27A on time.
-- **Still open:** 3C breaks Group 3 (AS 920, real delay), and Tarun is about 16 min late for 11A after Marisol Vega's ride (amber, inside the limit).
+- **Case 1.** DL 889 took off 40 min late, so 10B would wait 40 min for 10D + 10E. 13A is a sedan job in Jason's SUV, ready 14:06. Fix: 10D + 10E ride with 13A, 6 of 6 seats, and Group 10's van leaves at 13:35.
+- **Case 2.** UA 2089 is also 40 min late, so 8A + 8B are both late and Danny would be 35 min late for 27A at 14:21. 9A is a party of 6 in Alder's Sprinter. Fix: 8A + 8B ride with 9A, 10 of 14 seats, and Danny makes 27A on time.
+- **Still open:** 3C breaks Group 3 (AS 920, real delay), and Tony is about 16 min late for 11A after Marisol Vega's ride (amber, inside the limit).
 
 ## Evidence from the real day
 

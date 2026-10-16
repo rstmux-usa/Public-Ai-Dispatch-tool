@@ -1886,7 +1886,7 @@ function localTime() {
 
 // ---------- Fleet & places (real Seattle-area addresses) ----------
 // The drivers and affiliates on the September 4 grid. Each driver has a regular car; the MKTs and the Van 15 are shared.
-const DRIVERS = { Jaswant: 'SUV 2', Mila: 'Sedan 1', Daria: 'Sedan 3', Manveer: 'Sedan 2', Oleg: 'SUV 1', Tarun: 'SUV 4', Nate: 'SUV 3', Teo: 'Sprinter 1', Levon: 'SUV 5' };
+const DRIVERS = { Mike: 'SUV 2', Emily: 'Sedan 1', Sarah: 'Sedan 3', Chris: 'Sedan 2', Jason: 'SUV 1', Tony: 'SUV 4', Kyle: 'SUV 3', Danny: 'Sprinter 1', Brian: 'SUV 5' };
 // Each driver's own car, as the dispatcher listed them (Oct 14). Rank runs from the plainest class to the grandest;
 // seats and bags are what the car really holds.
 const XTS = { model: 'Cadillac XTS', short: 'XTS', kind: 'luxury sedan', seats: 3, bags: 3, rank: 1 };
@@ -2201,79 +2201,79 @@ const BOOKERS = {
 
 const LIVE = [
   // Overnight
-  LA(446851, '04:45', 'TA', 'INH', 'h_alki', 'SEA AS', 'Sedan', 'Jaswant', 'Nora Whitfield', 1),
-  LA(448650, '04:45', 'TA', 'INH', 'h_mukilteo', 'SEA DL 429', 'Sedan', 'Mila', 'Gary Feldmann', 1),
+  LA(446851, '04:45', 'TA', 'INH', 'h_alki', 'SEA AS', 'Sedan', 'Mike', 'Nora Whitfield', 1),
+  LA(448650, '04:45', 'TA', 'INH', 'h_mukilteo', 'SEA DL 429', 'Sedan', 'Emily', 'Gary Feldmann', 1),
   // Morning
-  LA(448492, '06:30', 'PTP', 'INH', 'silvercloud', 'csi', 'Sedan', 'Mila', 'Martin J. Kessler', 1),
-  LA(448888, '07:30', 'TA', 'INH', 'h_bellevue', 'SEA', 'Sedan', 'Oleg', 'Douglas', 1),
-  LA(448707, '08:02', 'FA', 'INH', 'SEA UA 5846', 'fieldwork', 'Sedan', 'Jaswant', 'Dr. Anders', 1),
-  LA(448716, '08:30', 'PTP', 'INH', 'soundhotel', 'fieldwork', 'Sedan', 'Mila', 'Dr. Russell', 1),
-  LA(448241, '08:30', 'TA', 'INH', 'h_lakewood', 'SEA TK 214', 'SUV', 'Tarun', 'Denise Halvorsen', 3),
-  LA(448802, '08:36', 'FA', 'INH', 'SEA AS 1091', 'h_northgate', 'Sedan', 'Oleg', 'Margaret', 1),
-  LA(448895, '09:00', 'PTP', 'INH', 'h_burien', 'lakeside', 'Sedan', 'Daria', 'Loretta Banks', 1),
-  LA(448905, '09:00', 'PTP', 'INH', 'h_kent', 'lakeside', 'Sedan', 'Manveer', 'Tracy Okonski', 1, { ride: 'noshow' }),
-  LA(448924, '09:21', 'FA', 'INH', 'SEA DL 3740', 'fairmont', 'SUV', 'Tarun', 'Colleen Brady', 4, plx('own', { ride: 'customerin', inAt: '09:46' })),
-  LA(448089, '09:21', 'FA', 'INH', 'SEA DL 3740', 'fairmont', 'SUV', 'Jaswant', 'Lauren Pickett', 4, plx(2, { ride: 'arrived', fam: [['Lauren Pickett', 2, 'DL 3740'], ['Erin Saunders', 2, 'DL 3740']] })),
-  LA(448493, '09:30', 'PTP', 'INH', 'csi', 'silvercloud', 'Sedan', 'Mila', 'Martin J. Kessler', 1),
-  LA(447886, '09:57', 'FA', 'INH', 'SEA AA 3799', 'fairmont', 'SUV', 'Oleg', 'Grant Hollis', 4, plx('own', { ride: 'ontheway' })),
-  LA(446785, '10:08', 'FA', 'INH', 'SEA DL 372', 'mayflower', 'Sedan', 'Nate', 'Raymond Toller', 2, { ride: 'ontheway' }),
+  LA(448492, '06:30', 'PTP', 'INH', 'silvercloud', 'csi', 'Sedan', 'Emily', 'Martin J. Kessler', 1),
+  LA(448888, '07:30', 'TA', 'INH', 'h_bellevue', 'SEA', 'Sedan', 'Jason', 'Douglas', 1),
+  LA(448707, '08:02', 'FA', 'INH', 'SEA UA 5846', 'fieldwork', 'Sedan', 'Mike', 'Dr. Anders', 1),
+  LA(448716, '08:30', 'PTP', 'INH', 'soundhotel', 'fieldwork', 'Sedan', 'Emily', 'Dr. Russell', 1),
+  LA(448241, '08:30', 'TA', 'INH', 'h_lakewood', 'SEA TK 214', 'SUV', 'Tony', 'Denise Halvorsen', 3),
+  LA(448802, '08:36', 'FA', 'INH', 'SEA AS 1091', 'h_northgate', 'Sedan', 'Jason', 'Margaret', 1),
+  LA(448895, '09:00', 'PTP', 'INH', 'h_burien', 'lakeside', 'Sedan', 'Sarah', 'Loretta Banks', 1),
+  LA(448905, '09:00', 'PTP', 'INH', 'h_kent', 'lakeside', 'Sedan', 'Chris', 'Tracy Okonski', 1, { ride: 'noshow' }),
+  LA(448924, '09:21', 'FA', 'INH', 'SEA DL 3740', 'fairmont', 'SUV', 'Tony', 'Colleen Brady', 4, plx('own', { ride: 'customerin', inAt: '09:46' })),
+  LA(448089, '09:21', 'FA', 'INH', 'SEA DL 3740', 'fairmont', 'SUV', 'Mike', 'Lauren Pickett', 4, plx(2, { ride: 'arrived', fam: [['Lauren Pickett', 2, 'DL 3740'], ['Erin Saunders', 2, 'DL 3740']] })),
+  LA(448493, '09:30', 'PTP', 'INH', 'csi', 'silvercloud', 'Sedan', 'Emily', 'Martin J. Kessler', 1),
+  LA(447886, '09:57', 'FA', 'INH', 'SEA AA 3799', 'fairmont', 'SUV', 'Jason', 'Grant Hollis', 4, plx('own', { ride: 'ontheway' })),
+  LA(446785, '10:08', 'FA', 'INH', 'SEA DL 372', 'mayflower', 'Sedan', 'Kyle', 'Raymond Toller', 2, { ride: 'ontheway' }),
   LA(448097, '10:17', 'FA', 'FOT', 'SEA DL 868', 'fairmont', 'Sprinter', 'Cedar', 'Sheryl Lindgren', 8, plx(5, { fam: [['Sheryl Lindgren', 4, 'DL 868'], ['Jillian Vanderhoek', 2, 'DL 868'], ['Marisa Paddock', 2, 'AA 767']] })),
-  LA(448835, '10:20', 'HR', 'FIN', 'innmarket', 'SEA AS 460', 'Sedan', 'Manveer', 'Steven Marcowitz', 2, { ride: 'ontheway' }),
+  LA(448835, '10:20', 'HR', 'FIN', 'innmarket', 'SEA AS 460', 'Sedan', 'Chris', 'Steven Marcowitz', 2, { ride: 'ontheway' }),
   LA(448096, '10:29', 'FA', 'FOT', 'SEA AA 767', 'fairmont', 'Van 15', 'Alder', 'Tara Whitcomb', 9, plx(4, { fam: [['Tara Whitcomb', 2, 'AA 767'], ['Renee Castillo', 2, 'AA 767'], ['Shawna Pierce', 2, 'AA 767'], ['Rodney Vasquez', 3, 'AA 767']] })),
   LA(447330, '10:32', 'FA', 'FOT', 'SEA DL 384', 'h_edmonds', 'MKT', 'Alder', 'Kenneth Abrams', 2),
   // Group 3 was booked for three families; AS 920 is late with the fourth.
-  LA(448093, '10:56', 'FA', 'INH', 'SEA AS 920', 'fairmont', 'Sprinter', 'Teo', 'Dana Cartwright', 6, plx(3, {
+  LA(448093, '10:56', 'FA', 'INH', 'SEA AS 920', 'fairmont', 'Sprinter', 'Danny', 'Dana Cartwright', 6, plx(3, {
     broken: true, card: 'c1', wait: { ready: 'Three families ready 11:00 ·', text: 'would wait 65 min for Kelli Rae’s family' },
     fam: [['Dana Cartwright', 2, 'DL 354'], ['Tonya Lee Hartwell', 2, 'DL 372'], ['Janelle Ostrander', 2, 'AS 627'], ['Kelli Rae', 2, 'AS 920']] })),
-  LA(448890, '11:00', 'PTP', 'INH', 'h_puyallup', 'lakeside', 'Sedan', 'Mila', 'Samuel Otieno', 1),
+  LA(448890, '11:00', 'PTP', 'INH', 'h_puyallup', 'lakeside', 'Sedan', 'Emily', 'Samuel Otieno', 1),
   LA(448891, '11:00', 'PTP', 'INH', 'h_columbia', 'lakeside', 'Sedan', '', 'Carol Ashby', 1, { ride: 'cancelled' }),
-  LA(448893, '11:15', 'PTP', 'INH', 'h_firsthill', 'lakeside', 'Sedan', 'Daria', 'Walter Dumont', 1),
-  LA(448288, '11:30', 'TA', 'INH', 'h_mercer', 'SEA AS 773', 'MKT', 'Tarun', 'Gina Moretti', 2),
+  LA(448893, '11:15', 'PTP', 'INH', 'h_firsthill', 'lakeside', 'Sedan', 'Sarah', 'Walter Dumont', 1),
+  LA(448288, '11:30', 'TA', 'INH', 'h_mercer', 'SEA AS 773', 'MKT', 'Tony', 'Gina Moretti', 2),
   // Created by the Group 3 fix: an SUV held for the late family.
-  LA(448927, '11:35', 'FA', 'INH', 'SEA AS 920', 'fairmont', 'SUV', 'Teo', 'Kelli Rae', 2, plx(3, { hidden: true })),
-  LA(448663, '11:45', 'TA', 'INH', 'h_madison', 'SEA OZ 271', 'Sedan', 'Jaswant', 'Franklin', 2),
+  LA(448927, '11:35', 'FA', 'INH', 'SEA AS 920', 'fairmont', 'SUV', 'Danny', 'Kelli Rae', 2, plx(3, { hidden: true })),
+  LA(448663, '11:45', 'TA', 'INH', 'h_madison', 'SEA OZ 271', 'Sedan', 'Mike', 'Franklin', 2),
   // Afternoon
-  LA(448494, '12:00', 'TA', 'INH', 'silvercloud', 'SEA AS 16', 'Sedan', 'Oleg', 'Martin J. Kessler', 1),
-  LA(448892, '12:15', 'PTP', 'INH', 'h_lfp', 'lakeside', 'Sedan', 'Daria', 'Joan Mercer', 1),
-  LA(448658, '12:24', 'FA', 'INH', 'SEA AS 3286', 'courtyardlu', 'MKT', 'Tarun', 'Marisol Vega', 3, { card: 'c3' }),
+  LA(448494, '12:00', 'TA', 'INH', 'silvercloud', 'SEA AS 16', 'Sedan', 'Jason', 'Martin J. Kessler', 1),
+  LA(448892, '12:15', 'PTP', 'INH', 'h_lfp', 'lakeside', 'Sedan', 'Sarah', 'Joan Mercer', 1),
+  LA(448658, '12:24', 'FA', 'INH', 'SEA AS 3286', 'courtyardlu', 'MKT', 'Tony', 'Marisol Vega', 3, { card: 'c3' }),
   LA(448317, '12:25', 'FA', 'FOT', 'SEA UA 2089', 'fairmont', 'Sprinter', 'Alder', 'Kaylee Brandon', 6, plx(9)),
-  LA(448101, '12:25', 'FA', 'INH', 'SEA UA 2089', 'fairmont', 'Sprinter', 'Teo', 'Tanya Rudd', 4, plx(8, { fam: [['Tanya Rudd', 2, 'DL 889'], ['Corinne Haley', 2, 'UA 2089']] })),
+  LA(448101, '12:25', 'FA', 'INH', 'SEA UA 2089', 'fairmont', 'Sprinter', 'Danny', 'Tanya Rudd', 4, plx(8, { fam: [['Tanya Rudd', 2, 'DL 889'], ['Corinne Haley', 2, 'UA 2089']] })),
   LA(448098, '12:28', 'FA', 'FOT', 'SEA AA 3076', 'fairmont', 'Van 15', 'Cedar', 'Michelle Barrett', 10, plx(7, { fam: [['Michelle Barrett', 2, 'AA 3076'], ['Angela Mercado', 2, 'AA 3076'], ['Kristin Albers', 2, 'AA 3076'], ['Leigh Ann Fortner', 2, 'AA 3076'], ['Bethany Orr', 2, 'AA 3076']] })),
   LA(448902, '12:41', 'FA', 'INH', 'SEA AS 629', 'arcticclub', 'Sedan', '', 'Kevin Doyle', 2, { card: 'c2' }),
-  LA(448092, '12:43', 'FA', 'INH', 'SEA AA 7442', 'fairmont', 'Sedan', 'Jaswant', 'Brandi Sutton', 2, plx(6, { card: 'c2' })),
+  LA(448092, '12:43', 'FA', 'INH', 'SEA AA 7442', 'fairmont', 'Sedan', 'Mike', 'Brandi Sutton', 2, plx(6, { card: 'c2' })),
   LA(448102, '12:46', 'FA', 'FOT', 'SEA WS 1550', 'fairmont', 'Van 15', 'Madrona', 'Holly Garner', 10, plx(10, { fam: [['Holly Garner', 2, 'UA 2089'], ['Dale Friesen', 2, 'WS 1550'], ['Aaron Stoltz', 2, 'WS 1550'], ['Gail Ostrom', 2, 'DL 889'], ['Dwight Ostrom', 2, 'DL 889']] })),
   // Group 1 was a sedan for two; AA 707 is three and a half hours late.
-  LA(448091, '12:49', 'FA', 'INH', 'SEA AA 707', 'fairmont', 'Sedan', 'Oleg', 'Diane Prescott', 2, plx(1, { card: 'c2' })),
-  LA(448088, '12:58', 'FA', 'INH', 'SEA AS 48', 'fairmont', 'SUV', 'Tarun', 'Sandra Ketchum', 5, plx(11, { card: 'c3', late: '~12 min late' })),
-  LA(448103, '13:17', 'FA', 'INH', 'SEA AS 1281', 'fairmont', 'SUV', 'Nate', 'Allison Reed', 4, plx(12, { fam: [['Allison Reed', 2, 'AS 1281'], ['Paula Whitley', 2, 'UA 690']] })),
+  LA(448091, '12:49', 'FA', 'INH', 'SEA AA 707', 'fairmont', 'Sedan', 'Jason', 'Diane Prescott', 2, plx(1, { card: 'c2' })),
+  LA(448088, '12:58', 'FA', 'INH', 'SEA AS 48', 'fairmont', 'SUV', 'Tony', 'Sandra Ketchum', 5, plx(11, { card: 'c3', late: '~12 min late' })),
+  LA(448103, '13:17', 'FA', 'INH', 'SEA AS 1281', 'fairmont', 'SUV', 'Kyle', 'Allison Reed', 4, plx(12, { fam: [['Allison Reed', 2, 'AS 1281'], ['Paula Whitley', 2, 'UA 690']] })),
   LA(448105, '13:36', 'FA', 'INH', 'SEA AA 3033', 'fairmont', 'SUV', '', 'Melanie Shore', 4, plx(13, { card: 'c4' })),
-  LA(448040, '13:41', 'FA', 'INH', 'SEA DL 2419', 'fairmont', 'Sprinter', 'Teo', 'Marco Ibarra', 6, plx('own', { card: 'c4' })),
+  LA(448040, '13:41', 'FA', 'INH', 'SEA DL 2419', 'fairmont', 'Sprinter', 'Danny', 'Marco Ibarra', 6, plx('own', { card: 'c4' })),
   LA(447896, '13:41', 'FA', 'FOT', 'SEA DL 2419', 'fairmont', 'Sprinter', 'Cedar', 'Luis Navarro', 6, plx('own')),
-  LA(447921, '13:58', 'FA', 'INH', 'SEA AS 637', 'fairmont', 'SUV', 'Jaswant', 'Trent Hadley', 4, plx('own')),
+  LA(447921, '13:58', 'FA', 'INH', 'SEA AS 637', 'fairmont', 'SUV', 'Mike', 'Trent Hadley', 4, plx('own')),
   LA(448104, '14:16', 'FA', 'FOT', 'SEA AA 757', 'fairmont', 'Van 15', 'Alder', 'Courtney Ellison', 10, plx(14, { fam: [['Courtney Ellison', 2, 'AA 757'], ['Kendra Vogt', 2, 'DL 2921'], ['Hannah Crain', 2, 'DL 2921'], ['Rosa Delgado', 2, 'AA 757'], ['Casey Harlan', 2, 'DL 728']] })),
-  LA(447890, '14:38', 'FA', 'INH', 'SEA AS 603', 'fairmont', 'SUV', 'Oleg', 'Chad Wilkins', 3, plx('own')),
-  LA(448318, '15:23', 'FA', 'INH', 'SEA UA 594', 'fairmont', 'SUV', 'Tarun', 'Jenna Pruitt', 4, plx(15)),
-  LA(448131, '15:44', 'FA', 'INH', 'SEA AA 7444', 'fairmont', 'Van 15', 'Teo', 'Stacy Morrow', 7, plx(16, { fam: [['Stacy Morrow', 2, 'AA 7444'], ['Lorraine Rhodes', 2, 'UA 594'], ['Gwen Paulsen', 3, 'UA 1485']] })),
-  LA(448803, '15:48', 'FA', 'INH', 'SEA AS 74', 'h_renton', 'Sedan', 'Manveer', 'Paul Jennings', 1),
+  LA(447890, '14:38', 'FA', 'INH', 'SEA AS 603', 'fairmont', 'SUV', 'Jason', 'Chad Wilkins', 3, plx('own')),
+  LA(448318, '15:23', 'FA', 'INH', 'SEA UA 594', 'fairmont', 'SUV', 'Tony', 'Jenna Pruitt', 4, plx(15)),
+  LA(448131, '15:44', 'FA', 'INH', 'SEA AA 7444', 'fairmont', 'Van 15', 'Danny', 'Stacy Morrow', 7, plx(16, { fam: [['Stacy Morrow', 2, 'AA 7444'], ['Lorraine Rhodes', 2, 'UA 594'], ['Gwen Paulsen', 3, 'UA 1485']] })),
+  LA(448803, '15:48', 'FA', 'INH', 'SEA AS 74', 'h_renton', 'Sedan', 'Chris', 'Paul Jennings', 1),
   LA(448132, '16:32', 'FA', 'FOT', 'SEA DL 877', 'fairmont', 'Van 15', 'Alder', 'Rebecca', 11, plx(17, { fam: [['Rebecca', 2, 'DL 629'], ['Monica Reyes', 2, 'DL 629'], ['Abby Lundberg', 4, 'DL 877'], ['Neil Marsh', 3, 'DL 877']] })),
   LA(448106, '16:35', 'FA', 'FOT', 'SEA WN 1342', 'fairmont', 'Sprinter', 'Cedar', 'Kim Lasley', 6, plx(18, { fam: [['Kim Lasley', 2, 'DL 2817'], ['Brynn Saddler', 4, 'WN 1342']] })),
-  LA(447891, '16:44', 'FA', 'INH', 'SEA AS 1006', 'fairmont', 'Cadillac', 'Levon', 'Byron Ellsworth', 1),
-  LA(448876, '16:46', 'FA', 'INH', 'SEA AS 312', 'h_belltown', 'Sedan', 'Jaswant', 'Irene Kowalczyk', 1),
-  LA(448133, '17:25', 'FA', 'INH', 'SEA UA 745', 'fairmont', 'Sprinter', 'Teo', 'Robin Stauffer', 6, plx(19, { fam: [['Robin Stauffer', 2, 'UA 745'], ['Travis Henley', 2, 'UA 1653'], ['Peggy Bauer', 2, 'DL 944']] })),
+  LA(447891, '16:44', 'FA', 'INH', 'SEA AS 1006', 'fairmont', 'Cadillac', 'Brian', 'Byron Ellsworth', 1),
+  LA(448876, '16:46', 'FA', 'INH', 'SEA AS 312', 'h_belltown', 'Sedan', 'Mike', 'Irene Kowalczyk', 1),
+  LA(448133, '17:25', 'FA', 'INH', 'SEA UA 745', 'fairmont', 'Sprinter', 'Danny', 'Robin Stauffer', 6, plx(19, { fam: [['Robin Stauffer', 2, 'UA 745'], ['Travis Henley', 2, 'UA 1653'], ['Peggy Bauer', 2, 'DL 944']] })),
   // Booked as To airport in Limo Anywhere, though the pickup is at SEA.
-  LA(448755, '17:37', 'TA', 'INH', 'SEA WN 519', 'h_uptown', 'SUV', 'Oleg', 'Tyler Beckett', 4),
+  LA(448755, '17:37', 'TA', 'INH', 'SEA WN 519', 'h_uptown', 'SUV', 'Jason', 'Tyler Beckett', 4),
   // Evening
   LA(448931, '18:15', 'PTP', 'FOT', 'dexter', 'h_bothell', 'Sedan', 'Madrona', 'Nathan Caldwell', 1),
-  LA(448137, '18:47', 'FA', 'INH', 'SEA AS 973', 'fairmont', 'Sedan', 'Manveer', 'Brooke Lindahl', 2, plx(20)),
-  LA(448732, '19:15', 'TA', 'INH', 'h_canyonpark', 'SEA AS 22', 'Sedan', 'Tarun', 'Simon Kagan', 2),
-  LA(448138, '19:36', 'FA', 'INH', 'SEA AS 419', 'fairmont', 'SUV', 'Oleg', 'Ashley Tolliver', 4, plx(21, { fam: [['Ashley Tolliver', 2, 'AA 1332'], ['Lorna Albright', 2, 'AS 419']] })),
-  LA(448936, '20:17', 'FA', 'INH', 'SEA AS 2208', 'h_snoqualmie', 'MKT', 'Tarun', 'Dean Fowler', 1),
-  LA(448748, '20:28', 'FA', 'INH', 'SEA AS 1126', 'h_sumner', 'Sedan', 'Manveer', 'Ryan Talbot', 2),
-  LA(448139, '21:13', 'FA', 'INH', 'SEA AA 2003', 'fairmont', 'Sprinter', 'Teo', 'Amanda Crowe', 9, plx(22, { fam: [['Amanda Crowe', 4, 'AA 2003'], ['Vanessa Pryor', 3, 'AA 2003'], ['Laurel Kemp', 2, 'AS 485']] })),
-  LA(448910, '21:17', 'FA', 'INH', 'SEA AS 1093', 'sorrento', 'Sedan', 'Jaswant', 'Rafael Montoya', 1),
-  LA(448145, '21:37', 'FA', 'INH', 'SEA AS 2003', 'h_kirkland', 'MKT', 'Manveer', 'Gregory Lamb', 3),
-  LA(448142, '22:15', 'FA', 'INH', 'SEA AS 379', 'fairmont', 'Sedan', 'Jaswant', 'Lydia Graber', 2, plx(24)),
-  LA(448140, '22:43', 'FA', 'INH', 'SEA AS 521', 'fairmont', 'SUV', 'Oleg', 'Heidi Lawson', 4, plx(23, { fam: [['Heidi Lawson', 2, 'AS 521'], ['Chelsea Ward', 2, 'DL 481']] })),
+  LA(448137, '18:47', 'FA', 'INH', 'SEA AS 973', 'fairmont', 'Sedan', 'Chris', 'Brooke Lindahl', 2, plx(20)),
+  LA(448732, '19:15', 'TA', 'INH', 'h_canyonpark', 'SEA AS 22', 'Sedan', 'Tony', 'Simon Kagan', 2),
+  LA(448138, '19:36', 'FA', 'INH', 'SEA AS 419', 'fairmont', 'SUV', 'Jason', 'Ashley Tolliver', 4, plx(21, { fam: [['Ashley Tolliver', 2, 'AA 1332'], ['Lorna Albright', 2, 'AS 419']] })),
+  LA(448936, '20:17', 'FA', 'INH', 'SEA AS 2208', 'h_snoqualmie', 'MKT', 'Tony', 'Dean Fowler', 1),
+  LA(448748, '20:28', 'FA', 'INH', 'SEA AS 1126', 'h_sumner', 'Sedan', 'Chris', 'Ryan Talbot', 2),
+  LA(448139, '21:13', 'FA', 'INH', 'SEA AA 2003', 'fairmont', 'Sprinter', 'Danny', 'Amanda Crowe', 9, plx(22, { fam: [['Amanda Crowe', 4, 'AA 2003'], ['Vanessa Pryor', 3, 'AA 2003'], ['Laurel Kemp', 2, 'AS 485']] })),
+  LA(448910, '21:17', 'FA', 'INH', 'SEA AS 1093', 'sorrento', 'Sedan', 'Mike', 'Rafael Montoya', 1),
+  LA(448145, '21:37', 'FA', 'INH', 'SEA AS 2003', 'h_kirkland', 'MKT', 'Chris', 'Gregory Lamb', 3),
+  LA(448142, '22:15', 'FA', 'INH', 'SEA AS 379', 'fairmont', 'Sedan', 'Mike', 'Lydia Graber', 2, plx(24)),
+  LA(448140, '22:43', 'FA', 'INH', 'SEA AS 521', 'fairmont', 'SUV', 'Jason', 'Heidi Lawson', 4, plx(23, { fam: [['Heidi Lawson', 2, 'AS 521'], ['Chelsea Ward', 2, 'DL 481']] })),
 ];
 const findRide = id => LIVE.find(r => r.id === id);
 function assign(r, driver) {
@@ -2360,7 +2360,7 @@ CODES_ON = true;
 const codeFor = id => CODE_HELD[id] || (LIVE.find(r => r.id === id) || {}).code || '';
 // Real bookings on later days that today's email talks about. They sit on top of the generated schedule.
 const BOOKED = {
-  [seedOf(addDays(TODAY, 2))]: () => [Object.assign(mkRide({ id: 'r449015', confNo: 449015, pickup: '10:30', party: 'Katie Brennan', pax: 4, bags: 6, pu: 'hotel1000', do: 'pier91', driver: 'Oleg', vehicle: 'SUV', notes: 'Alaska cruise · 6 bags' }),
+  [seedOf(addDays(TODAY, 2))]: () => [Object.assign(mkRide({ id: 'r449015', confNo: 449015, pickup: '10:30', party: 'Katie Brennan', pax: 4, bags: 6, pu: 'hotel1000', do: 'pier91', driver: 'Jason', vehicle: 'SUV', notes: 'Alaska cruise · 6 bags' }),
     { payment: 'Card on file', due: false, cc: 'Visa ending 2231 · expired 08/25' })],
 };
 // A past day reads as finished: every ride done, every flight landed, and quotes that never booked dropped.
@@ -2373,9 +2373,9 @@ function ridesFor(d) {
 }
 
 // ---------- Decisions ----------
-const SMALL_CARS = ['Mila', 'Daria', 'Manveer'];
-const SIX_SEATS = ['Oleg', 'Jaswant', 'Tarun', 'Nate'];
-const VANS = ['Teo'];
+const SMALL_CARS = ['Emily', 'Sarah', 'Chris'];
+const SIX_SEATS = ['Jason', 'Mike', 'Tony', 'Kyle'];
+const VANS = ['Danny'];
 // Every fix follows the house rule: cover it in-house first, then an affiliate, then Uber Black. Families never split.
 // The two moves from September 4: when one family is late, the ready families take the van and an SUV waits for
 // the late one; two sedan jobs of two go out as one SUV.
@@ -2385,19 +2385,19 @@ const CARDS = [
     detail: () => `AS 920 is 39 min late and now lands at 11:35. The Cartwright, Hartwell and Ostrander families land by 10:30 and are ready at 11:00. They would wait 65 min for Kelli Rae’s family. Our limit is ${S.cfg.limit}.`,
     fixIcon: 'route', fixTitle: 'Send the van with who’s ready, hold an SUV for the late family', compactFix: 'Van goes at 11:00 · an SUV waits for AS 920',
     plan: [
-      { time: '11:00', driver: 'Teo', detail: 'Cartwright, Hartwell, Ostrander · 6 of 14 seats · nobody waits', pool: VANS },
-      { time: '12:05', driver: 'Nate', detail: 'Kelli Rae’s family (AS 920) · a new SUV ride', pool: SIX_SEATS },
+      { time: '11:00', driver: 'Danny', detail: 'Cartwright, Hartwell, Ostrander · 6 of 14 seats · nobody waits', pool: VANS },
+      { time: '12:05', driver: 'Kyle', detail: 'Kelli Rae’s family (AS 920) · a new SUV ride', pool: SIX_SEATS },
     ],
     cost: 'One extra SUV run, in-house. No family split.',
     options: [
-      { label: 'In-house', text: 'Hold Nate’s SUV for Kelli Rae’s family', cost: '$0' },
+      { label: 'In-house', text: 'Hold Kyle’s SUV for Kelli Rae’s family', cost: '$0' },
       { label: 'Affiliate', text: 'Cedar SUV for Kelli Rae’s family', cost: '−$170 margin' },
       { label: 'Leave it', text: 'Three families wait 65 min', cost: 'Over the limit', bad: true },
     ],
     why: () => [
       'The Cartwrights (DL 354), Hartwells (DL 372) and Ostranders (AS 627) all land by 10:30 and go to the Fairmont, so they leave together at 11:00.',
       'Kelli Rae’s family is the only one on AS 920. They are two, so an SUV is enough.',
-      'Nate drops at the Mayflower around 11:05 and is free until 13:47, so the ride stays in-house.',
+      'Kyle drops at the Mayflower around 11:05 and is free until 13:47, so the ride stays in-house.',
     ],
     rows: ['r448093'], touches: ['r448093', 'r448927'],
     apply(d) {
@@ -2413,20 +2413,20 @@ const CARDS = [
   {
     id: 'c2', title: 'No driver for Kevin Doyle', when: '12:40', actBy: '12:40',
     detail: () => 'Kevin Doyle (2, AS 629) is ready at 13:11 for the Arctic Club, and nobody is assigned. Two Lumora couples are booked in two sedans to the Fairmont: the Prescotts (AA 707, 3 h 30 min late) and the Suttons (AA 7442, 40 min late). They now land six minutes apart.',
-    fixIcon: 'route', fixTitle: 'One SUV for both couples frees a sedan for Kevin Doyle', compactFix: 'Two sedans become one SUV · frees Jaswant',
+    fixIcon: 'route', fixTitle: 'One SUV for both couples frees a sedan for Kevin Doyle', compactFix: 'Two sedans become one SUV · frees Mike',
     plan: [
-      { time: '13:11', driver: 'Jaswant', detail: 'Kevin Doyle (AS 629) to the Arctic Club', pool: SMALL_CARS.concat(SIX_SEATS) },
-      { time: '13:19', driver: 'Oleg', detail: 'Prescott + Sutton couples · 4 of 6 seats · the Suttons wait 6 min', pool: SIX_SEATS },
+      { time: '13:11', driver: 'Mike', detail: 'Kevin Doyle (AS 629) to the Arctic Club', pool: SMALL_CARS.concat(SIX_SEATS) },
+      { time: '13:19', driver: 'Jason', detail: 'Prescott + Sutton couples · 4 of 6 seats · the Suttons wait 6 min', pool: SIX_SEATS },
     ],
     cost: 'Nothing extra. One car run saved, and the open ride stays in-house.',
     options: [
-      { label: 'In-house', text: 'Merge the couples, Jaswant takes Kevin Doyle', cost: '$0' },
+      { label: 'In-house', text: 'Merge the couples, Mike takes Kevin Doyle', cost: '$0' },
       { label: 'Affiliate', text: 'Cedar sedan for Kevin Doyle', cost: '−$110 margin' },
       { label: 'Uber Black', text: 'For Kevin Doyle, no sign inside', cost: '−$70' },
     ],
     why: () => [
       'Both couples are Lumora, both go to the Fairmont, and they land six minutes apart, so one SUV carries all four.',
-      'That frees Jaswant’s sedan. They’re at SEA after their 11:45 run and back in time for Trent Hadley at 14:28.',
+      'That frees Mike’s sedan. They’re at SEA after their 11:45 run and back in time for Trent Hadley at 14:28.',
       'An affiliate for Kevin Doyle would cost $110 of margin.',
     ],
     rows: ['r448902', 'r448092', 'r448091'], touches: ['r448902', 'r448092', 'r448091'],
@@ -2442,22 +2442,22 @@ const CARDS = [
     doneMeta: d => `Prescott + Sutton with ${d[1]} at 13:19 · Kevin Doyle with ${d[0]} at 13:11`,
   },
   {
-    id: 'c3', title: 'Tarun ~12 min late for the Ketchum family', when: '12:50', actBy: '12:50',
-    detail: () => 'AS 3286 is 25 min late, so Tarun drops the Vega party at the Courtyard on Lake Union around 13:25 and gets back to SEA about 13:50. The Ketchum family (5, AS 48) is ready at 13:38.',
-    fixIcon: 'route', fixTitle: 'Swap jobs with Nate', compactFix: 'Swap jobs with Nate · no extra driving',
+    id: 'c3', title: 'Tony ~12 min late for the Ketchum family', when: '12:50', actBy: '12:50',
+    detail: () => 'AS 3286 is 25 min late, so Tony drops the Vega party at the Courtyard on Lake Union around 13:25 and gets back to SEA about 13:50. The Ketchum family (5, AS 48) is ready at 13:38.',
+    fixIcon: 'route', fixTitle: 'Swap jobs with Kyle', compactFix: 'Swap jobs with Kyle · no extra driving',
     plan: [
-      { time: '13:38', driver: 'Nate', detail: 'Ketchum family (AS 48) · 5 of 6 seats', pool: SIX_SEATS },
-      { time: '13:47', driver: 'Tarun', detail: 'Reed + Whitley families · Tarun is there by 13:50', pool: SIX_SEATS },
+      { time: '13:38', driver: 'Kyle', detail: 'Ketchum family (AS 48) · 5 of 6 seats', pool: SIX_SEATS },
+      { time: '13:47', driver: 'Tony', detail: 'Reed + Whitley families · Tony is there by 13:50', pool: SIX_SEATS },
     ],
     cost: 'Nothing. Both rides stay in-house, no extra miles.',
     options: [
-      { label: 'In-house', text: 'Swap the Ketchums and the Reeds between Tarun and Nate', cost: '$0' },
+      { label: 'In-house', text: 'Swap the Ketchums and the Reeds between Tony and Kyle', cost: '$0' },
       { label: 'Affiliate', text: 'Cedar SUV for the Ketchums', cost: '−$170 margin' },
       { label: 'Leave it', text: 'A family of five waits at the curb', cost: '~12 min', bad: true },
     ],
     why: () => [
-      'Nate is free at SEA well before 13:38, so they can meet the Ketchums on time.',
-      'The Reed and Whitley families are ready at 13:47. Tarun gets there about 13:50: a three-minute wait for two couples instead of twelve for a family of five.',
+      'Kyle is free at SEA well before 13:38, so they can meet the Ketchums on time.',
+      'The Reed and Whitley families are ready at 13:47. Tony gets there about 13:50: a three-minute wait for two couples instead of twelve for a family of five.',
       'Swapping two in-house drivers costs nothing.',
     ],
     rows: ['r448088', 'r448658'], touches: ['r448088', 'r448103'],
@@ -2472,21 +2472,21 @@ const CARDS = [
   {
     id: 'c4', title: 'No driver for the Shore party', when: '13:30', actBy: '13:30',
     detail: () => 'The Shore party (4, Lumora Group 13, AA 3033) is ready at 14:06, and nobody is assigned. Every in-house SUV is on a run until about 14:35.',
-    fixIcon: 'users', fixTitle: 'Put them on Teo’s Sprinter with the Ibarra group', compactFix: 'Share Teo’s Sprinter · 10 of 14 seats',
+    fixIcon: 'users', fixTitle: 'Put them on Danny’s Sprinter with the Ibarra group', compactFix: 'Share Danny’s Sprinter · 10 of 14 seats',
     plan: [
-      { time: '14:21', driver: 'Teo', detail: 'Ibarra group (6) + Shore party (4) · the Shores wait 15 min', pool: VANS },
+      { time: '14:21', driver: 'Danny', detail: 'Ibarra group (6) + Shore party (4) · the Shores wait 15 min', pool: VANS },
     ],
     cost: 'Nothing. Same hotel, the Sprinter has room, no family split.',
     options: [
-      { label: 'In-house', text: 'The Shores ride with the Ibarra group in Teo’s Sprinter', cost: '$0' },
+      { label: 'In-house', text: 'The Shores ride with the Ibarra group in Danny’s Sprinter', cost: '$0' },
       { label: 'Affiliate', text: 'Cedar SUV at 14:06', cost: '−$170 margin' },
       { label: 'Uber Black', text: 'SUV at 14:06, no sign inside', cost: '−$110' },
     ],
     why: () => [
       'Both parties are Lumora and go to the Fairmont Olympic.',
-      'The Ibarra group (DL 2419) is ready at 14:21, and ten people fit Teo’s 14-seat Sprinter.',
+      'The Ibarra group (DL 2419) is ready at 14:21, and ten people fit Danny’s 14-seat Sprinter.',
       `The Shores wait 15 min, inside our ${S.cfg.limit}-min limit.`,
-      'Teo is back at SEA from their 13:16 run by about 14:15.',
+      'Danny is back at SEA from their 13:16 run by about 14:15.',
     ],
     rows: ['r448105', 'r448040'], touches: ['r448105', 'r448040'],
     apply(d) {
@@ -2534,20 +2534,20 @@ const HAND = store.get('sp-mode') !== 'staged';
 const HAND_KEY = 'sp-hand-moves';
 // Where the end-of-day grid differs from the manifest, the manifest wins: Group 3 was three families, Groups 4 and 7
 // each had one more family, and Groups 13 and 15 were sedans for two. The empty drivers on Kevin Doyle and the
-// Shore party were staged, so they get a driver back. Group 13's sedan job goes out in Oleg's SUV, so Manveer
+// Shore party were staged, so they get a driver back. Group 13's sedan job goes out in Jason's SUV, so Chris
 // takes Group 1's sedan job.
 const AS_BOOKED = {
   r448093: { fam: [['Dana Cartwright', 2, 'DL 354'], ['Tonya Lee Hartwell', 2, 'DL 372'], ['Kelli Rae', 2, 'AS 920']] },
   r448096: { fam: [['Tara Whitcomb', 2, 'AA 767'], ['Renee Castillo', 2, 'AA 767'], ['Shawna Pierce', 2, 'AA 767'], ['Rodney Vasquez', 3, 'AA 767'], ['Kristy Bellamy', 2, 'AA 767']] },
   r448098: { fam: [['Michelle Barrett', 2, 'AA 3076'], ['Angela Mercado', 2, 'AA 3076'], ['Kristin Albers', 2, 'AA 3076'], ['Leigh Ann Fortner', 2, 'AA 3076'], ['Bethany Orr', 2, 'AA 3076'], ['Joy Pemberton', 2, 'AA 3076']] },
-  r448091: { driver: 'Manveer', vehicle: 'Sedan' },
-  r448105: { fam: [['Melanie Shore', 2, 'AA 3033']], vehicle: 'Sedan', driver: 'Oleg', car: 'SUV 1' },
-  r448318: { fam: [['Jenna Pruitt', 2, 'AA 2107']], vehicle: 'Sedan', driver: 'Mila' },
-  r448902: { driver: 'Mila' },
+  r448091: { driver: 'Chris', vehicle: 'Sedan' },
+  r448105: { fam: [['Melanie Shore', 2, 'AA 3033']], vehicle: 'Sedan', driver: 'Jason', car: 'SUV 1' },
+  r448318: { fam: [['Jenna Pruitt', 2, 'AA 2107']], vehicle: 'Sedan', driver: 'Emily' },
+  r448902: { driver: 'Emily' },
 };
 // The dispatcher's two cases, staged on real rides. DL 889 took off 40 min late, and UA 2089 is 40 min late too.
 // Case 1: Group 10's van can't wait for 10D and 10E (DL 889); Group 13's sedan job in an SUV lands at the same time.
-// Case 2: 8A and 8B are both late, so Teo can't be back for 27A at 14:21; 9A's Sprinter (6 people) has room.
+// Case 2: 8A and 8B are both late, so Danny can't be back for 27A at 14:21; 9A's Sprinter (6 people) has room.
 // DL 877 stays held at the gate, so the wait-for-takeoff rule still shows.
 const HAND_FLIGHTS = {
   'DL 889': { lands: '13:26', late: 40, why: 'Waited for a late inbound plane, took off 40 min late' },
@@ -3219,13 +3219,13 @@ const MAILS = [
     checks: () => [
       `Matched by reply: Simon answered our reminder for conf ${codeFor('r448732')}.`,
       'AS 22 now leaves SEA at 22:25, 30 min later. Flight tracking shows the same.',
-      'Tarun still makes the next job: Simon is at SEA about 20:30, and Dean Fowler reaches the curb at 20:37.',
+      'Tony still makes the next job: Simon is at SEA about 20:30, and Dean Fowler reaches the curb at 20:37.',
       'Same car, same price.',
     ],
-    reply: () => `Hi Simon,\n\nDone. Your pickup tonight is now ${ct(tm('19:45'))} at 21520 3rd Ave W, Bothell. Tarun will take you to Sea-Tac for AS 22.\n\nSafe travels,\n${sig()}`,
+    reply: () => `Hi Simon,\n\nDone. Your pickup tonight is now ${ct(tm('19:45'))} at 21520 3rd Ave W, Bothell. Tony will take you to Sea-Tac for AS 22.\n\nSafe travels,\n${sig()}`,
     apply() { const r = findRide('r448732'); r.pickup = tm('19:45'); r.spot += 30; r.garage += 30; r.total = priceOf(r); },
     toast: () => 'Simon Kagan’s pickup moved to 19:45. Reply sent.',
-    doneTitle: 'Moved Simon Kagan’s pickup', doneMeta: 'Tonight 19:15 → 19:45 · Tarun still makes the 20:37 job',
+    doneTitle: 'Moved Simon Kagan’s pickup', doneMeta: 'Tonight 19:15 → 19:45 · Tony still makes the 20:37 job',
   },
   {
     id: 'm-lamb', rank: 3, at: '08:57', from: 'Erica Tan', org: 'for Gregory Lamb', addr: 'erica.tan@lambcapital.example',
@@ -3347,8 +3347,8 @@ const FILED = [
     body: 'Hi Sunset & Palms,\n\nAttached is our invoice for the farm-outs we ran for you in August: 23 rides, $4,186.50, due September 30.\n\nThanks for the work!\nCedar Car Billing',
     why: 'Affiliate bill. Labeled for accounting, so Ines Varga picks it up.' },
   { id: 'f-thanks', at: '08:21', from: 'Peter Lindqvist', addr: 'p.lindqvist@example.com', subject: 'Thank you!', label: 'Kind words',
-    body: 'Hi,\n\nJust wanted to say Oleg was fantastic yesterday. Early, helpful with the bags, and the car was spotless. We’ll book again next trip.\n\nPeter',
-    why: 'Thank-you note for Oleg. Nothing to reply to.' },
+    body: 'Hi,\n\nJust wanted to say Jason was fantastic yesterday. Early, helpful with the bags, and the car was spotless. We’ll book again next trip.\n\nPeter',
+    why: 'Thank-you note for Jason. Nothing to reply to.' },
   { id: 'f-news', at: '06:30', from: 'Uber for Business', addr: 'news@uber.example', subject: 'Your August summary', label: 'Newsletters',
     body: 'Your August summary is ready. See trips, spend and savings in your dashboard.',
     why: 'Newsletter.' },
@@ -3410,7 +3410,7 @@ const S = {
   statusNames: { assigned: 'Assigned', ontheway: 'En route', arrived: 'Arrived', customerin: 'Picked up', done: 'Done' },
   msgOn: { confirm: true, reminder: true, offer: true, otw: true, upgrade: true, arrived: true, final: false, receipt: true },
   msgSel: 'otw',
-  wake: { Jaswant: true, Mila: true, Daria: false, Manveer: false, Oleg: true, Tarun: true, Nate: false, Teo: true, Levon: false },
+  wake: { Mike: true, Emily: true, Sarah: false, Chris: false, Jason: true, Tony: true, Kyle: false, Danny: true, Brian: false },
   perms: {
     approve: { owner: true, lead: true, dispatcher: true, accounting: false },
     billing: { owner: true, lead: true, dispatcher: false, accounting: true },
@@ -4428,7 +4428,7 @@ const SETS = {
   },
   drivers() {
     const rows = Object.entries(DRIVERS).map(([d, car], i) => `<tr><td><b>${d}</b></td><td class="t3">${carLabel(car)}</td><td class="num">(206) 555-01${10 + i}</td>
-      <td>${d === 'Levon' ? '<span class="muted">Invite sent</span>' : `<span class="ok">${ic('check', 14)}Connected</span>`}</td>
+      <td>${d === 'Brian' ? '<span class="muted">Invite sent</span>' : `<span class="ok">${ic('check', 14)}Connected</span>`}</td>
       <td><button class="switch" role="switch" aria-checked="${!!S.wake[d]}" data-a="wake" data-v="${d}" aria-label="Wake-up call for ${d}"><span class="track"></span></button></td></tr>`);
     return card('Drivers', 'Wake-up calls ring 90 minutes before the driver’s first garage-out.', tbl(['Driver', 'Car', 'Mobile', 'Driver app', 'Wake-up call'], rows));
   },
@@ -6867,21 +6867,21 @@ function buildThreads() {
     out.push(Object.assign({ id: `p-${id}`, kind: 'pax', name: r.party, phone: r.phone, rides: [id], msgs: msgs.sort((a, b) => tm(a.t) - tm(b.t)), unread: 0 }, o));
   };
   // Drivers
-  out.push({ id: 'd-Tarun', kind: 'drv', name: 'Tarun', phone: DRV_PHONE('Tarun'), rides: ['r448088'].filter(R), unread: 1, msgs: [
-    { who: 'us', t: '09:12', text: 'Morning Tarun. Colleen Brady first, then Mercer Island at 11:30 and the Ketchum family at 13:38.' },
+  out.push({ id: 'd-Tony', kind: 'drv', name: 'Tony', phone: DRV_PHONE('Tony'), rides: ['r448088'].filter(R), unread: 1, msgs: [
+    { who: 'us', t: '09:12', text: 'Morning Tony. Colleen Brady first, then Mercer Island at 11:30 and the Ketchum family at 13:38.' },
     { who: 'them', t: '09:14', text: 'Copy. Heading to SEA now.' },
     { who: 'them', t: '09:44', text: 'Heads up: the Mercer Island pickup always runs long. I’ll be about 12 min late for the Ketchums at 13:38.' },
   ] });
-  out.push({ id: 'd-Oleg', kind: 'drv', name: 'Oleg', phone: DRV_PHONE('Oleg'), rides: ['r447886'].filter(R), unread: 0, msgs: [
+  out.push({ id: 'd-Jason', kind: 'drv', name: 'Jason', phone: DRV_PHONE('Jason'), rides: ['r447886'].filter(R), unread: 0, msgs: [
     { who: 'them', t: '09:31', text: 'In the cell phone lot for AA 3799. App says 12 min late.' },
     { who: 'us', t: '09:33', text: 'Thanks. Grant Hollis has 2 bags, he’ll text when he’s at the curb.' },
   ] });
-  out.push({ id: 'd-Teo', kind: 'drv', name: 'Teo', phone: DRV_PHONE('Teo'), rides: ['r448093'].filter(R), unread: 0, msgs: [
+  out.push({ id: 'd-Danny', kind: 'drv', name: 'Danny', phone: DRV_PHONE('Danny'), rides: ['r448093'].filter(R), unread: 0, msgs: [
     { who: 'them', t: '08:55', text: 'Sprinter is cleaned and fueled. Which door for Group 3?' },
     { who: 'us', t: '08:57', text: 'Door 00 on arrivals, same as always. Marta from Lumora will bring them out.' },
     { who: 'them', t: '08:58', text: '👍' },
   ] });
-  out.push({ id: 'd-Mila', kind: 'drv', name: 'Mila', phone: DRV_PHONE('Mila'), rides: [], unread: 0, msgs: [
+  out.push({ id: 'd-Emily', kind: 'drv', name: 'Emily', phone: DRV_PHONE('Emily'), rides: [], unread: 0, msgs: [
     { who: 'them', t: '08:31', text: 'Dropped Dr. Russell at Fieldwork Labs. Heading to the Sound Hotel for the next one.' },
     { who: 'us', t: '08:32', text: 'Perfect, thank you.' },
   ] });
@@ -6889,15 +6889,15 @@ function buildThreads() {
   out.push({ id: 'g-lumora', kind: 'grp', name: 'Marta · Lumora greeter at SEA', phone: '(312) 555-0137', rides: ['r448093', 'r448924', 'r448089'].filter(R), unread: 2, msgs: [
     { who: 'them', t: '09:18', text: 'Good morning! I’m at door 00 with the Lumora sign.' },
     { who: 'them', t: '09:24', text: 'Group 2 (Pickett and Saunders) and Colleen Brady are with me. Bags almost done.' },
-    { who: 'us', t: '09:25', text: 'Great. Jaswant and Tarun are both at the curb in SUVs.' },
+    { who: 'us', t: '09:25', text: 'Great. Mike and Tony are both at the curb in SUVs.' },
     { who: 'them', t: '09:41', text: 'Group 3: Cartwrights and Hartwells landed. Ostranders getting bags.' },
     { who: 'them', t: '09:47', text: 'Kelli Rae says AS 920 is delayed again, maybe 11:35 now. Should the others wait?' },
   ] });
   // Passengers
-  pax('r448924', [{ who: 'them', t: '09:36', text: 'Landed! Waiting for bags at carousel 12.' }, { who: 'us', t: '09:37', text: 'Welcome to Seattle! Tarun is at the curb, door 00 on the arrivals level.' }]);
+  pax('r448924', [{ who: 'them', t: '09:36', text: 'Landed! Waiting for bags at carousel 12.' }, { who: 'us', t: '09:37', text: 'Welcome to Seattle! Tony is at the curb, door 00 on the arrivals level.' }]);
   pax('r448089', [{ who: 'them', t: '09:40', text: 'We’re with the Lumora lady. Coming out now.' }]);
   pax('r448835', [{ who: 'them', t: '09:48', text: 'Hi! Could the driver pick me up on the Pine St side, by the courtyard?' }], { unread: 1 });
-  pax('r447886', [{ who: 'them', t: '09:38', text: 'Flight’s running a little late, sorry! Should be on the ground by 10.' }, { who: 'us', t: '09:39', text: 'No problem at all, Oleg is tracking the flight.' }]);
+  pax('r447886', [{ who: 'them', t: '09:38', text: 'Flight’s running a little late, sorry! Should be on the ground by 10.' }, { who: 'us', t: '09:39', text: 'No problem at all, Jason is tracking the flight.' }]);
   pax('r448716', [{ who: 'them', t: '09:12', text: 'Thank you, great driver!' }]);
   pax('r448707');
   return out.filter(Boolean);
@@ -7068,7 +7068,7 @@ function smsSend(text) {
   renderSms();
   $('smsText')?.focus();
   // Drivers and the greeter answer; passengers mostly don't.
-  const reply = th.kind === 'drv' ? (th.id === 'd-Tarun' ? 'Ok, I’ll call the Ketchums when I’m close.' : 'Copy that 👍') : th.kind === 'grp' ? 'Ok! Sending them out to Teo now.' : null;
+  const reply = th.kind === 'drv' ? (th.id === 'd-Tony' ? 'Ok, I’ll call the Ketchums when I’m close.' : 'Copy that 👍') : th.kind === 'grp' ? 'Ok! Sending them out to Danny now.' : null;
   if (reply) {
     setTimeout(() => { S.sms.typing = th.id; if (S.view === 'sms' && S.sms.sel === th.id) renderSms(); }, 900);
     setTimeout(() => {
@@ -7353,7 +7353,7 @@ document.addEventListener('mousemove', e => { if (!vizTip.hidden) { vizTip.style
 // It runs on the same rides as the board, so a tap here moves the status on the grid, the timeline and the map,
 // and sends the passenger the same automatic text. Limo Anywhere's app shows a pickup and a drop-off and little else;
 // this keeps it that simple, but adds the flight, the sign, and the wait clock.
-S.da = { driver: 'Tarun', ride: null, offer: null, offerAt: 0 };
+S.da = { driver: 'Tony', ride: null, offer: null, offerAt: 0 };
 const NEXT_STEP = { assigned: ['ontheway', 'I’m on my way'], ontheway: ['arrived', 'I’ve arrived'], arrived: ['customerin', 'Customer is in the car'], customerin: ['done', 'Drop off and finish'] };
 const daJobs = d => LIVE.filter(r => r.driver === d && !r.quote && !r.hidden && r.ride !== 'cancelled').sort((a, b) => a.pickup - b.pickup);
 const daCurrent = d => daJobs(d).find(r => ['ontheway', 'arrived', 'customerin'].includes(r.ride)) || daJobs(d).find(r => r.ride === 'assigned');

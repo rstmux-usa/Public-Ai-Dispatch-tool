@@ -9,7 +9,7 @@ Status as of Oct 15, 2026: every page is built. Oct 13–15 made it deeper: the 
 1. [x] **Close the open decisions.** Done Oct 15: Story cards (all three styles are kept side by side in `case-study/ai-cards/shots/card-styles.png`), and the street map stays.
 2. [x] **First-minute check.** Done Oct 15: the clicks worked, but a stranger had no context, so a "Start here" note now tops the assistant panel.
 3. [x] **Privacy swap.** Done Oct 15: the drivers, affiliates, client (now Lumora), client sites, record numbers and yearly figures are all made up. The public repo, `rstmux-usa/Public-Ai-Dispatch-tool`, starts from one clean commit. The private working repo keeps the real names in its history, so it never goes public.
-4. [ ] **Publish the prototype.** Republish the shared link from the swapped copy. It still shows the Oct 9 version.
+4. [x] **Publish the prototype.** Done Oct 15: live on GitHub Pages at https://rstmux-usa.github.io/Public-Ai-Dispatch-tool/prototype/, street map included. A Claude artifact can't host the map's tile files, so Pages replaces the old artifact link.
 5. [ ] **Write the case study.** The material is in `case-study/`:
    - The problem: one dispatcher, 64 rides, flights running late one after another (Sep 4, 2025)
    - What confused the dispatcher in the first AI cards (`ai-cards/confusion-log.md`)

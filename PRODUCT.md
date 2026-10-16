@@ -87,8 +87,8 @@ over Limo Anywhere. Examples:
   (2) two sedan jobs of 2 passengers each go out as one SUV.
 - **Workflow:** ideas are tried first in the clickable prototype
   (`prototype/index.html`), then settled decisions go to Figma, which stays
-  the source of truth. The prototype is shared as a claude.ai artifact so
-  people can click through on their own.
+  the source of truth. The prototype is live on GitHub Pages so people can
+  click through on their own.
 - **How it will be shown:** the portfolio case study will include images
   and videos of the product, plus the live prototype for hiring managers or
   anyone else who wants to try it. All of them use the made-up names below.

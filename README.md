@@ -4,7 +4,9 @@ It's the screen a dispatcher lives in all day, designed for the moment the sched
 
 A clickable prototype of a live dispatch board for a Seattle limo and car service, with an AI assistant that suggests fixes when flights run late.
 
-Open `prototype/index.html` in a browser. It is one self-contained file with no build step.
+**Try it live: https://rstmux-usa.github.io/Public-Ai-Dispatch-tool/prototype/**
+
+The board is one HTML file with no build step. To run it yourself, serve the project folder (for example `python3 -m http.server`) and open `prototype/`. The Map page loads its street tiles from `prototype/map/`, so it needs the server; the rest also works opened as a plain file.
 
 ## What you can try
 

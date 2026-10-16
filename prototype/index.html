@@ -12,7 +12,7 @@
    with a sunset edge, and each part of the day painted as its sky. Sunset colors stay in the chrome, never in rows or buttons. */
 :root {
   --board: #f3ede4; --panel: #ffffff; --raised: #f6f1ea; --hover: #fbf8f3; --ai-bg: #fbf8fd;
-  --selected: #f4effc; --selected-bar: #7d2f84;
+  --selected: #f4effc; --selected-bar: #6d3fd0;
   --line: #ebe3d7; --line-strong: #d9cfc0;
   --text: #1b1a30; --text-2: #43425d; --text-3: #62617c;
   --flap: #2b2a5a; --flap-hover: #3a3973; --flap-text: #f6f4ee; --flap-split: rgba(255, 255, 255, 0.18);
@@ -24,9 +24,14 @@
   --inair: #1a68a6; --inair-tint: #dceaf7; --link-on-dark: #a9cdf0; --delayed-on-dark: #f3c67a; --needs-on-dark: #f6a9a9;
   --pill: rgba(43, 42, 90, 0.07);
   --scrim: rgba(27, 26, 48, 0.32);
-  --ring: conic-gradient(from 90deg, #3b3aa6 0%, #5a2f9c 16%, #a54288 32%, #dc6a7c 46%, #ffb08a 58%, #dc6a7c 72%, #5a2f9c 86%, #3b3aa6 100%);
-  --ink: linear-gradient(90deg, #3b3aa6 0%, #7d2f84 55%, #a54288 100%);
-  --ai-shadow: 0 8px 24px rgba(90, 47, 156, 0.14), 0 2px 6px rgba(220, 106, 124, 0.10);
+  /* AI colors, from Apple Intelligence's edge glow (the user's iPhone screenshots, Oct 15). Clockwise from the top:
+     gold, orange, pink, magenta, purple, blue, lilac, amber, sky blue. Only the assistant uses them. */
+  --glow: #f6c04a, #ff9640, #f5577f, #c64fd6, #8b5cf6, #4d7cff, #c98ef0, #f7a93a, #58b6f2, #f6c04a;
+  --ring: conic-gradient(var(--glow));
+  /* Darker cut of the same colors, for text and icons that must stay readable on white. */
+  --ink: linear-gradient(90deg, #3a63e8 0%, #7f45dd 50%, #d6407a 100%);
+  --ink-flow: linear-gradient(90deg, #3a63e8, #7f45dd, #d6407a, #d9622a, #7f45dd, #3a63e8);
+  --ai-shadow: 0 8px 24px rgba(139, 92, 246, 0.16), 0 2px 6px rgba(245, 87, 127, 0.10);
   --pop-shadow: 0 12px 32px rgba(19, 32, 48, 0.16), 0 2px 6px rgba(19, 32, 48, 0.08);
   --panel-shadow: 0 8px 16px rgba(19, 32, 48, 0.16);
   --ease-panel: cubic-bezier(0.5, 0, 0, 0.75);
@@ -230,8 +235,9 @@ button.count:hover { background: var(--pill); }
 .grid { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--panel); }
 .table-wrap { flex: 1; min-height: 0; overflow: auto; }
 /* Once every column is at its widest, the leftover space splits evenly left and right instead of piling up at the end. */
-.table { min-width: 1040px; --gut: max(16px, calc((100% - var(--grid-max, 100%)) / 2)); }
-.cols { display: grid; grid-template-columns: var(--cols); padding: 0 var(--gut); align-items: center; }
+/* The left gutter is 8px wider: it holds the assistant's transfer arrow, clear of the grid's glowing edge. */
+.table { min-width: 1040px; --gut: max(16px, calc((100% - var(--grid-max, 100%)) / 2)); --gutL: calc(var(--gut) + 8px); }
+.cols { display: grid; grid-template-columns: var(--cols); padding: 0 var(--gut) 0 var(--gutL); align-items: center; }
 .thead { position: sticky; top: 68px; z-index: 2; height: 34px; background: var(--panel); border-bottom: 1px solid var(--line-strong); }
 .th[draggable="true"] { cursor: grab; user-select: none; }
 .th.dragging, .collist li.dragging { opacity: 0.4; }
@@ -348,7 +354,7 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .rail-in { width: 360px; padding: 0 18px 32px; display: flex; flex-direction: column; gap: 20px; }
 .rail-top { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; height: 52px; margin: 0 -18px; padding: 0 10px 0 18px; background: var(--panel); border-bottom: 1px solid var(--line); }
 .rail-top b { font-weight: 600; font-size: 16px; }
-.rt-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--ai-bg); box-shadow: inset 0 0 0 1px #e6dcf3; }
+.rt-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--ai-bg); box-shadow: inset 0 0 0 1px #e2d6f7; }
 .muted.sm { font-size: 13px; line-height: 18px; }
 .ai-launch { position: relative; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 6px 0 9px; border-radius: 16px; background: var(--panel); font-weight: 600; white-space: nowrap; }
 .ai-launch::before { content: ""; position: absolute; inset: 0; padding: 1.5px; border-radius: 16px; background: var(--ring); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
@@ -392,9 +398,12 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .sec-t.big .cnt { font-size: 18px; line-height: 22px; color: var(--text); }
 .cards { display: flex; flex-direction: column; gap: 10px; }
 .ai { position: relative; }
-.ai.lead::before { content: ""; position: absolute; inset: -2px; border-radius: 12px; background: var(--ring); filter: blur(8px); opacity: 0.42; pointer-events: none; }
+.ai.lead::before { content: ""; position: absolute; inset: -2px; border-radius: 12px; background: conic-gradient(from var(--glow-a), var(--glow)); filter: blur(8px); opacity: 0.42; pointer-events: none; }
+/* While its plan is on the grid, the lead card's ring flows and glows brighter, like the grid's edge. */
+.ai.lead.pv::before { inset: -3px; filter: blur(12px); opacity: 0.6; }
+.ai.lead.pv::before, .ai.lead.pv .ai-card::before { animation: glowSpin 4s linear infinite var(--gd, 0s); }
 .ai-card { position: relative; display: flex; flex-direction: column; width: 100%; background: var(--panel); border-radius: 10px; box-shadow: 0 1px 2px rgba(19, 32, 48, 0.06); }
-.ai-card::before { content: ""; position: absolute; inset: 0; padding: 1.5px; border-radius: 10px; background: var(--ring); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.ai-card::before { content: ""; position: absolute; inset: 0; padding: 1.5px; border-radius: 10px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
 .ai-card.x { padding: 16px 18px; gap: 10px; box-shadow: var(--ai-shadow); }
 .ai-card.c { padding: 12px 14px; gap: 6px; }
 .ai-card.c:hover { background: var(--ai-bg); }
@@ -475,7 +484,7 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .ai-meta { margin: 0; color: var(--text-2); font-size: 13px; line-height: 18px; }
 .ai-whol { display: grid; gap: 2px; color: var(--text-2); font-size: 13px; line-height: 18px; }
 .ai-pv { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--selected-bar); font-size: 13px; }
-.fc.fly { box-shadow: 0 8px 18px rgba(125, 47, 132, 0.35), inset 0 0 0 1px var(--selected-bar); }
+.fc.fly { box-shadow: 0 8px 18px rgba(139, 92, 246, 0.4), 0 0 14px rgba(245, 87, 127, 0.35); }
 /* Smaller cards, so more decisions fit beside the grid. */
 .ai-card.x.v2 { padding: 12px 14px; gap: 8px; }
 .ai-card.v2 .prob .t { font-size: 15px; line-height: 20px; }
@@ -488,11 +497,64 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .ghost-t { color: var(--text-3); font-style: italic; white-space: nowrap; }
 .ai-res { display: inline-flex; align-items: center; gap: 3px; }
 .cf { margin-left: 4px; color: var(--text-3); font: 500 12px/20px var(--f-num); white-space: nowrap; }
-/* The transfer, drawn in the grid's left margin beside the pickup times, under the pinned headers. */
+/* The transfer, drawn in the grid's 24px left margin beside the pickup times, under the pinned headers. */
 #rows { position: relative; }
 .ai-arrows { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; color: var(--selected-bar); pointer-events: none; }
 .ai-arrows path, .ai-arrows circle { fill: currentColor; }
 .ai-arrows .ai-arrow-line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* ---------- AI glow (Oct 15) ----------
+   Whatever the assistant proposes glows in its colors until you approve or put it back: the grid's edge, the arrow,
+   the families that move, the conf # they land in, and a ride it would make. --gd keeps a redrawn glow in step. */
+@property --glow-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes glowSpin { to { --glow-a: 360deg; } }
+@keyframes inkFlow { to { background-position: 200% 0; } }
+.ai-arrows { filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.55)) drop-shadow(0 0 6px rgba(245, 87, 127, 0.35)); }
+.ai-arrows .ai-arrow-line { stroke-width: 2.5; }
+.ai-arrows .ai-arrow-pulse { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; opacity: 0.95; }
+/* A family the suggestion moves: a flowing ring and a soft glow around its code. */
+.fc.ai-in { position: relative; background: var(--panel); color: var(--text); box-shadow: 0 0 8px rgba(139, 92, 246, 0.45), 0 0 3px rgba(77, 124, 255, 0.35); animation: chipGlow 2.4s ease-in-out infinite alternate var(--gd, 0s); }
+.fc.ai-in::before { content: ""; position: absolute; inset: 0; padding: 1.5px; border-radius: 5px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: glowSpin 3s linear infinite var(--gd, 0s); pointer-events: none; }
+@keyframes chipGlow { to { box-shadow: 0 0 12px 1px rgba(245, 87, 127, 0.45), 0 0 4px rgba(139, 92, 246, 0.5); } }
+/* The conf # the families land in, or the ride whose driver changes. */
+.ai-t { background: var(--ink-flow) 0 0 / 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 700; animation: inkFlow 3s linear infinite var(--gd, 0s); }
+/* A ride the suggestion would make. It isn't booked: it glows until you approve it, and opens filled in. */
+.row.draft, .row.draft.sel, .row.draft.open { position: relative; z-index: 1; background: var(--ai-bg); box-shadow: none; }
+.row.draft::before, .row.draft::after { content: ""; position: absolute; top: 2px; bottom: 2px; left: calc(var(--gutL) - 6px); right: calc(var(--gut) - 10px); border-radius: 7px; pointer-events: none; }
+.row.draft::before { box-shadow: 0 0 14px rgba(139, 92, 246, 0.35), -10px 0 16px -6px rgba(77, 124, 255, 0.45), 10px 0 16px -6px rgba(255, 150, 64, 0.4); animation: draftGlow 2.4s ease-in-out infinite alternate var(--gd, 0s); }
+.row.draft::after { padding: 1.5px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: glowSpin 4s linear infinite var(--gd, 0s); }
+@keyframes draftGlow { to { box-shadow: 0 0 20px 2px rgba(245, 87, 127, 0.32), -12px 0 18px -6px rgba(139, 92, 246, 0.45), 12px 0 18px -6px rgba(246, 192, 74, 0.45); } }
+.row.draft.enter { animation: draftIn 0.7s 0.45s cubic-bezier(.3, .7, .2, 1) both; }
+@keyframes draftIn { from { opacity: 0; clip-path: inset(50% 0); } }
+.draft-tag { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 7px; border-radius: 11px; background: var(--panel); box-shadow: inset 0 0 0 1px #d9c8f5; font-weight: 600; font-size: 12px; white-space: nowrap; }
+.draft-tag span { background: var(--ink); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.qv.draft { position: relative; background: var(--ai-bg); box-shadow: none; }
+.qv.draft::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, #4d7cff, #8b5cf6, #f5577f, #ff9640); }
+.qv-note { margin: -4px 0 12px; color: var(--text-2); font-size: 13px; line-height: 18px; }
+.qv h3.ai-h { display: flex; align-items: center; gap: 6px; }
+.qv h3.ai-h span { background: var(--ink); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.qv-grid label.ai-f .inp, .qv-grid label.ai-f select { border-color: #cdb9f3; background-color: var(--panel); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08); }
+/* The grid's edge while a suggestion is on it, like Apple Intelligence's glow around the screen: a thin flowing
+   line, a soft band that fades inward, and a wide bloom that breathes. It means: not saved yet. */
+.grid { position: relative; }
+.ai-edge { position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; transition: opacity 0.6s ease; }
+.grid.ai-glow .ai-edge { opacity: 1; }
+.ai-edge i { position: absolute; inset: 0; overflow: hidden; }
+.ai-edge i::before { content: ""; position: absolute; left: 50%; top: 50%; width: 160vmax; height: 160vmax; margin: -80vmax 0 0 -80vmax; background: conic-gradient(var(--glow)); animation: edgeSpin 9s linear infinite paused; }
+.grid.ai-glow .ai-edge i::before { animation-play-state: running; }
+.ai-edge .ae-line { padding: 2.5px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+/* The bloom comes in from the top, right and bottom. The left edge, beside the assistant panel, keeps just the line,
+   so the transfer arrow next to it stays crisp. */
+.ai-edge .ae-soft, .ai-edge .ae-wide { -webkit-mask: linear-gradient(270deg, #000, transparent var(--e)), linear-gradient(180deg, #000, transparent var(--e)), linear-gradient(0deg, #000, transparent var(--e)); mask: linear-gradient(270deg, #000, transparent var(--e)), linear-gradient(180deg, #000, transparent var(--e)), linear-gradient(0deg, #000, transparent var(--e)); }
+.ai-edge .ae-soft { --e: 16px; opacity: 0.5; }
+.ai-edge .ae-soft::before { animation-duration: 13s; animation-direction: reverse; }
+.ai-edge .ae-wide { --e: 56px; opacity: 0.18; }
+.grid.ai-glow .ae-wide { animation: edgeBloom 1.4s ease-out, edgeBreathe 3.2s 1.4s ease-in-out infinite alternate; }
+@keyframes edgeSpin { to { transform: rotate(1turn); } }
+@keyframes edgeBloom { from { opacity: 0.55; } }
+@keyframes edgeBreathe { to { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) {
+  .ai.lead.pv::before, .ai.lead.pv .ai-card::before, .fc.ai-in, .fc.ai-in::before, .ai-t, .row.draft::before, .row.draft::after, .row.draft.enter, .ai-edge i::before, .grid.ai-glow .ae-wide { animation: none; }
+}
 
 .hmove.ai-made .hm-t b .ic { display: inline-block; margin-right: 4px; vertical-align: -2px; }
 .hfam { cursor: grab; }
@@ -560,7 +622,7 @@ button.mres:hover { border-color: var(--line-strong); background: var(--hover); 
 .mlink span { flex: 1; }
 .mlink b { color: var(--text); font-weight: 600; }
 .mlink .ic:first-child { color: var(--selected-bar); }
-.mlink:hover { box-shadow: inset 0 0 0 1px #e6dcf3; }
+.mlink:hover { box-shadow: inset 0 0 0 1px #e2d6f7; }
 .att { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border: 1px solid var(--line-strong); border-radius: 13px; color: var(--text-2); font-weight: 500; font-size: 13px; }
 .att .ic { color: var(--text-3); }
 .fitems { display: grid; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
@@ -606,7 +668,7 @@ button.mres:hover { border-color: var(--line-strong); background: var(--hover); 
 /* ---------- Toast ---------- */
 /* Quick view: slides open under its row, like Limo Anywhere's quick edit */
 .row.open { background: var(--hover); box-shadow: inset 3px 0 0 var(--flap); }
-.qv { padding: 0 calc(var(--gut) - 16px); background: var(--hover); border-bottom: 1px solid var(--line-strong); box-shadow: inset 3px 0 0 var(--flap); }
+.qv { padding: 0 calc(var(--gut) - 16px) 0 calc(var(--gutL) - 16px); background: var(--hover); border-bottom: 1px solid var(--line-strong); box-shadow: inset 3px 0 0 var(--flap); }
 .qv.enter { animation: qvOpen 0.3s var(--ease-panel) both; }
 @keyframes qvOpen { from { clip-path: inset(0 0 100% 0); opacity: 0.4; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .qv.enter { animation: none; } }
@@ -705,7 +767,7 @@ button.mres:hover { border-color: var(--line-strong); background: var(--hover); 
 .t3 { color: var(--text-2); }
 
 /* Time-of-day blocks: big, pinned headers so the day reads in four chunks */
-.blk-h { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 12px; width: 100%; height: 68px; padding: 0 var(--gut); background: var(--board); border-bottom: 1px solid var(--line-strong); color: var(--text); }
+.blk-h { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 12px; width: 100%; height: 68px; padding: 0 var(--gut) 0 var(--gutL); background: var(--board); border-bottom: 1px solid var(--line-strong); color: var(--text); }
 .blk + .blk .blk-h { border-top: 1px solid var(--line-strong); }
 .blk-h { background-image: var(--sky, none); }
 .blk-h > .ic:first-child { box-sizing: content-box; padding: 7px; border-radius: 9px; background: var(--sky-tile, transparent); color: var(--sky-icon, var(--text-2)); }
@@ -846,7 +908,7 @@ button.mres:hover { border-color: var(--line-strong); background: var(--hover); 
 .fld.err > span, .rt-stop.err .rt-l, .nr-ret.err .switch { color: var(--needs); }
 .fld.err .inp, .fld.err select, .rt-stop.err .inp { border-color: var(--needs); }
 /* Assistant fill */
-.nr-ai { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 1px solid #e4d8f1; border-radius: 10px; background: var(--ai-bg); text-align: left; color: var(--text-2); transition: box-shadow 0.2s ease; }
+.nr-ai { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 1px solid #e2d6f7; border-radius: 10px; background: var(--ai-bg); text-align: left; color: var(--text-2); transition: box-shadow 0.2s ease; }
 button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .nr-ai > span { flex: 1; }
 .nr-ai b { margin-right: 6px; color: var(--text); font-weight: 600; }
@@ -1168,8 +1230,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .mp-eta-row .big { font: 600 24px/28px var(--f-num); }
 .mp-eta-row .to { overflow: hidden; color: var(--mp-ink-2); text-overflow: ellipsis; white-space: nowrap; }
 .mp-eta-row .r { margin-left: auto; flex: none; color: var(--mp-ink-2); font: 600 15px/20px var(--f-num); }
-.mp-bar { position: relative; display: flex; height: 5px; margin: 12px 0 2px 16px; border-radius: 3px; background: var(--mp-line); }
-.mp-bar::before { content: ''; position: absolute; left: -16px; top: -5px; border-style: solid; border-width: 7.5px 0 7.5px 12px; border-color: transparent transparent transparent var(--mp-ink); }
+.mp-bar { position: relative; display: flex; height: 5px; margin: 12px 0 2px; border-radius: 3px; background: var(--mp-line); }
 .mp-bar i { height: 100%; background: var(--mp-route); }
 .mp-bar i:first-child { border-radius: 3px 0 0 3px; }
 .mp-bar i:last-child { border-radius: 0 3px 3px 0; }
@@ -1179,6 +1240,8 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .mp-note b { color: var(--mp-ink); font-weight: 600; }
 .mp-note.late b { color: var(--mp-late); }
 .mp-note.bad b { color: var(--mp-bad); }
+.mp-note .late b { color: var(--mp-late); }
+.mp-note .bad b { color: var(--mp-bad); }
 .mp-acts { flex: none; display: flex; gap: 6px; padding: 4px 16px 14px; }
 .mp-btn { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 9px; background: var(--mp-hover); box-shadow: inset 0 0 0 1px var(--mp-line); color: var(--mp-ink); font-weight: 600; }
 .mp-btn:hover { background: var(--mp-line); }
@@ -1190,6 +1253,14 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .mp-jam { display: grid; grid-template-columns: 5px minmax(0, 1fr) auto; gap: 0 12px; width: 100%; padding: 6px 8px; border-radius: 10px; color: inherit; text-align: left; }
 .mp-jam .who { color: var(--mp-ink); font-weight: 500; }
 .mp-card.tr { width: 300px; max-height: min(420px, calc(100% - 28px)); }
+/* The traffic card, folded away: one pill in its corner that opens it again. */
+.mp-trpill { position: absolute; top: 14px; left: 14px; z-index: 3; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 14px; border-radius: 10px; background: var(--mp-card); color: var(--mp-ink); box-shadow: var(--mp-shadow); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); font-weight: 600; }
+.mp-trpill:hover { background: var(--mp-hover); }
+.mp-trpill .n { color: var(--mp-ink-2); font: 600 15px/20px var(--f-num); }
+/* A slow stretch you tap: what it adds, right where it is. */
+.mp-bub.jam { border-radius: 10px 10px 10px 3px; }
+.mp-bub.jam.slow { background: var(--mp-slow); }
+.mp-bub.jam.heavy { background: var(--mp-heavy); }
 .mp-jam:hover, .mp-jam.on { background: var(--mp-hover); }
 .mp-jam > i { grid-row: span 3; border-radius: 3px; background: var(--mp-slow); }
 .mp-jam.heavy > i { background: var(--mp-heavy); }
@@ -1722,9 +1793,9 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
-    <linearGradient id="ink24" gradientUnits="userSpaceOnUse" x1="2" y1="0" x2="22" y2="0"><stop offset="0" stop-color="#3b3aa6"/><stop offset=".55" stop-color="#7d2f84"/><stop offset="1" stop-color="#a54288"/></linearGradient>
-    <linearGradient id="ink16" gradientUnits="userSpaceOnUse" x1="2" y1="0" x2="14" y2="0"><stop offset="0" stop-color="#3b3aa6"/><stop offset=".55" stop-color="#7d2f84"/><stop offset="1" stop-color="#a54288"/></linearGradient>
-    <linearGradient id="ink14" gradientUnits="userSpaceOnUse" x1="2" y1="0" x2="12" y2="0"><stop offset="0" stop-color="#3b3aa6"/><stop offset=".55" stop-color="#7d2f84"/><stop offset="1" stop-color="#a54288"/></linearGradient>
+    <linearGradient id="ink24" gradientUnits="userSpaceOnUse" x1="2" y1="0" x2="22" y2="0"><stop offset="0" stop-color="#3a63e8"/><stop offset=".5" stop-color="#7f45dd"/><stop offset="1" stop-color="#d6407a"/></linearGradient>
+    <linearGradient id="ink16" gradientUnits="userSpaceOnUse" x1="2" y1="0" x2="14" y2="0"><stop offset="0" stop-color="#3a63e8"/><stop offset=".5" stop-color="#7f45dd"/><stop offset="1" stop-color="#d6407a"/></linearGradient>
+    <linearGradient id="ink14" gradientUnits="userSpaceOnUse" x1="2" y1="0" x2="12" y2="0"><stop offset="0" stop-color="#3a63e8"/><stop offset=".5" stop-color="#7f45dd"/><stop offset="1" stop-color="#d6407a"/></linearGradient>
   </defs>
 </svg>
 
@@ -1740,6 +1811,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
         </div>
       </div>
       <div class="timeline" id="timeline" hidden></div>
+      <div class="ai-edge" aria-hidden="true"><i class="ae-wide"></i><i class="ae-soft"></i><i class="ae-line"></i></div>
     </section>
   </div>
   <div class="placeholder" id="placeholder" hidden></div>
@@ -3035,6 +3107,15 @@ function aiGate() {
 // Headsups: a driver running late but still inside the limit. The plan works, so nothing to change.
 const aiHeads = () => { const mine = new Set(aiDecisions().flatMap(d => d.touch)); return LIVE.filter(r => !r.hidden && drvLate(r) > 0 && !lateBad(r) && !mine.has(r.id)); };
 const aiTouched = () => { const d = aiDecisions().find(x => x.id === S.aiOpen); return d ? [...d.touch] : []; };
+// While a suggestion is on the grid, what it changes glows: the families it moves, the conf # they land in (or the
+// ride whose driver changes), the new driver, and any ride it would make.
+const aiShown = () => S.aiPv ? aiDecisions().find(x => x.id === S.aiPv) : null;
+const aiMovedFam = name => !!aiShown()?.anim.includes(name);
+const isDraft = r => !!(S.aiPv && r && HMOVES.some(m => m.pv && m.nid === r.id));
+function aiGlowConf(r) { const d = aiShown(); return !!d && (d.arrows ? d.arrows.some(([, b]) => b === r.id) : d.touch.includes(r.id)); }
+const aiGlowDriver = r => !!S.aiPv && HMOVES.some(m => m.pv && m.t === 'edit' && m.from === r.id && m.set.driver);
+// Glows drawn again (a re-render) start mid-cycle, in step with the ones they replace. 24 s fits every glow loop.
+const glowDelay = () => `${-Math.round(performance.now() % 24000)}ms`;
 // An arrow in the grid's left margin, beside the pickup times, from the reservation the families leave to the one
 // they join. It shows for the open suggestion while both rows are on the grid.
 function aiArrows() {
@@ -3042,19 +3123,30 @@ function aiArrows() {
   const d = HAND && aiOn() && isLive() && S.view === 'grid' ? aiDecisions().find(x => x.id === S.aiOpen) : null;
   if (!d || !d.arrows) return;
   const base = rowsEl.getBoundingClientRect(), mid = id => { const el = rowsEl.querySelector(`.row[data-v="${id}"]`); if (!el) return null; const b = el.getBoundingClientRect(); return b.top - base.top + b.height / 2; };
-  const paths = d.arrows.map(([a, b]) => [mid(a), mid(b)]).filter(([y1, y2]) => y1 != null && y2 != null && y1 !== y2).map(([y1, y2]) => {
-    const s = Math.sign(y2 - y1), r = Math.min(4, Math.abs(y2 - y1) / 2);
-    return `<path class="ai-arrow-line" d="M13 ${y1} H${7 + r} Q7 ${y1} 7 ${y1 + s * r} V${y2 - s * r} Q7 ${y2} ${7 + r} ${y2} H11"/>
-      <circle cx="13" cy="${y1}" r="2.5"/><path d="M10 ${y2 - 4} L15 ${y2} L10 ${y2 + 4} Z"/>`;
+  // In the AI colors: cool where the families leave, warm where they land.
+  const paths = d.arrows.map(([a, b]) => [mid(a), mid(b)]).filter(([y1, y2]) => y1 != null && y2 != null && y1 !== y2).map(([y1, y2], i) => {
+    const s = Math.sign(y2 - y1), r = Math.min(4, Math.abs(y2 - y1) / 2), line = `M18 ${y1} H${8 + r} Q8 ${y1} 8 ${y1 + s * r} V${y2 - s * r} Q8 ${y2} ${8 + r} ${y2} H14`;
+    return `<linearGradient id="aiArr${i}" gradientUnits="userSpaceOnUse" x1="0" y1="${y1}" x2="0" y2="${y2}"><stop offset="0" stop-color="#4d7cff"/><stop offset=".4" stop-color="#8b5cf6"/><stop offset=".75" stop-color="#e64f9a"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient>
+      <path class="ai-arrow-line" style="stroke:url(#aiArr${i})" d="${line}"/><path class="ai-arrow-pulse" d="${line}"/>
+      <circle cx="18" cy="${y1}" r="2.5" style="fill:#4d7cff"/><path d="M13 ${y2 - 4} L18 ${y2} L13 ${y2 + 4} Z" style="fill:#ff8a3d"/>`;
   });
   if (!paths.length) return;
   const fresh = aiArrows.last !== d.id + S.aiPv; aiArrows.last = d.id + S.aiPv;
-  rowsEl.insertAdjacentHTML('beforeend', `<svg class="ai-arrows" width="16" height="${rowsEl.scrollHeight}" aria-hidden="true">${paths.join('')}</svg>`);
+  rowsEl.insertAdjacentHTML('beforeend', `<svg class="ai-arrows" width="24" height="${rowsEl.scrollHeight}" aria-hidden="true">${paths.join('')}</svg>`);
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // A new suggestion draws its arrow from the old reservation to the new one, after the families land.
-  if (fresh && !matchMedia('(prefers-reduced-motion: reduce)').matches) rowsEl.querySelectorAll('.ai-arrows .ai-arrow-line').forEach(line => {
+  if (fresh && !still) rowsEl.querySelectorAll('.ai-arrows .ai-arrow-line').forEach(line => {
     const len = line.getTotalLength();
     line.style.strokeDasharray = len;
     line.animate([{ strokeDashoffset: len }, { strokeDashoffset: 0 }], { duration: 600, delay: 350, easing: 'ease-out', fill: 'backwards' });
+  });
+  // Then a spark keeps running along it, so it reads which way the families go.
+  rowsEl.querySelectorAll('.ai-arrows .ai-arrow-pulse').forEach(p => {
+    const len = p.getTotalLength();
+    if (still) { p.remove(); return; }
+    p.style.strokeDasharray = `8 ${len + 16}`;
+    const run = p.animate([{ strokeDashoffset: 8 }, { strokeDashoffset: -len }], { duration: Math.max(900, len * 4), iterations: Infinity, easing: 'ease-in-out', delay: fresh ? 950 : 0, fill: 'backwards' });
+    if (!fresh) run.currentTime = performance.now() % Math.max(900, len * 4); // a redraw picks up where it was
   });
 }
 
@@ -3092,7 +3184,7 @@ function aiPreview(id) {
   renderRows(); aiScrollTo(d.touch);
   aiFly(d.anim, () => {
     HMOVES.push(...d.moves.map(m => Object.assign(structuredClone(m), { pv: true, grp: d.id })));
-    S.aiPv = id; handRebuild(); flash(d.touch); renderRows(); aiScrollTo(d.touch);
+    S.aiPv = id; S.draftEnter = true; handRebuild(); flash(d.touch); renderRows(); aiScrollTo(d.touch);
   });
   renderRail(); updateHeader();
 }
@@ -3101,24 +3193,49 @@ function aiUnpreview(quiet) {
   HMOVES = HMOVES.filter(m => !m.pv); S.aiPv = null; handRebuild();
   if (!quiet) { renderRows(); renderRail(); updateHeader(); }
 }
-function aiApprove(id) {
+// ed: what the dispatcher changed on a new ride before approving it ({ said, driver }).
+function aiApprove(id, ed) {
   const d = aiDecisions().find(x => x.id === id);
   if (!d) return;
   if (S.aiPv !== id) {
     aiUnpreview(true);
     aiFly(d.anim, () => { HMOVES.push(...d.moves.map(m => Object.assign(structuredClone(m), { grp: d.id }))); handRebuild(); renderRows(); });
   }
-  const mine = HMOVES.filter(m => m.grp === id);
-  mine.forEach((m, i) => { delete m.pv; Object.assign(m, { ai: true, text: i ? '' : d.title, sub: i ? '' : `${d.story} ${d.who.join('. ')}.`, why: i ? '' : d.why[0] }); });
+  const mine = HMOVES.filter(m => m.grp === id), swap = ed && ed.driver && d.toOwn && d.toOwn !== 'affiliate' ? [d.toOwn, ed.driver] : null;
+  const title = swap ? d.title.replace(`${swap[0]} drives`, `${swap[1]} drives`) : d.title;
+  const who = d.who.map(w => swap && w.startsWith(`${swap[0]}:`) ? swap[1] + w.slice(swap[0].length) : w);
+  mine.forEach((m, i) => { delete m.pv; Object.assign(m, { ai: true, text: i ? '' : title, sub: i ? '' : `${d.story}${ed ? ` You changed it: ${ed.said}.` : ''} ${who.join('. ')}.`, why: i ? '' : d.why[0] }); });
   S.aiPv = null; handSave(); handDriverLate();
-  const told = [...new Set(d.who.map(w => w.split(':')[0]).concat(d.off || []).filter(w => !/No driver/.test(w)))];
-  const up = d.moves.some(m => m.t === 'edit' && m.set.car && carFit(m.set.car, findRide(m.from)) === 'upgrade') && S.msgOn.upgrade ? ' Upgrade text sent.' : '';
-  logChange(`Approved: ${d.title}`);
+  const told = [...new Set(d.who.map(w => w.split(':')[0]).concat(d.off || []).map(w => swap && w === swap[0] ? swap[1] : w).filter(w => !/No driver/.test(w)))];
+  const up = mine.some(m => m.t === 'edit' && m.set.car && carFit(m.set.car, findRide(m.from)) === 'upgrade') && S.msgOn.upgrade ? ' Upgrade text sent.' : '';
+  logChange(`Approved: ${title}`);
   flash(d.touch);
   S.aiOpen = null; aiDecisions(); S.aiOpen = (AI_CACHE.list[0] || {}).id || null;
   renderRows(); renderRail(); renderCtx(); updateHeader();
   const confs = [...new Set(d.touch.map(findRide).filter(r => r && !r.hidden).map(cf))];
-  toast(`${d.title} (${confs.join(', ')}). ${told.length ? `${told.join(', ')} notified.` : ''}${up}`, handUndo);
+  toast(`${title} (${confs.join(', ')}). ${told.length ? `${told.join(', ')} notified.` : ''}${up}`, handUndo);
+}
+// Approve from a new ride's reservation: anything the dispatcher changed goes in with the suggestion, as one group.
+function draftApprove(id) {
+  const r = rideById(id), d = aiShown(), box = rowsEl.querySelector('.qv.draft');
+  if (!r || !d || !box) return;
+  const val = k => box.querySelector(`[data-q="${k}"]`).value;
+  // The same rule as a quick edit: the car that goes is the booked size or bigger, never smaller.
+  const picked = val('car') !== carOf(r) ? val('car') : null, newDrv = val('driver') !== (r.driver || '') && DRIVERS[val('driver')];
+  const goes = picked || (newDrv ? DRIVERS[val('driver')] : null), booked = Object.assign({}, r, { vehicle: val('vehicle') });
+  if (goes && goes !== 'Affiliate car' && carFit(goes, booked) === 'small') {
+    toast(`${picked ? `The ${picked}` : `${val('driver')}’s ${carWord(goes)}`} is smaller than the ${vtypeOf(booked.vehicle).name} this ride is booked for, so the bags won’t fit. Pick the same size or bigger.`);
+    return;
+  }
+  const set = {}, said = [];
+  if (/^\d\d:\d\d$/.test(val('time')) && tm(val('time')) !== r.pickup) { set.pickup = tm(val('time')); said.push(`pickup ${val('time')}`); }
+  if (val('vehicle') !== r.vehicle) { set.vehicle = val('vehicle'); said.push(val('vehicle')); }
+  if (val('driver') !== (r.driver || '')) { set.driver = val('driver'); set.aff = !!AFF_NAMES[val('driver')]; said.push(`${val('driver') || 'no driver'} drives${r.driver ? ` instead of ${r.driver}` : ''}`); }
+  const car = picked ?? (newDrv ? DRIVERS[val('driver')] : null);
+  if (car && car !== carOf(r)) { set.car = car; if (!newDrv) said.push(car); }
+  S.open = null;
+  if (said.length) { HMOVES.push({ t: 'edit', from: id, set, pv: true, grp: d.id }); handRebuild(); }
+  aiApprove(d.id, said.length ? { said: said.join(', '), driver: set.driver } : null);
 }
 // The card: the move as code chips, one line on why, and the cost. "Show me" acts it out on the grid.
 function aiChips(fams, cls = '') { return fams.map(f => `<b class="fc ${cls}" >${famCode(f)}</b>`).join(''); }
@@ -3137,7 +3254,7 @@ function aiCardHTML(d) {
   const details = why ? `<div class="why"><ul>${d.why.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
     <div class="opts"><span class="opts-h">Ways to cover it, in-house first</span>${d.options.map((o, i) => `<div class="opt ${o.pick ? 'pick' : ''}"><span class="opt-n num">${i + 1}</span><span class="opt-t"><b>${esc(o.label)}</b> ${esc(o.text)}</span><span class="opt-c ${o.bad ? 'bad' : ''}">${esc(o.cost)}</span></div>`).join('')}</div>
     <div class="ai-whol"><span class="opts-h">Who hears about it</span>${d.who.map(w => `<span>${esc(w)}</span>`).join('')}</div>` : '';
-  return `<div class="ai lead" data-aicard="${d.id}"><article class="ai-card x v2" aria-label="${esc(d.title)}">
+  return `<div class="ai lead ${pv ? 'pv' : ''}" data-aicard="${d.id}"><article class="ai-card x v2" aria-label="${esc(d.title)}">
     <div class="prob"><span class="t">${esc(d.title)}</span><span class="actby">act by</span><span class="tnum">${d.actBy}</span></div>
     ${body}${details}
     ${pv ? `<p class="ai-pv">${ic('spark', 13)}<span>Showing on the grid. Nothing changes until you approve.</span></p>` : ''}
@@ -3759,7 +3876,7 @@ function renderCtx() {
 // ---------- Grid columns (Settings → Grid columns, like Grid Setup in Limo Anywhere) ----------
 const COLS = {
   pickup: { label: 'PU time', w: '64px', lock: true, desc: 'Pickup time, in Seattle time. For a flight, it’s when the party reaches the curb, not when the plane lands.', cell: r => `<span class="pickup num">${fmt(r.pickup)}</span>` },
-  status: { label: 'Driver status', w: '100px', desc: 'Where the driver is on this ride. Flight status sits next to the flight, so the two never mix.', cell: r => chipHTML(r) },
+  status: { label: 'Driver status', w: '100px', desc: 'Where the driver is on this ride. Flight status sits next to the flight, so the two never mix.', cell: r => isDraft(r) ? `<span class="draft-tag">${ic('spark', 12)}<span>Not booked yet</span></span>` : chipHTML(r) },
   party: { label: 'Party', w: 'minmax(150px, 240px)', lock: true, desc: 'Who rides, with flags and late notes.', cell: (r, o) => partyHTML(r, o) },
   pax: { label: 'Pax', w: '64px', desc: 'Number of passengers. Open the ride to see each family.', cls: 'c-pax', cell: r => `${ic('users', 14)}<span${r.pax > seatsOf(r) ? ` class="over" title="${r.pax} people, ${seatsOf(r)} seats in the ${esc(carKind(r))}"` : ''}>${r.pax}</span>${r.bags == null ? '' : `<span class="gap"></span>${ic('bag', 14)}<span>${r.bags}</span>`}` },
   pu: { label: 'PU location', w: 'minmax(290px, 440px)', lock: true, desc: 'Pickup place and street. Airport pickups add the flight, landing time and flight status.', cls: 'loc', title: r => locTitle(r.pu), cell: r => puHTML(r) },
@@ -3768,8 +3885,8 @@ const COLS = {
   vehicle: { label: 'Vehicle', w: '66px', desc: 'What the passenger booked. Open the ride to see the driver’s actual car.', cell: r => carTooSmall(r)
     ? `<span class="trunc veh-bad" title="${esc(`${r.driver}’s ${carWord(DRIVERS[r.driver])} is smaller than the ${vtypeOf(r.vehicle).name} they booked. Pick another driver.`)}">${esc(r.vehicle)}</span>`
     : `<span class="trunc" title="${esc(r.vehicle)}">${esc(r.vehicle)}</span>` },
-  driver: { label: 'Driver', w: '56px', desc: 'In-house driver, or the affiliate on a farm-out.', cell: r => r.driver ? `<span class="trunc" ${r.aff ? `title="${esc(AFF_NAMES[r.driver] || r.driver)} (affiliate)"` : ''}>${esc(r.driver)}</span>` : '<span class="muted" title="No driver yet">—</span>' },
-  conf: { label: 'Conf', w: '60px', desc: 'Confirmation code: the passenger’s initials and a number. Customers, drivers and affiliates all go by it. Hover for the Limo Anywhere record.', cell: r => `<span class="num conf" title="Limo Anywhere record #${r.conf}">${esc(codeOf(r))}</span>` },
+  driver: { label: 'Driver', w: '56px', desc: 'In-house driver, or the affiliate on a farm-out.', cell: r => r.driver ? `<span class="trunc ${aiGlowDriver(r) ? 'ai-t' : ''}" ${r.aff ? `title="${esc(AFF_NAMES[r.driver] || r.driver)} (affiliate)"` : ''}>${esc(r.driver)}</span>` : '<span class="muted" title="No driver yet">—</span>' },
+  conf: { label: 'Conf', w: '60px', desc: 'Confirmation code: the passenger’s initials and a number. Customers, drivers and affiliates all go by it. Hover for the Limo Anywhere record.', cell: r => `<span class="num conf ${aiGlowConf(r) ? 'ai-t' : ''}" title="Limo Anywhere record #${r.conf}">${esc(codeOf(r))}</span>` },
   service: { label: 'Service type', w: '110px', desc: 'From airport, To airport, Point-to-point, Cruise transfer or Wine tour.', cell: r => `<span class="trunc t3">${r.service}</span>` },
   spot: { label: 'Spot time', w: '64px', desc: 'When the driver should be on location.', cell: r => `<span class="num t2">${fmt(r.spot)}</span>` },
   garage: { label: 'Garage out', w: '72px', desc: 'When the car leaves the garage.', cell: r => `<span class="num t2">${fmt(r.garage)}</span>` },
@@ -3781,7 +3898,7 @@ const COLS = {
 };
 const visCols = () => S.colOrder.filter(id => S.colOn[id]);
 function gridMinWidth() {
-  let w = 32 + 40; // side padding + the last column with the column settings button
+  let w = 40 + 40; // side padding (the left one holds the arrow) + the last column with the column settings button
   for (const id of visCols()) w += parseInt(COLS[id].w.replace('minmax(', ''), 10) + (id === 'party' ? 14 : 0);
   return w;
 }
@@ -3959,7 +4076,7 @@ function famState(f, r) {
   const fl = FLIGHTS[f[2]], mixed = new Set(r.fam.map(x => x[2])).size > 1;
   return mixed && fl.late && (fl.gate || tm(fl.lands) > NOW) ? 'late' : '';
 }
-const famChip = (f, r) => `<b class="fc ${famState(f, r)}" data-fam="${esc(f[0])}">${famCode(f)}</b>`;
+const famChip = (f, r) => `<b class="fc ${famState(f, r)} ${aiMovedFam(f[0]) ? 'ai-in' : ''}" data-fam="${esc(f[0])}">${famCode(f)}</b>`;
 // Three or more families in a row from one group, in the same state, read as a range: 7A–F.
 function famChips(r) {
   const runs = [];
@@ -3989,8 +4106,9 @@ const bracketHTML = (pos, broken, label = '') => pos ? `<span class="bracket ${p
 function rowHTML(r, o) {
   if (r.hidden) return ghostRowHTML(r, o);
   const tint = S.cfg.rowColor === 'row' && !o.sel && r.ride !== 'assigned' && r.ride !== 'quote' ? `tint-${r.ride}` : '';
-  const cls = ['row', 'cols', tint, r.ride === 'cancelled' && 'cx', o.sel && 'sel', S.open === r.id && 'open', 'clickable', S.flash.has(r.id) && 'flash'].filter(Boolean).join(' ');
-  const act = `data-a="row" data-v="${r.id}" tabindex="0" aria-expanded="${S.open === r.id}" title="Click to open · right-click for more"`;
+  const draft = isDraft(r);
+  const cls = ['row', 'cols', tint, r.ride === 'cancelled' && 'cx', o.sel && 'sel', S.open === r.id && 'open', 'clickable', S.flash.has(r.id) && 'flash', draft && 'draft', draft && S.draftEnter && 'enter'].filter(Boolean).join(' ');
+  const act = `data-a="row" data-v="${r.id}" tabindex="0" aria-expanded="${S.open === r.id}" title="${draft ? 'A new ride the assistant would make. Not booked yet: click to see it filled in' : 'Click to open · right-click for more'}"`;
   const cells = visCols().map(id => {
     const c = COLS[id];
     const pre = id === 'party' ? `<div class="cell bracket-cell">${bracketHTML(o.pos, r.broken, o.pos === 'top' && r.g ? r.g[0] : '')}</div>` : '';
@@ -4030,6 +4148,9 @@ function emptyHTML() {
   return `<div class="empty"><b>${esc(title)}</b><span>${esc(text)}</span>${S.q.trim() ? '<button class="btn sec sm" data-a="clear-search">Clear search</button>' : ''}</div>`;
 }
 function renderRows() {
+  // A suggestion on show lights the grid's edge until it's approved or put back.
+  tablewrap.parentElement.classList.toggle('ai-glow', !!S.aiPv);
+  rowsEl.style.setProperty('--gd', glowDelay());
   if (S.view === 'timeline') { renderTimeline(); return; } // every change that redraws the grid redraws the timeline instead
   const list = visibleRides(), live = isLive();
   // With the Email tab up, the rides of the open email are the ones marked, on whatever day they fall.
@@ -4068,7 +4189,7 @@ function renderRows() {
   }
   rowsEl.innerHTML = html;
   aiArrows();
-  S.qvEnter = false; // the slide plays once, when the reservation opens
+  S.qvEnter = false; S.draftEnter = false; // the slide plays once, when the reservation opens
 }
 
 // ---------- Decision rail ----------
@@ -4113,6 +4234,7 @@ function cardCompact(c) {
   </button></div>`;
 }
 function renderRail() {
+  rail.style.setProperty('--gd', glowDelay());
   rail.classList.toggle('closed', !S.railOpen);
   rail.setAttribute('aria-hidden', String(!S.railOpen));
   const open = unresolved();
@@ -4650,7 +4772,8 @@ function quickHTML(r) {
   const c = r.card && isLive() && !S.resolved[r.card] ? CARD[r.card] : null;
   const f = r.flight && FLIGHTS[r.flight];
   const q = (k, opts, cur, label) => pick('data-q', k, opts, cur, label);
-  return `<div class="qv ${S.qvEnter ? 'enter' : ''}" role="region" aria-label="Reservation ${esc(codeOf(r))}"><div class="qv-in">
+  const dr = isDraft(r);
+  return `<div class="qv ${dr ? 'draft' : ''} ${S.qvEnter ? 'enter' : ''}" role="region" aria-label="${dr ? 'New ride, not booked yet' : 'Reservation'} ${esc(codeOf(r))}"><div class="qv-in">
     <section class="qv-col">
       <h3>Pickup</h3>
       <div class="qv-pu"><span class="pt num">${fmt(r.pickup)}</span><p>${esc(pickupWhy(r))}</p></div>
@@ -4660,7 +4783,17 @@ function quickHTML(r) {
       ${mailFor(r.id) ? `<button class="qv-dec" data-a="mail-card" data-v="${mailFor(r.id).id}">${ic('mail', 15)}<span>Email from ${esc(mailFor(r.id).from)}: <b>${esc(mailFor(r.id).fix())}</b></span>${ic('right', 14)}</button>` : ''}
     </section>
     <section class="qv-col">${r.fam && r.fam.length > 1 ? famHTML(r) : tripHTML(r)}</section>
-    <section class="qv-col">
+    ${dr ? `<section class="qv-col">
+      <h3 class="ai-h">${ic('spark', 13)}<span>New ride · Conf ${esc(codeOf(r))} · not booked yet</span></h3>
+      <p class="qv-note">The assistant filled this in. Change what you like, then approve. Nothing is booked until you do.</p>
+      <div class="qv-grid">
+        <label class="ai-f">Pickup time<input class="inp" type="time" data-q="time" value="${fmt(r.pickup)}"></label>
+        <label class="ai-f">Vehicle type${q('vehicle', VEH_OPTS, r.vehicle, 'Vehicle type')}</label>
+        <label class="ai-f">Driver${q('driver', driverOpts(r), r.driver === '—' ? '' : r.driver, 'Driver')}</label>
+        <label class="ai-f">Car${q('car', carOpts(), carOf(r), 'Car')}</label>
+      </div>
+      <div class="qv-acts"><button class="btn pri sm" data-a="qv-draft-ok" data-v="${r.id}">Approve</button><button class="btn sec sm" data-a="ai-unshow">Put back</button><span class="spacer"></span><button class="btn ghost sm" data-a="qv-close">Close</button></div>
+    </section>` : `<section class="qv-col">
       <h3 title="Limo Anywhere record #${r.conf}">Quick edit · Conf ${esc(codeOf(r))}</h3>
       <div class="qv-grid">
         <label>Pickup time<input class="inp" type="time" data-q="time" value="${fmt(r.pickup)}"></label>
@@ -4670,7 +4803,7 @@ function quickHTML(r) {
         <label class="span2">Car${q('car', carOpts(), carOf(r), 'Car')}</label>
       </div>
       <div class="qv-acts"><button class="btn pri sm" data-a="qv-save" data-v="${r.id}">Save</button><button class="btn sec sm" data-a="qv-close">Close</button><span class="spacer"></span><button class="btn ghost sm" data-a="ed-open" data-v="${r.id}">Edit reservation${ic('right', 14)}</button></div>
-    </section>
+    </section>`}
   </div></div>`;
 }
 function openQuick(id) {
@@ -6301,7 +6434,7 @@ const MAP_THEMES = {
     ferry: '#5b5a70', runway: '#3e3d46', border: '#7a7983', label: '#f1f0f5', label2: '#bab9c4', street: '#a7a6b1', halo: 'rgba(24, 23, 29, 0.92)',
     route: '#3b76ff', routeCase: '#1b3d96', routeNext: '#5a6890', slow: '#f5ac2a', heavy: '#ef3e32' },
 };
-S.mp = { sel: null, win: 'soon', focus: null, drift: 0, theme: store.get('sp-map-theme') || 'auto', traffic: store.get('sp-map-traffic') !== 'off' };
+S.mp = { sel: null, win: 'soon', focus: null, drift: 0, theme: store.get('sp-map-theme') || 'auto', traffic: store.get('sp-map-traffic') !== 'off', trCard: store.get('sp-map-trcard') !== 'off' };
 const MP = { map: null, tiers: 0, boot: null, routes: null, legs: {}, jams: [], markers: new Map(), theme: null, timer: null, tick: 0, cars: [], pick: { list: [], groups: [] }, geo: null };
 const mpNow = () => NOW + S.mp.drift;
 // Day and night follow the board clock (day from 06:30 to 19:30) until the dispatcher picks one.
@@ -6395,8 +6528,9 @@ function mpRest(leg, t) {
   let cur = null;
   for (let i = at.i; i < leg.segs.length; i++) {
     const s = leg.segs[i], lvl = s.jam ? s.jam.lvl : 'clear', part = i === at.i ? 1 - at.f : 1;
-    if (!cur || cur.lvl !== lvl) { cur = { lvl, len: 0, pts: [cur ? cur.pts[cur.pts.length - 1] : at.pos] }; runs.push(cur); }
+    if (!cur || cur.lvl !== lvl) { cur = { lvl, len: 0, jam: null, pts: [cur ? cur.pts[cur.pts.length - 1] : at.pos] }; runs.push(cur); }
     cur.pts.push(leg.pts[i + 1]); cur.len += s.len * part;
+    if (s.jam) cur.jam = s.jam.id; // which jam this stretch is in, for a tap
   }
   return runs;
 }
@@ -6480,8 +6614,8 @@ function mpPlan(c) {
     stops.push({ r: c.cur, kind: 'pu', at: c.state === 'ontheway' ? c.eta : c.cur.pickup, now: true });
     legs.push(mpLeg(c.cur.pu, c.cur.do)); stops.push({ r: c.cur, kind: 'do', at: rideSpan(c.cur).end + drvLate(c.cur) }); from = c.cur.do;
   }
-  for (const r of c.later) { if (stops.length >= 4) break; ride(r); }
-  return { stops: stops.slice(0, 4), legs };
+  if (!c.cur && c.later[0]) ride(c.later[0]); // one ride: the one it's on, else the next one
+  return { stops, legs };
 }
 // Upcoming pickups, grouped by place so the airport reads as one pin with a count.
 function mpPickups() {
@@ -6610,7 +6744,21 @@ function mpInit(el) {
   m.keyboard.disableRotation();
   m.on('styleimagemissing', e => mpShield(e.id));
   m.on('load', () => { mpDraw(); if (S.mp.sel) mpFit(S.mp.sel); });
-  m.on('click', e => { if (e.originalEvent.target.closest('.maplibregl-marker')) return; if (S.mp.sel) { S.mp.sel = null; mpDraw(); renderMapSide(); } });
+  m.on('click', e => {
+    if (e.originalEvent.target.closest('.maplibregl-marker')) return;
+    const hit = mpSlowAt(e.point); // a slow or jammed stretch: say what it adds, and keep what's picked
+    if (hit) { MP.pop = { ll: [e.lngLat.lng, e.lngLat.lat], lvl: hit.lvl, jam: hit.jam }; mpDraw(); return; }
+    const had = MP.pop; MP.pop = null;
+    if (S.mp.sel) { S.mp.sel = null; mpDraw(); renderMapSide(); } else if (had) mpDraw();
+  });
+  m.on('mousemove', e => { m.getCanvas().style.cursor = mpSlowAt(e.point) ? 'pointer' : ''; });
+}
+// The jam under a tap: the traffic layer first, else a car's or ride's slow stretch. It says what the jam adds,
+// the same number as the traffic card.
+function mpSlowAt(p) {
+  const m = MP.map, layers = ['route', 'jams'].filter(id => m.getLayer(id) && m.getLayoutProperty(id, 'visibility') !== 'none');
+  const f = layers.length ? m.queryRenderedFeatures([[p.x - 7, p.y - 7], [p.x + 7, p.y + 7]], { layers }).filter(x => x.properties.jam && x.properties.lvl !== 'clear').sort((a, b) => (b.layer.id === 'jams') - (a.layer.id === 'jams'))[0] : null;
+  return f ? { lvl: f.properties.lvl, jam: f.properties.jam } : null;
 }
 
 // ----- Drawing: routes and traffic as map layers, cars and pins as HTML on top -----
@@ -6628,14 +6776,14 @@ function mpGeo(cars, pick) {
   for (const c of cars) {
     if (!c.leg || !c.leg.dist) continue;
     const on = sel === c.name || (ride && c.cur === ride); // a picked ride keeps its own car's road in view
-    for (const run of mpRest(c.leg, c.t)) if (run.pts.length > 1) routes.push(mpLine(run.pts, { car: c.name, lvl: run.lvl, sel: on, dim: !!sel && !on }));
+    for (const run of mpRest(c.leg, c.t)) if (run.pts.length > 1) routes.push(mpLine(run.pts, { car: c.name, lvl: run.lvl, sel: on, dim: !!sel && !on, jam: run.jam || '' }));
     if (sel === c.name) for (const l of mpPlan(c).legs) if (l.dist) next.push(mpLine(l.pts));
   }
   // A picked ride, or every ride at a picked place: the road it will take, colored by today's traffic.
   const trips = ride ? [ride] : sel && sel.startsWith('p:') ? (pick.groups.find(x => x.k === sel.slice(2)) || { rs: [] }).rs : [];
-  for (const r of trips) for (const run of mpTrip(r).runs) if (run.pts.length > 1) routes.push(mpLine(run.pts, { lvl: run.lvl, sel: true, dim: false }));
+  for (const r of trips) for (const run of mpTrip(r).runs) if (run.pts.length > 1) routes.push(mpLine(run.pts, { lvl: run.lvl, sel: true, dim: false, jam: run.jam || '' }));
   if (!trips.length && sel && !sel.startsWith('j:')) { const c = cars.find(x => x.name === sel); if (c && !c.leg) for (const l of mpPlan(c).legs) if (l.dist) next.push(mpLine(l.pts)); }
-  return { routes: mpFC(routes), next: mpFC(next), jams: mpFC(MP.jams.map(j => mpLine(j.pts, { lvl: j.lvl, id: j.id }))) };
+  return { routes: mpFC(routes), next: mpFC(next), jams: mpFC(MP.jams.map(j => mpLine(j.pts, { lvl: j.lvl, id: j.id, jam: j.id }))) };
 }
 function mpMarker(key, ll, html, o = {}) {
   let mk = MP.markers.get(key);
@@ -6680,31 +6828,41 @@ function mpMarkers(cars, pick) {
     if (pt) mpMarker('bub', pt, `<div class="mp-bub"><b>${mpMin(t.time)} min</b><span>Drop ${fmt(Math.round(t.drop))}</span></div>`, { anchor: 'bottom-left', offset: [6, -6], z: 45 });
   }
   if (S.mp.traffic && isLive()) for (const j of MP.jams) if (j.at) mpMarker(`j:${j.id}`, [j.at[1], j.at[0]], `<button class="mp-inc ${j.lvl}" data-a="mp-sel" data-v="j:${j.id}" aria-label="${esc(j.road)}: ${esc(j.why)}">${ic('alert', 14)}</button>`, { z: 22 });
+  if (MP.pop) { // the slow stretch that was tapped
+    const j = MP.jams.find(x => x.id === MP.pop.jam);
+    mpMarker('pop', MP.pop.ll, `<div class="mp-bub jam ${MP.pop.lvl}"><b>+${j ? mpMin(j.delay) : '?'} min</b><span>${esc(j ? j.road : '')}</span></div>`, { anchor: 'bottom-left', offset: [4, -4], z: 60 });
+  }
   for (const [k, mk] of MP.markers) if (!mk._seen) { mk.remove(); MP.markers.delete(k); }
 }
 
 // ----- The floating card (top left) and the map buttons (top right) -----
 function mpStopHTML(c, s, i) {
   const r = s.r, pu = s.kind === 'pu', key = pu ? r.pu : r.do;
-  const t = s.now && (c.state === 'ontheway' || c.state === 'customerin') ? `ETA ${fmt(Math.round(s.at))}` : s.now && c.state === 'arrived' ? `Waiting · pickup ${fmt(r.pickup)}` : fmt(Math.round(s.at));
-  const sub = pu ? `Pick up ${esc(mpWho(r))}${r.flight ? ` · ${esc(r.flight)}` : ''} · ${r.pax} ${r.pax === 1 ? 'person' : 'people'}` : `Drop off ${esc(mpWho(r))}`;
+  // The board's times; the arrival estimate sits in the box below, so it isn't said twice.
+  const t = s.now && c.state === 'arrived' ? `Waiting · pickup ${fmt(r.pickup)}` : fmt(Math.round(pu ? r.pickup : s.at));
+  const sub = pu ? `${esc(mpWho(r))}${r.flight ? ` · ${esc(r.flight)}` : ''}` : '';
   return `<li class="mp-stop ${i > 1 ? 'later' : ''}"><span class="mp-ico ${pu ? 'pu' : 'do'}">${pu ? ic(mpIcon(key), 13) : ''}</span>
     <span class="mp-st"><span class="t">${t}</span><b>${esc(key === 'GARAGE' ? 'Garage' : PL[key].name)}</b><span class="s">${sub}</span></span>
     <button class="mp-go" data-a="mp-open" data-v="${r.id}" aria-label="Open the reservation">${ic('right', 15)}</button></li>`;
+}
+// "+3 min traffic on I-5 N", or "No traffic". Two jams on the same road count as one.
+function mpTrafficSaid(jams, extra) {
+  const roads = new Map();
+  for (const [id, d] of jams) { const road = MP.jams.find(j => j.id === id).road; roads.set(road, (roads.get(road) || 0) + d); }
+  const slow = [...roads].filter(([, d]) => d >= 30).map(([road]) => road);
+  return slow.length ? `<b>+${mpMin(extra)} min</b> traffic on ${esc(slow.join(', '))}` : 'No traffic';
 }
 function mpCarCard(c) {
   const plan = mpPlan(c), r = c.cur || c.later[0], chip = c.cur ? chipHTML(c.cur) : `<span class="rs assigned">${ic('car', 12)}<span>Free</span></span>`;
   let eta = '';
   if (c.leg && c.left.time > 0) {
     const runs = mpRest(c.leg, c.t), total = runs.reduce((n, x) => n + x.len, 0) || 1, late = c.state === 'ontheway' ? drvLate(c.cur) : 0;
-    const jams = [...c.left.jams.entries()].filter(([, d]) => d >= 30).map(([id, d]) => `${MP.jams.find(j => j.id === id).road} +${mpMin(d)}`);
-    const verdict = c.state === 'ontheway'
-      ? late ? `<p class="mp-note ${lateBad(c.cur) ? 'bad' : 'late'}"><b>${late} min late</b> for the ${fmt(c.cur.pickup)} pickup.${c.cur.lateWhy ? ` Busy with ${esc(c.cur.lateWhy)}.` : ''}</p>`
-        : `<p class="mp-note">On time for the ${fmt(c.cur.pickup)} pickup, <b>${Math.max(0, Math.round(c.cur.pickup - c.eta))} min</b> to spare.</p>`
-      : '';
+    // One short line: what traffic adds, then on time or late.
+    const traffic = mpTrafficSaid(c.left.jams, c.left.extra);
+    const verdict = c.state !== 'ontheway' ? '' : late ? ` · <span class="${lateBad(c.cur) ? 'bad' : 'late'}"><b>${late} min late</b></span>` : ` · on time, ${Math.max(0, Math.round(c.cur.pickup - c.eta))} min early`;
     eta = `<div class="mp-eta"><div class="mp-eta-row"><b class="big num">${fmt(Math.round(c.eta))}</b><span class="to">${c.state === 'customerin' ? 'drop at' : 'at'} ${esc(mpShort(c.to))}</span><span class="r">${mpMin(c.left.time)} min · ${mpMi(c.left.dist)} mi</span></div>
       <div class="mp-bar" aria-hidden="true">${runs.map(x => `<i class="${x.lvl}" style="flex:${(x.len / total).toFixed(4)}"></i>`).join('')}</div>
-      <p class="mp-note">${c.leg.via ? `Via ${esc(c.leg.via)}. ` : ''}${jams.length ? `Traffic adds <b>${mpMin(c.left.extra)} min</b>: ${esc(jams.join(', '))}.` : 'No traffic on the way.'}</p>${verdict}</div>`;
+      <p class="mp-note">${traffic}${verdict}</p></div>`;
   }
   return `<div class="mp-card" role="dialog" aria-label="${esc(c.name)}"><div class="mp-card-h">${chip}<b>${esc(c.name)}</b><span class="mp-sub">${esc(carLabel(c.car))}</span><button class="mp-x" data-a="mp-sel" data-v="" aria-label="Close">${ic('x', 15)}</button></div>
     <div class="mp-card-b">${!c.leg ? `<p class="mp-lead">${esc(c.text)}</p>` : ''}${plan.stops.length ? `<ol class="mp-stops">${plan.stops.map((s, i) => mpStopHTML(c, s, i)).join('')}</ol>` : ''}${eta}</div>
@@ -6721,12 +6879,13 @@ function mpJamCard(j, cars) {
     return `<li><button data-a="mp-sel" data-v="${c.name}"><b>${esc(c.name)}</b><span>${esc(said)}</span><span class="t3 num">+${mpMin(d)} min</span></button></li>`;
   }).join('');
   return `<div class="mp-card" role="dialog" aria-label="${esc(j.road)}"><div class="mp-card-h"><b>${esc(j.road)}</b><span class="mp-sub">${j.lvl === 'heavy' ? 'Heavy traffic' : 'Slow traffic'}</span><button class="mp-x" data-a="mp-sel" data-v="" aria-label="Close">${ic('x', 15)}</button></div>
-    <div class="mp-card-b"><p class="mp-lead">${esc(j.where)}. ${esc(j.why)}. About <b>${mpMin(j.delay)} min</b> slower than a clear road, ${mpMi(j.len)} mi long.</p>
+    <div class="mp-card-b"><p class="mp-lead"><b>+${mpMin(j.delay)} min</b> · ${esc(j.where)} · ${esc(j.why)}</p>
     ${rows ? `<ul class="mp-list mp-jl">${rows}</ul>` : '<p class="mp-clear">None of our cars is on it right now.</p>'}</div></div>`;
 }
 function mpTrafficCard(cars) {
   const jams = MP.jams.slice().sort((a, b) => (b.lvl === 'heavy') - (a.lvl === 'heavy') || b.delay - a.delay);
-  return `<div class="mp-card tr" aria-label="Traffic now"><div class="mp-card-h"><b>Traffic now</b><span class="mp-sub num">${fmt(NOW)}</span></div><div class="mp-card-b">
+  if (!S.mp.trCard) return `<button class="mp-trpill" data-a="mp-trcard" aria-label="Show traffic now"><span class="mp-tr-ico"></span>Traffic now<span class="n">${jams.length}</span></button>`;
+  return `<div class="mp-card tr" aria-label="Traffic now"><div class="mp-card-h"><b>Traffic now</b><span class="mp-sub num">${fmt(NOW)}</span><button class="mp-x" data-a="mp-trcard" aria-label="Hide traffic now" title="Hide">${ic('x', 15)}</button></div><div class="mp-card-b">
     ${jams.map(j => { const on = mpOnJam(j, cars).map(x => x.c.name); return `<button class="mp-jam ${j.lvl}" data-a="mp-sel" data-v="j:${j.id}"><i></i><b>${esc(j.road)}</b><span class="d">+${mpMin(j.delay)} min</span><span>${esc(j.where)} · ${esc(j.why)}</span>${on.length ? `<span class="who">${esc(on.join(', '))} ${on.length === 1 ? 'is' : 'are'} on it</span>` : ''}</button>`; }).join('')}</div></div>`;
 }
 function mpPlaceCard(g) {
@@ -6737,15 +6896,12 @@ function mpPlaceCard(g) {
 // One ride: where it goes, the road it takes, and how long that is in today's traffic.
 function mpRideCard(r, pick) {
   const t = mpTrip(r), total = t.runs.reduce((n, x) => n + x.len, 0) || 1, here = pick.groups.find(g => g.k === r.pu);
-  const byRoad = new Map(); // two jams on the same road read as one: "I-5 N +16"
-  for (const [id, d] of t.jams) { const road = MP.jams.find(j => j.id === id).road; byRoad.set(road, (byRoad.get(road) || 0) + d); }
-  const jams = [...byRoad].filter(([, d]) => d >= 30).map(([road, d]) => `${road} +${mpMin(d)}`);
   const who = r.driver && r.driver !== '—' ? driverSaid(r) + (DRIVERS[r.driver] ? ` · ${carLabel(DRIVERS[r.driver])}` : '') : 'No driver yet';
   return `<div class="mp-card" role="dialog" aria-label="${esc(mpWho(r))}"><div class="mp-card-h"><span class="mp-ico">${ic(mpIcon(r.pu), 13)}</span><b><span class="num">${fmt(r.pickup)}</span> ${esc(mpWho(r))}</b><span class="mp-sub">${esc(cf(r))}</span><button class="mp-x" data-a="mp-sel" data-v="" aria-label="Close">${ic('x', 15)}</button></div>
     <div class="mp-card-b"><p class="mp-lead">${esc(mpShort(r.pu))}${r.flight ? ` · ${esc(r.flight)}` : ''} → ${esc(PL[r.do].name)}<br>${esc(who)}</p>
     ${t.dist ? `<div class="mp-eta"><div class="mp-eta-row"><b class="big num">${fmt(Math.round(t.drop))}</b><span class="to">drop at ${esc(mpShort(r.do))}</span><span class="r">${mpMin(t.time)} min · ${mpMi(t.dist)} mi</span></div>
       <div class="mp-bar" aria-hidden="true">${t.runs.map(x => `<i class="${x.lvl}" style="flex:${(x.len / total).toFixed(4)}"></i>`).join('')}</div>
-      <p class="mp-note">${t.leg.via ? `Via ${esc(t.leg.via)}. ` : ''}${jams.length ? `Traffic adds <b>${mpMin(t.extra)} min</b>: ${esc(jams.join(', '))}.` : 'No traffic on the way.'}</p></div>` : ''}</div>
+      <p class="mp-note">${mpTrafficSaid(t.jams, t.extra)}</p></div>` : ''}</div>
     <div class="mp-acts"><button class="mp-btn" data-a="mp-open" data-v="${r.id}">Open reservation</button>${here && here.rs.length > 1 ? `<button class="mp-btn" data-a="mp-sel" data-v="p:${r.pu}">All ${here.rs.length} at ${esc(mpShort(r.pu))}</button>` : ''}</div></div>`;
 }
 function mpUi(cars, pick) {
@@ -6797,7 +6953,7 @@ function mpFit(v) {
   const w = $('mpMap').clientWidth, left = w > 640 ? $('mpUi').querySelector('.mp-card')?.offsetWidth + 36 || 380 : 24;
   MP.map.fitBounds(b, { padding: { top: 80, bottom: 80, left, right: 90 }, maxZoom: 14.5, duration: 800 });
 }
-function mpSelect(v) { S.mp.sel = v || null; mpDraw(); renderMapSide(); if (v) mpFit(v); }
+function mpSelect(v) { S.mp.sel = v || null; MP.pop = null; mpDraw(); renderMapSide(); if (v) mpFit(v); }
 function mpZoom(v) {
   if (!MP.map) return;
   if (v === 'in') MP.map.zoomIn(); else if (v === 'out') MP.map.zoomOut();
@@ -7697,7 +7853,7 @@ document.addEventListener('click', e => {
     case 'mail-send-now': if (S.modal) { S.modal = null; renderModal(); } finishMail(v); break;
     case 'mail-gmail': toast('This would open Gmail. Not in the prototype yet.'); break;
     case 'row': {
-      if (S.aiPv) aiUnpreview();
+      if (S.aiPv && !isDraft(rideById(v))) aiUnpreview(); // a ride the suggestion would make opens with it still on show
       const r = rideById(v);
       if (!r) break;
       if (isLive() && r.card && !S.resolved[r.card] && S.openCard !== r.card) { S.openCard = r.card; renderRail(); }
@@ -7705,6 +7861,7 @@ document.addEventListener('click', e => {
       break;
     }
     case 'qv-save': quickSave(v); break;
+    case 'qv-draft-ok': draftApprove(v); break;
     case 'qv-close': { const id = S.open; S.open = null; renderRows(); rowsEl.querySelector(`.row[data-v="${id}"]`)?.focus(); break; }
     case 'qv-card': openCard(v); break;
     case 'ctx': { const at = S.ctxMenu; S.ctxMenu = null; renderOverlay(); ctxAction(v, at.id, at); break; }
@@ -7818,6 +7975,7 @@ document.addEventListener('click', e => {
     case 'mp-zoom': mpZoom(v); break;
     case 'mp-theme': S.mp.theme = mpThemeNow() === 'day' ? 'night' : 'day'; store.set('sp-map-theme', S.mp.theme); mpDraw(); break;
     case 'mp-traffic': S.mp.traffic = !S.mp.traffic; store.set('sp-map-traffic', S.mp.traffic ? 'on' : 'off'); mpDraw(); break;
+    case 'mp-trcard': S.mp.trCard = !S.mp.trCard; store.set('sp-map-trcard', S.mp.trCard ? 'on' : 'off'); mpDraw(); break;
     case 'mp-sms': smsOpenFor(v, 'driver'); break;
     // Office: close-out
     case 'co-tab': S.co.tab = v; renderCloseout(); break;

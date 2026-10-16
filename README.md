@@ -10,6 +10,7 @@ The board is one HTML file with no build step. To run it yourself, serve the pro
 
 ## What you can try
 
+- **Sign-in and tour**: the link opens on the product's sign-in, already filled in. It signs you in by itself, then offers a 1-minute tour that plays the real board: a row, the assistant's fix on the grid, the Map, the Inbox. Skip it to go straight to the board. Help → Replay the tour plays it again.
 - **Schedule** in the header: pick today, tomorrow or any date, and filter by Upcoming, Done, Quotes, All, vehicle type and in-house or affiliate.
 - **Grid**: rides are split into Overnight, Morning, Afternoon and Evening. Click a ride's driver status to move it along: Assigned, En route, Arrived, Picked up, Done. Green means the driver is on time, amber a little late, red late past the wait limit. Click a ride for its quick view, right-click it for actions.
 - **Assistant** (left panel): approve, adjust or undo the suggested fixes for broken shared vans and late drivers. The Email tab ties incoming requests to rides and drafts the reply.

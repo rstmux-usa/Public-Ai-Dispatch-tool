@@ -383,12 +383,6 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .bracket.broken .vl { color: var(--needs); background: none; }
 .rail-ctx { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; border-radius: 6px; background: var(--raised); color: var(--text-2); font-size: 13px; line-height: 18px; }
 .rail-ctx .ic { margin-top: 2px; color: var(--text-3); }
-/* First visit: who you are on this board and what to try, until "Got it". Neutral, because it isn't the assistant. */
-.start { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 14px; border-radius: 8px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); color: var(--text-2); font-size: 13px; line-height: 19px; }
-.start p { margin: 0; }
-.start b { color: var(--text); font-weight: 600; }
-.start .fc { display: inline-grid; vertical-align: 1px; }
-.start .btn { margin-top: 4px; }
 .sec { display: flex; flex-direction: column; gap: 10px; }
 .sec-t { display: flex; align-items: center; gap: 8px; }
 .sec-t .ic { color: var(--text-3); }
@@ -555,6 +549,27 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 @media (prefers-reduced-motion: reduce) {
   .ai.lead.pv::before, .ai.lead.pv .ai-card::before, .fc.ai-in, .fc.ai-in::before, .ai-t, .row.draft::before, .row.draft::after, .row.draft.enter, .ai-edge i::before, .grid.ai-glow .ae-wide { animation: none; }
 }
+/* ---------- Opening ----------
+   So the page never flashes half-built: the sun comes up and the day is named while the board loads, then the sign-in
+   takes over. When the sign-in leaves, the board builds itself in reading order (header, day bar, rides, the
+   assistant), and someone who skips the tour sees the first decision glow once. */
+.intro { position: fixed; left: 0; right: 0; top: 0; height: 100%; z-index: 95; display: grid; place-items: center; overflow: hidden; background: var(--hdr-bg); color: var(--hdr-text); }
+/* Golden hour: a warm sky comes up with the sun. */
+.intro::before { content: ""; position: absolute; left: 50%; top: 50%; width: 900px; height: 520px; margin: -300px 0 0 -450px; background: radial-gradient(closest-side, rgba(243, 160, 74, 0.26), rgba(210, 74, 108, 0.12) 55%, transparent); animation: introText 1.4s 0.2s ease-out both; pointer-events: none; }
+.intro-in { display: grid; justify-items: center; gap: 8px; text-align: center; transition: opacity 0.25s ease, transform 0.5s var(--ease-panel); }
+.intro-sun { position: relative; width: 280px; height: 60px; margin-bottom: 14px; overflow: hidden; }
+.intro-sun .disc { position: absolute; left: 50%; bottom: 0; width: 76px; height: 76px; margin-left: -38px; border-radius: 50%; background: radial-gradient(circle at 50% 35%, #ffd98a, #f3a04a 45%, #e8673f 75%, #d24a6c); box-shadow: 0 0 48px 6px rgba(243, 160, 74, 0.45); animation: sunUp 1.2s 0.15s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.intro-sun .hz { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--sunset); animation: hzDraw 0.7s ease-out both; }
+.intro-brand { font-weight: 600; font-size: 34px; line-height: 40px; animation: introText 0.6s 0.6s ease-out both; }
+.intro-day { font: 500 19px/24px var(--f-num); letter-spacing: 0.04em; color: rgba(245, 243, 238, 0.7); animation: introText 0.6s 0.85s ease-out both; }
+@keyframes sunUp { from { transform: translateY(100%); } to { transform: translateY(42%); } }
+@keyframes hzDraw { from { transform: scaleX(0); } }
+@keyframes introText { from { opacity: 0; transform: translateY(8px); } }
+/* Last beat: the first decision glows once, and its Show me button calls for a click. */
+.ai.lead.spot::before { animation: glowSpin 1.8s linear, spotBloom 1.8s ease-out; }
+@keyframes spotBloom { 40% { inset: -7px; filter: blur(16px); opacity: 0.85; } }
+.ai.lead.spot [data-a="ai-show"] { animation: showCall 1.4s 0.5s ease-out 2; }
+@keyframes showCall { from { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.55); } to { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); } }
 
 .hmove.ai-made .hm-t b .ic { display: inline-block; margin-right: 4px; vertical-align: -2px; }
 .hfam { cursor: grab; }
@@ -1753,6 +1768,62 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
   .vehs, .drvs { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* ---------- Sign-in and the 1-minute tour ----------
+   For a first-timer (a recruiter, a hiring manager): the product's own sign-in over the user's sunset photo, filled
+   in and read-only, then a short tour on the real board. The tour is dusk and white, never violet: it isn't the
+   assistant. */
+.si { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px 16px; overflow: hidden; background: var(--hdr-bg); transition: opacity 0.45s ease; animation: siCome 0.5s ease-out; }
+@keyframes siCome { from { opacity: 0; } } /* over the opening's sunrise, which covered the page while it loaded */
+.si-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 85%; opacity: 0; transition: opacity 0.6s ease; }
+.si-photo.on { opacity: 1; }
+/* A little dusk at the top, so the card reads and the board's dusk header follows. */
+.si::before { content: ""; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, rgba(21, 20, 44, 0.5) 0%, rgba(21, 20, 44, 0.12) 50%, rgba(21, 20, 44, 0) 75%); pointer-events: none; }
+.si.out { opacity: 0; pointer-events: none; }
+.si-card { position: relative; z-index: 2; width: 360px; max-width: 100%; margin-top: -10vh; display: flex; flex-direction: column; gap: 14px; padding: 30px 28px 24px; overflow: hidden; border-radius: 12px; background: var(--panel); box-shadow: 0 24px 60px rgba(21, 20, 44, 0.35), 0 2px 8px rgba(21, 20, 44, 0.12); }
+.si-card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--sunset); }
+.si-card.swap > * { animation: siIn 0.4s ease-out both; }
+@keyframes siIn { from { opacity: 0; transform: translateY(6px); } }
+.si-brand { display: flex; align-items: center; gap: 9px; }
+.si-brand .ic { color: var(--sun); }
+.si-brand b { font-weight: 600; font-size: 19px; line-height: 24px; }
+.si-h { margin: 2px 0 0; font-weight: 600; font-size: 24px; line-height: 30px; }
+.si-f { display: grid; gap: 5px; font-weight: 600; font-size: 13px; line-height: 18px; color: var(--text-2); }
+.si-f .inp { width: 100%; height: 40px; background: var(--raised); cursor: default; }
+.si-f .inp:focus { border-color: var(--line-strong); box-shadow: none; }
+.si-pw { letter-spacing: 0.14em; }
+.si-btn { justify-content: center; height: 40px; font-size: 15px; }
+.si-wait { display: flex; align-items: center; gap: 10px; min-height: 18px; color: var(--text-3); font-size: 13px; line-height: 18px; }
+.si-bar { flex: 1; height: 3px; overflow: hidden; border-radius: 2px; background: var(--line); }
+.si-bar i { display: block; height: 100%; background: var(--sunset); transform-origin: left; animation: siFill 1.5s linear both; }
+@keyframes siFill { from { transform: scaleX(0); } }
+.si-card.choice { text-align: center; }
+.si-card.choice .avatar { align-self: center; margin-bottom: 2px; }
+.si-sub { margin-top: -10px; color: var(--text-2); }
+.si-card.choice .si-sub { margin-bottom: 6px; }
+.si-foot { position: relative; z-index: 2; color: rgba(255, 255, 255, 0.92); font-size: 13px; line-height: 18px; text-shadow: 0 1px 3px rgba(21, 20, 44, 0.6); }
+
+.tour { position: fixed; inset: 0; z-index: 92; transition: opacity 0.3s ease; }
+.tour.out { opacity: 0; pointer-events: none; }
+.tour-dim { position: absolute; inset: 0; background: rgba(21, 20, 44, 0.6); transition: clip-path 0.45s var(--ease-panel); }
+/* A warm ring around what's explained: the sun's color, so it reads as the product, not the assistant. */
+.tour-ring { position: absolute; border-radius: 10px; box-shadow: 0 0 0 2px rgba(246, 244, 238, 0.95), 0 0 22px 3px rgba(243, 180, 83, 0.35); pointer-events: none; transition: left 0.45s var(--ease-panel), top 0.45s var(--ease-panel), width 0.45s var(--ease-panel), height 0.45s var(--ease-panel), opacity 0.2s ease; }
+.tour-card { position: absolute; width: 304px; display: grid; gap: 6px; padding: 18px 18px 14px; border-radius: 10px; background: var(--panel); box-shadow: 0 16px 40px rgba(21, 20, 44, 0.32), 0 2px 6px rgba(21, 20, 44, 0.12); transition: left 0.45s var(--ease-panel), top 0.45s var(--ease-panel); }
+.tour { animation: tourIn 0.3s ease-out; }
+@keyframes tourIn { from { opacity: 0; } }
+.tour.still .tour-dim, .tour.still .tour-ring, .tour.still .tour-card, .tour.still .tour-arrow { transition: none; }
+.tour-card h2 { font-weight: 600; font-size: 17px; line-height: 22px; }
+.tour-card p { color: var(--text-2); text-wrap: pretty; }
+.tour-card.fresh .tour-txt { animation: siIn 0.35s ease-out both; }
+.tour-arrow { position: absolute; width: 14px; height: 14px; border-radius: 2px; background: var(--panel); transform: rotate(45deg); transition: left 0.45s var(--ease-panel), top 0.45s var(--ease-panel); }
+.tour-foot { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+.tour-dots { display: flex; align-items: center; gap: 5px; margin-right: auto; }
+.tour-dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--line-strong); transition: width 0.3s ease, background-color 0.3s ease; }
+.tour-dots i.past { background: var(--text-3); }
+.tour-dots i.on { width: 16px; background: var(--flap); }
+/* The tour presses the assistant's Show me itself: a quick push, then the fix plays. */
+.tour-press { transform: scale(0.94); box-shadow: 0 0 0 4px rgba(43, 42, 90, 0.16); transition: transform 0.12s ease, box-shadow 0.12s ease; }
+@media (prefers-reduced-motion: reduce) { .si-bar { display: none; } }
+
 /* ---------- Narrow screens ---------- */
 @media (max-width: 1180px) {
   .mm { flex-wrap: wrap; gap: 28px; padding: 24px 20px 32px; }
@@ -1798,6 +1869,17 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
     <linearGradient id="ink14" gradientUnits="userSpaceOnUse" x1="2" y1="0" x2="12" y2="0"><stop offset="0" stop-color="#3a63e8"/><stop offset=".5" stop-color="#7f45dd"/><stop offset="1" stop-color="#d6407a"/></linearGradient>
   </defs>
 </svg>
+
+<script>
+// The opening's title card goes up here, before the board's markup and its big script load, so the page never flashes
+// half-built. It shows whenever the sign-in will (the first visit in a tab, or ?intro in the URL), and the sign-in
+// takes over from it. The board's day is fixed: Sep 4, 09:50.
+const INTRO_HTML = `<div class="intro-in"><div class="intro-sun"><span class="disc"></span><span class="hz"></span></div>
+  <b class="intro-brand">Sunset &amp; Palms</b><span class="intro-day">Thursday, Sep 4 · 09:50 in Seattle</span></div>`;
+let introUp = true;
+try { introUp = /[?&]intro\b/.test(location.search) || sessionStorage.getItem('sp-signed') !== 'yes'; } catch { /* no storage: the sign-in shows, so the card does too */ }
+if (introUp) document.body.insertAdjacentHTML('afterbegin', `<div class="intro" aria-hidden="true">${INTRO_HTML}</div>`);
+</script>
 
 <div class="app">
   <header class="hdr" id="hdr"></header>
@@ -3272,13 +3354,7 @@ function aiRailHTML() {
   const gates = aiGate().map(({ code, f, hit, T }) => `<div class="gate-card"><div class="gate-h"><b class="num">${code}</b><span class="spacer"></span><span class="gate-d">+${f.late} min, at the gate</span></div>
     <p>${hit ? `If it leaves like that, ${esc(codesShort(hit.B))} (${cf(hit.R)}) would make ${esc(famCode(hit.first) || hit.first[0])} wait ${hit.sp.wait} min. Ready once it takes off: ${esc(T ? `${codesShort(hit.B)} ride with ${codesShort(T.t.fam)}, ${cf(T.t)} (${T.pax} of ${T.seats} seats)` : `${codesShort(hit.B)} get their own car`)}.` : 'Nothing breaks even if it leaves this late.'} Nothing changes until it takes off.</p></div>`).join('');
   const heads = aiHeads().map(r => `<div class="ai"><div class="ai-card h">${ic('spark', 16)}<p>${esc(`${r.driver} is about ${drvLate(r)} min late for ${rideSaid(r)} (${cf(r)}), after ${r.lateWhy}. ${promised(r) ? `That’s ${S.cfg.promise - drvLate(r)} min before our on-time promise makes the ride free, so keep an eye on it.` : `That’s inside the ${S.cfg.limit} min limit, so nothing to change.`}`)}</p></div></div>`).join('');
-  // For someone opening the board for the first time, e.g. a recruiter: the story in three lines, then the first try.
-  const start = list.length && store.get('sp-start') !== 'seen' ? `<section class="start" aria-label="Start here">
-    <p><b>You’re the dispatcher.</b> It’s ${fmt(NOW)} on Thursday, Sep 4, 2025, a real day with 64 rides. Flights are landing late, and a shared van just broke.</p>
-    <p>The assistant has ${list.length} ${list.length > 1 ? 'fixes' : 'fix'} ready. Press <b>Show me</b> to see the first one on the grid, then <b>Approve</b>. Nothing changes until you do, and Undo takes it back.</p>
-    <p>Codes like <b class="fc">3C</b> are families: group 3, family C.</p>
-    <button class="btn sec sm" data-a="start-close">Got it</button></section>` : '';
-  return `${start}<section class="sec"><div class="sec-t big"><b>Decisions</b><span class="cnt">${list.length}</span></div>${cards}</section>
+  return `<section class="sec"><div class="sec-t big"><b>Decisions</b><span class="cnt">${list.length}</span></div>${cards}</section>
     ${gates ? `<section class="sec"><div class="sec-t">${ic('clock', 15)}<b>Waiting for takeoff</b></div>${gates}</section>` : ''}
     ${heads ? `<section class="sec"><div class="sec-t">${ic('bulb', 15)}<b>Heads-up</b></div><div class="cards">${heads}</div></section>` : ''}
     ${handRailHTML(true)}`;
@@ -3759,6 +3835,7 @@ const MEGA = {
         </div></div>
       </div>
       <div class="mm-side">
+        <div class="mm-col mm-item" style="--i:3"><h4>New here?</h4><button class="mm-link" data-a="tour-replay"><span class="ck">${ic('help', 16)}</span><span>Replay the tour</span></button></div>
         <div class="mm-col mm-item" style="--i:3"><h4>Shortcuts</h4><div class="keys">
           <div><kbd>/</kbd>Search rides</div><div><kbd>Esc</kbd>Close a menu</div>
         </div></div>
@@ -7882,7 +7959,7 @@ document.addEventListener('click', e => {
     case 'ai-show': aiPreview(v); break;
     case 'ai-unshow': aiUnpreview(); break;
     case 'ai-approve': aiApprove(v); break;
-    case 'start-close': store.set('sp-start', 'seen'); renderRail(); break;
+    case 'tour-replay': tourStart(true); break;
     case 'ai-why': S.aiWhy[v] = !S.aiWhy[v]; renderRail(); break;
     case 'ai-toggle': aiUnpreview(true); store.set('sp-ai', aiOn() ? 'off' : 'on'); AI_CACHE.key = ''; S.aiOpen = aiOn() ? (aiDecisions()[0] || {}).id || null : null; renderAll(); break;
     case 'h-copy': handCopy(); break;
@@ -8166,6 +8243,7 @@ document.addEventListener('input', e => {
   }
 });
 document.addEventListener('keydown', e => {
+  if (onbBusy()) return; // the sign-in or the tour has the keyboard
   const typing = e.target.matches?.('input, select, textarea');
   // The new reservation window: suggestion lists first, then the window itself.
   if (S.nr && TY && TY.el === e.target) {
@@ -8250,8 +8328,302 @@ document.addEventListener('mousedown', e => { if (e.target.closest?.('.ty-i')) e
 
 if (HAND) handInit(); else buildCodes();
 if (aiOn()) S.aiOpen = (aiDecisions()[0] || {}).id || null;
+// ---------- Opening ----------
+// The sunrise card covers the page while it loads (the script before the board), and the sign-in takes over from it.
+// When the sign-in leaves, the board builds itself in reading order: header, day bar, the rides on screen, the
+// assistant. Then comes what's next: the tour, or for someone who skips it, a glow on the first decision. A click or a
+// key lands the build at once and moves on.
+let INTRO = null;
+function boardBuild(then) {
+  introEnd();
+  if (onbStill()) { then?.(); return; }
+  const I = INTRO = { anims: [], then };
+  // Attached only now, after the sign-in has left, so the click that leaves it can't cut the build short.
+  const skip = () => introEnd(true);
+  document.addEventListener('pointerdown', skip, { capture: true });
+  document.addEventListener('keydown', skip, { capture: true });
+  I.off = () => { document.removeEventListener('pointerdown', skip, { capture: true }); document.removeEventListener('keydown', skip, { capture: true }); };
+  // Only what's on screen moves; the rest is simply there.
+  const onScreen = x => { const b = x.getBoundingClientRect(); return b.height && b.top < innerHeight && b.bottom > 0; };
+  const show = (els, at, step, from) => els.filter(onScreen).forEach((x, i) => I.anims.push(x.animate([{ opacity: 0, transform: from }, { opacity: 1, transform: 'none' }],
+    { duration: 520, delay: at + Math.min(i, 16) * step, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' })));
+  show([...hdr.children], 120, 70, 'translateY(-4px)');
+  show([ctx, ...rowsEl.querySelectorAll('.blk-h, .thead, .row, .note')], 160, 24, 'translateY(10px)');
+  show([...rail.querySelectorAll('.rail-top, .sec-t, .cards > *, .gate-card')], 420, 70, 'translateX(-14px)');
+  // What's next starts once the header and rides are in; the last of the panel lands under it.
+  I.timer = setTimeout(() => { if (INTRO !== I) return; INTRO = null; I.off(); then?.(); }, 1100);
+}
+// go: a click or key during the build: everything lands now and what's next starts.
+function introEnd(go) {
+  const I = INTRO;
+  if (!I) return;
+  INTRO = null;
+  clearTimeout(I.timer); I.off();
+  I.anims.forEach(a => a.finish());
+  if (go) I.then?.();
+}
+// For someone who skips the tour: the first decision glows once, and its Show me button calls for a click.
+function introSpot() {
+  const lead = rail.querySelector('.ai.lead');
+  if (!lead || onbStill()) return;
+  lead.classList.add('spot');
+  setTimeout(() => lead.classList.remove('spot'), 3400);
+}
+
 buildHeader();
 renderThead();
 renderAll();
 document.fonts?.ready.then(() => { pillPlaced = false; placePill(pillRest()); syncHdrH(); });
+
+// ---------- Sign-in and the 1-minute tour ----------
+// For someone who has never dispatched (a recruiter, a hiring manager). The product's own sign-in comes first, filled
+// in and read-only: nothing is typed, kept or sent. It signs in by itself, then offers a short tour or the board.
+// The tour dims everything but one part and acts it out on the real board, so it can't go out of date. It remembers
+// "tour seen" (localStorage) and "signed in" for this tab (sessionStorage). Help → "Replay the tour" plays it again.
+const ses = {
+  get: k => { try { return sessionStorage.getItem(k); } catch { return null; } },
+  set: (k, v) => { try { sessionStorage.setItem(k, v); } catch { /* private window: the sign-in shows again on reload */ } },
+};
+let SI = null, TOUR = null;
+const onbBusy = () => !!(SI || TOUR);
+const onbStill = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+function onbInert(on) { document.querySelector('.app').inert = on; mega.inert = on; }
+// Tab stays inside the sign-in card or the tour card.
+function onbTrap(e, box) {
+  const f = [...box.querySelectorAll('button')].filter(b => !b.hidden && !b.disabled);
+  if (!f.length) return;
+  e.preventDefault();
+  const i = f.indexOf(document.activeElement);
+  f[i < 0 ? 0 : (i + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+}
+
+// ----- Sign-in -----
+const siFormHTML = () => `<div class="si-brand">${ic('sun', 26)}<b>Sunset &amp; Palms</b></div>
+    <h1 class="si-h" id="siTitle">Sign in to Dispatch</h1>
+    <label class="si-f"><span>Email</span><input class="inp" value="sasha.klein@sunsetpalms.example" readonly tabindex="-1" autocomplete="off" spellcheck="false"></label>
+    <label class="si-f"><span>Password</span><input class="inp si-pw" value="••••••••••••" readonly tabindex="-1" autocomplete="off" aria-label="Password, filled in"></label>
+    <button class="btn pri si-btn" data-si="go">Sign in</button>
+    <p class="si-wait" role="status"><span class="si-bar" aria-hidden="true"><i></i></span><span>Signing you in…</span></p>`;
+const siChoiceHTML = () => `<span class="avatar xl">${ME.initials}</span>
+    <h1 class="si-h" id="siTitle">Hi, ${esc(ME.name.split(' ')[0])}</h1>
+    <p class="si-sub">${esc(ME.role)}</p>
+    <button class="btn pri si-btn" data-si="tour">Take the 1-minute tour</button>
+    <button class="btn sec si-btn" data-si="skip">Skip, go to the board</button>`;
+function signInShow() {
+  const el = Object.assign(document.createElement('div'), { className: 'si' });
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'siTitle');
+  el.innerHTML = `<img class="si-photo" src="img/sunset-palms.jpg" alt="" decoding="async"><div class="si-card">${siFormHTML()}</div><p class="si-foot">Demo account. Nothing is typed or sent.</p>`;
+  const photo = el.querySelector('.si-photo'); // fades in once loaded, over the dusk
+  photo.addEventListener('load', () => photo.classList.add('on'));
+  el.addEventListener('click', e => { const b = e.target.closest('[data-si]'); if (b) siAct(b.dataset.si); });
+  document.body.append(el);
+  SI = { el, card: el.querySelector('.si-card'), timer: setTimeout(signedIn, 1500) };
+  onbInert(true);
+  SI.card.querySelector('[data-si="go"]').focus();
+  setTimeout(() => document.querySelector('.intro')?.remove(), onbStill() ? 0 : 520); // the opening's card, once the sign-in covers it
+}
+function signedIn() {
+  if (!SI || SI.done) return;
+  clearTimeout(SI.timer); SI.done = true;
+  ses.set('sp-signed', 'yes');
+  if (store.get('sp-tour') === 'seen' && !/[?&]intro\b/.test(location.search)) { signInClose(); boardBuild(introSpot); return; } // back again: straight to the board
+  SI.card.innerHTML = siChoiceHTML();
+  SI.card.classList.add('choice', 'swap');
+  SI.card.querySelector('[data-si="tour"]').focus();
+}
+function signInClose() {
+  if (!SI) return;
+  const el = SI.el;
+  SI = null;
+  el.classList.add('out');
+  setTimeout(() => el.remove(), onbStill() ? 0 : 460);
+  if (!TOUR) onbInert(false);
+}
+function siAct(k) {
+  if (k === 'go') signedIn();
+  else if (k === 'tour') { signInClose(); boardBuild(() => tourStart()); }
+  else if (k === 'skip') { store.set('sp-tour', 'seen'); signInClose(); boardBuild(introSpot); }
+}
+
+// ----- The tour -----
+const trRect = x => { if (!x || !x.getBoundingClientRect) return x || null; const b = x.getBoundingClientRect(); return b.width || b.height ? { l: b.left, t: b.top, r: b.right, b: b.bottom } : null; };
+const trUnion = rs => { rs = rs.filter(Boolean); return rs.length ? { l: Math.min(...rs.map(q => q.l)), t: Math.min(...rs.map(q => q.t)), r: Math.max(...rs.map(q => q.r)), b: Math.max(...rs.map(q => q.b)) } : null; };
+// The first few rides on screen, and a family code among them to explain.
+const tourRows = () => { const w = tablewrap.getBoundingClientRect(); return [...rowsEl.querySelectorAll('.row[data-v]')].filter(r => { const b = r.getBoundingClientRect(); return b.top >= w.top && b.bottom <= w.bottom; }).slice(0, 4); };
+const tourFam = () => tourRows().flatMap(r => [...r.querySelectorAll('.fc')]).find(x => /^\d+[A-Z]$/.test(x.textContent.trim()));
+// An email the assistant matched to a ride and prepared a change for, so both halves of the work show.
+const tourMail = () => { const open = inboxItems().filter(x => x.src === 'gmail' && mailState(x.m.id) === 'open' && !isBlocked(x.m)); return open.find(x => mailRides(x.m).length) || open[0]; };
+// Each step: the view it needs, what it lights up (holes), what the card points at (anchor), and what it acts out.
+const TOUR_STEPS = [
+  { view: 'grid', side: 'bottom',
+    title: () => 'You’re the dispatcher',
+    body: () => `It’s ${fmt(NOW)} on a real Seattle day with ${dayCount(TODAY)} rides. Flights are landing late, and a shared van just broke.`,
+    holes: () => [hdr], anchor: () => $('clock') },
+  { view: 'grid', side: 'bottom',
+    enter() { tablewrap.scrollTop = 0; },
+    title: () => 'One row is one ride',
+    body: () => { const m = /^(\d+)([A-Z])$/.exec(tourFam()?.textContent.trim() || ''); return `${m ? `${m[0]} is a family: group ${m[1]}, family ${m[2]}.` : 'Codes like 3C are families: group 3, family C.'} The driver chip is green on time, amber late, red past the limit.`; },
+    holes: () => [trUnion(tourRows().map(trRect)) || tablewrap], anchor: () => tourFam() || tourRows()[0] },
+  // The tour presses Show me itself, so the families fly on the grid. Approving stays the dispatcher's call.
+  { view: 'grid', side: 'bottom',
+    enter(t) {
+      if (!S.railOpen) setRail(true);
+      if (HAND && !aiOn()) { store.set('sp-ai', 'on'); AI_CACHE.key = ''; renderAll(); }
+      const d = HAND ? aiDecisions()[0] : null;
+      t.dec = d ? d.id : null; t.touch = d ? d.touch : [];
+      if (!d) return;
+      if (S.aiPv) aiUnpreview(); // from the top, so Back plays it again
+      S.aiOpen = d.id; renderRail(); renderRows();
+      t.later(800, () => {
+        rail.querySelector(`[data-a="ai-show"][data-v="${d.id}"]`)?.classList.add('tour-press');
+        t.later(240, () => aiPreview(d.id));
+      });
+    },
+    leave() { rail.querySelector('.tour-press')?.classList.remove('tour-press'); },
+    title: () => 'The assistant suggests the fix',
+    body: t => `${t.dec ? 'Show me plays it on the grid; nothing is saved.' : 'When a late flight breaks a ride, the fix shows up here.'} Approve when it looks right; Undo takes it back.`,
+    holes: t => {
+      const card = t.dec && rail.querySelector(`[data-aicard="${t.dec}"]`);
+      if (!card) return [rail];
+      if (S.aiPv !== t.dec) return [card];
+      const rows = [...t.touch.map(id => rowsEl.querySelector(`.row[data-v="${id}"]`)), ...rowsEl.querySelectorAll('.row.draft')].filter(Boolean);
+      const lit = trUnion(rows.concat(rows.map(r => r.nextElementSibling).filter(n => n && n.classList.contains('note'))).map(trRect)), w = trRect(tablewrap);
+      return [card, lit && w ? { l: w.l, r: w.r, t: Math.max(lit.t, w.t), b: Math.min(lit.b, w.b) } : null];
+    },
+    anchor: t => (t.dec && rail.querySelector(`[data-aicard="${t.dec}"]`)) || rail },
+  // The tour taps the next pickup once the map is up, so its road and drive time show.
+  { view: 'map', side: 'left',
+    enter(t) {
+      let n = 0;
+      const pick = () => {
+        if (!MP.map || !MP.map.loaded()) { if (++n < 40) t.later(200, pick); return; }
+        const r = MP.pick && MP.pick.list[0];
+        if (r && !S.mp.sel) { mpSelect(`r:${r.id}`); t.mapSel = S.mp.sel; }
+      };
+      t.later(600, pick);
+    },
+    leave(t) { if (t.mapSel && S.mp.sel === t.mapSel) mpSelect(null); t.mapSel = null; },
+    title: () => 'The Map: live cars and traffic',
+    body: () => 'Tap a ride to see its road and drive time, like this one.',
+    holes: () => [$('mpMap') || $('mapPage')], anchor: () => $('mpMap') || $('mapPage') },
+  { view: 'sms', side: 'left',
+    enter() { const it = tourMail(); if (it && S.sms.sel !== it.id) { S.sms.sel = it.id; renderSms(); } },
+    title: () => 'The Inbox: email and texts',
+    body: () => 'For each request, the assistant drafts the change and the reply. Nothing goes out until you approve.',
+    holes: () => [trUnion(['.sms-conv', '.sms-ctx'].map(s => trRect($('smsPage').querySelector(s))))],
+    anchor: () => $('smsPage').querySelector('.sms-compose') || $('smsPage').querySelector('.sms-conv') },
+  { view: 'grid', side: 'bottom', next: 'Try it yourself',
+    title: () => 'Your turn',
+    body: () => `${S.aiPv ? 'Approve the fix on the grid, or open any ride.' : 'Open any ride, or drag a family to another car.'} Replay this tour from Help.`,
+    holes: () => [hdr.querySelector('[data-menu="help"]')], anchor: () => hdr.querySelector('[data-menu="help"]') },
+];
+function tourStart(fromHelp) {
+  if (TOUR) return;
+  closeMega();
+  if (S.modal) closeModal();
+  S.menu = null; S.ctxMenu = null; renderOverlay();
+  if (S.open) { S.open = null; renderRows(); }
+  if (!isLive()) selectDate(TODAY);
+  store.set('sp-tour', 'seen');
+  const el = Object.assign(document.createElement('div'), { className: 'tour still' });
+  el.innerHTML = `<div class="tour-dim"></div><span class="tour-ring"></span><span class="tour-ring"></span>
+    <section class="tour-card" role="dialog" aria-modal="true" aria-labelledby="tourT" aria-describedby="tourB">
+      <span class="tour-arrow" aria-hidden="true"></span>
+      <div class="tour-txt"><h2 id="tourT"></h2><p id="tourB"></p></div>
+      <p class="sr" aria-live="polite" id="tourLive"></p>
+      <div class="tour-foot"><span class="tour-dots" role="img"></span>
+        <button class="btn ghost sm" data-t="skip">Skip</button><button class="btn sec sm" data-t="back">Back</button><button class="btn pri sm" data-t="next">Next</button></div>
+    </section>`;
+  el.addEventListener('click', e => { const b = e.target.closest('[data-t]'); if (!b) return; if (b.dataset.t === 'skip') tourEnd(); else if (b.dataset.t === 'back') tourGo(TOUR.i - 1); else tourNext(); });
+  document.body.append(el);
+  const t = TOUR = { el, i: -1, timers: [], fromHelp: !!fromHelp, card: el.querySelector('.tour-card'), dim: el.querySelector('.tour-dim'), rings: [...el.querySelectorAll('.tour-ring')], last: '' };
+  t.later = (ms, f) => t.timers.push(setTimeout(f, ms));
+  onbInert(true);
+  tourGo(0);
+  // Follow what's lit while it moves: re-renders, scrolling, the map loading, a resized window.
+  const loop = () => { if (TOUR !== t) return; tourPlace(); t.raf = requestAnimationFrame(loop); };
+  loop();
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.remove('still')));
+}
+function tourGo(i) {
+  const t = TOUR;
+  if (!t || i < 0 || i >= TOUR_STEPS.length) return;
+  t.timers.forEach(clearTimeout); t.timers = [];
+  if (t.i >= 0) TOUR_STEPS[t.i].leave?.(t);
+  t.i = i;
+  const st = TOUR_STEPS[i], n = TOUR_STEPS.length, c = t.card;
+  if (S.view !== st.view) { S.view = st.view; S.menu = null; closeMega(); renderAll(); }
+  st.enter?.(t);
+  const title = st.title(t), body = st.body(t);
+  c.querySelector('#tourT').textContent = title;
+  c.querySelector('#tourB').textContent = body;
+  c.querySelector('#tourLive').textContent = `Step ${i + 1} of ${n}. ${title}. ${body}`;
+  const dots = c.querySelector('.tour-dots');
+  dots.innerHTML = TOUR_STEPS.map((_, k) => `<i class="${k === i ? 'on' : k < i ? 'past' : ''}"></i>`).join('');
+  dots.setAttribute('aria-label', `Step ${i + 1} of ${n}`);
+  c.querySelector('[data-t="back"]').hidden = i === 0;
+  c.querySelector('[data-t="skip"]').hidden = i === n - 1;
+  c.querySelector('[data-t="next"]').textContent = st.next || 'Next';
+  c.classList.remove('fresh'); void c.offsetWidth; c.classList.add('fresh');
+  c.querySelector('[data-t="next"]').focus({ preventScroll: true });
+}
+function tourNext() { if (TOUR) TOUR.i === TOUR_STEPS.length - 1 ? tourEnd(true) : tourGo(TOUR.i + 1); }
+function tourEnd(done) {
+  const t = TOUR;
+  if (!t) return;
+  t.timers.forEach(clearTimeout); cancelAnimationFrame(t.raf);
+  TOUR_STEPS[t.i]?.leave?.(t);
+  TOUR = null;
+  onbInert(false);
+  t.el.classList.add('out');
+  setTimeout(() => t.el.remove(), onbStill() ? 0 : 320);
+  // Finishing hands the keyboard to the fix on the grid; replaying from Help hands it back to Help.
+  (done ? rail.querySelector('[data-a="ai-approve"]') : t.fromHelp ? hdr.querySelector('[data-menu="help"]') : null)?.focus({ preventScroll: true });
+}
+// Dim everything but the holes, ring them, and set the card beside the anchor where it fits (never over a hole).
+function tourPlace() {
+  const t = TOUR, st = TOUR_STEPS[t.i], W = innerWidth, H = innerHeight, PAD = 6, M = 16, GAP = 12;
+  const holes = st.holes(t).map(trRect).filter(Boolean)
+    .map(q => ({ l: Math.max(2, q.l - PAD), t: Math.max(2, q.t - PAD), r: Math.min(W - 2, q.r + PAD), b: Math.min(H - 2, q.b + PAD) }))
+    .filter(q => q.r - q.l > 4 && q.b - q.t > 4).slice(0, 2);
+  const a = trRect(st.anchor(t)) || holes[0] || { l: W / 2, r: W / 2, t: H / 2, b: H / 2 };
+  const ax = (a.l + a.r) / 2, ay = (a.t + a.b) / 2;
+  const near = holes.find(q => ax >= q.l && ax <= q.r && ay >= q.t && ay <= q.b) || a;
+  const c = t.card, w = c.offsetWidth, h = c.offsetHeight;
+  const cx = x => Math.min(Math.max(x, M), W - w - M), cy = y => Math.min(Math.max(y, M), H - h - M);
+  const at = {
+    bottom: () => ({ x: cx(ax - w / 2), y: near.b + GAP }), top: () => ({ x: cx(ax - w / 2), y: near.t - GAP - h }),
+    right: () => ({ x: near.r + GAP, y: cy(ay - h / 2) }), left: () => ({ x: near.l - GAP - w, y: cy(ay - h / 2) }),
+  };
+  const fits = p => p.x >= M - 1 && p.y >= M - 1 && p.x + w <= W - M + 1 && p.y + h <= H - M + 1 && !holes.some(q => p.x < q.r && p.x + w > q.l && p.y < q.b && p.y + h > q.t);
+  const side = [st.side, 'bottom', 'top', 'right', 'left'].find(s => fits(at[s]()));
+  const p = side ? at[side]() : { x: cx(near.r - w - 24), y: cy(near.b - h - 24) }; // no room outside: inside the hole's corner
+  // Two holes always, so the dim morphs from one step's shape to the next.
+  const R = n => Math.round(n * 10) / 10, all = holes.length ? holes.slice() : [{ l: ax, r: ax, t: ay, b: ay }];
+  while (all.length < 2) { const q = all[0], mx = (q.l + q.r) / 2, my = (q.t + q.b) / 2; all.push({ l: mx, r: mx, t: my, b: my }); }
+  const path = `path(evenodd, 'M0 0H${W}V${H}H0Z${all.map(q => { const r = R(Math.min(10, (q.r - q.l) / 2, (q.b - q.t) / 2)); return ` M${R(q.l + r)} ${R(q.t)}H${R(q.r - r)}A${r} ${r} 0 0 1 ${R(q.r)} ${R(q.t + r)}V${R(q.b - r)}A${r} ${r} 0 0 1 ${R(q.r - r)} ${R(q.b)}H${R(q.l + r)}A${r} ${r} 0 0 1 ${R(q.l)} ${R(q.b - r)}V${R(q.t + r)}A${r} ${r} 0 0 1 ${R(q.l + r)} ${R(q.t)}Z`; }).join('')}')`;
+  const key = `${path}|${R(p.x)}|${R(p.y)}|${side}|${R(ax)}|${R(ay)}`;
+  if (key === t.last) return;
+  t.last = key;
+  t.dim.style.clipPath = path;
+  t.rings.forEach((ring, k) => { const q = holes[k]; ring.style.opacity = q ? '1' : '0'; if (q) Object.assign(ring.style, { left: `${q.l}px`, top: `${q.t}px`, width: `${q.r - q.l}px`, height: `${q.b - q.t}px` }); });
+  Object.assign(c.style, { left: `${R(p.x)}px`, top: `${R(p.y)}px` });
+  const arrow = c.querySelector('.tour-arrow'), ox = Math.min(Math.max(ax - p.x - 7, 14), w - 28), oy = Math.min(Math.max(ay - p.y - 7, 14), h - 28);
+  arrow.hidden = !side;
+  if (side) Object.assign(arrow.style, side === 'bottom' || side === 'top' ? { left: `${ox}px`, top: side === 'bottom' ? '-7px' : `${h - 7}px` } : { top: `${oy}px`, left: side === 'right' ? '-7px' : `${w - 7}px` });
+}
+// The sign-in and the tour own the keyboard: Tab stays in the card, Esc skips, arrows step through the tour.
+addEventListener('keydown', e => {
+  if (SI) {
+    if (e.key === 'Tab') onbTrap(e, SI.card);
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); if (SI.done) siAct('skip'); }
+    return;
+  }
+  if (!TOUR) return;
+  if (e.key === 'Tab') onbTrap(e, TOUR.card);
+  else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); tourEnd(); }
+  else if (e.key === 'ArrowRight' && TOUR.i < TOUR_STEPS.length - 1) { e.preventDefault(); tourGo(TOUR.i + 1); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); tourGo(TOUR.i - 1); }
+}, true);
+if (document.querySelector('.intro') || ses.get('sp-signed') !== 'yes') signInShow();
 </script>

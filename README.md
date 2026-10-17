@@ -18,7 +18,9 @@ The board is one HTML file with no build step. To run it yourself, serve the pro
 - **New** (or the N key): book a ride in one window.
 - **Settings** (gear icon): 14 sections modeled on Limo Anywhere.
 
-`prototype/palettes.html` is the Palette Lab used to pick the Golden Hour colors. `case-study/` collects material for the case study.
+`prototype/palettes.html` is the Palette Lab used to pick the Golden Hour colors.
+
+**Read the case study: https://rstmux-usa.github.io/Public-Ai-Dispatch-tool/case-study/** (`case-study/index.html`). The rest of `case-study/` is its source material: the font tests, the dispatcher's notes on the AI cards, and the rules behind them.
 
 ## About the data
 

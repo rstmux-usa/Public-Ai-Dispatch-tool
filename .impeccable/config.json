@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "case-study/index.html"
+        ],
+        "createdAt": "2026-10-17T02:56:40.338Z",
+        "reason": "Agent: a one-line redirect page shown for an instant; #f7f3ec is the product's own Golden Hour canvas (the board's cream, chosen 12 Oct in the Palette Lab), not a reflex default"
+      }
+    ]
+  }
+}

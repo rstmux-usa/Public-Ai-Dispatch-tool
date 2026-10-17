@@ -20,7 +20,7 @@ The board is one HTML file with no build step. To run it yourself, serve the pro
 
 `prototype/palettes.html` is the Palette Lab used to pick the Golden Hour colors.
 
-**Read the case study: https://rstmux-usa.github.io/Public-Ai-Dispatch-tool/case-study/** (`case-study/index.html`). The rest of `case-study/` is its source material: the font tests, the dispatcher's notes on the AI cards, and the rules behind them.
+**Read the case study: https://rstm.design/work/dispatch/** on my portfolio. `case-study/` holds its source material: the font tests, the dispatcher's notes on the AI cards, and the rules behind them.
 
 ## About the data
 

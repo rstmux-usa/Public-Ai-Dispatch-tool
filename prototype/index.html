@@ -412,18 +412,23 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 /* The glow means one thing: not saved yet. At rest the cards are plain, like every other card on the board; the open
    one has a firmer border. Only while its plan is on the grid does the open card wear the ring and halo, with the
    grid's edge, the moving chips and the new-ride row. The glow fades in when a plan goes on the grid and fades out
-   when it leaves (.in / .out), so it never pops. */
+   when it leaves (.in / .out), so it never pops. The one other time: when the board opens, and after an approval or a
+   decline, the card on top glows for a moment and fades (.hint), to say "look here". Its plan waits for a click. */
 .ai-card { position: relative; display: flex; flex-direction: column; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
 .ai-card.x { padding: 16px 18px; gap: 10px; border-color: var(--line-strong); box-shadow: 0 4px 14px rgba(19, 32, 48, 0.08), 0 1px 2px rgba(19, 32, 48, 0.05); }
-.ai.lead.pv::before, .ai.lead.out::before { content: ""; position: absolute; inset: -3px; border-radius: 11px; background: conic-gradient(from var(--glow-a), var(--glow)); filter: blur(12px); opacity: 0.6; pointer-events: none; }
-.ai.lead.pv .ai-card::before, .ai.lead.out .ai-card::before { content: ""; position: absolute; inset: -1px; padding: 1.5px; border-radius: 8px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.ai.lead.pv::before, .ai.lead.out::before, .ai.lead.hint::before { content: ""; position: absolute; inset: -3px; border-radius: 11px; background: conic-gradient(from var(--glow-a), var(--glow)); filter: blur(12px); opacity: 0.6; pointer-events: none; }
+.ai.lead.pv .ai-card::before, .ai.lead.out .ai-card::before, .ai.lead.hint .ai-card::before { content: ""; position: absolute; inset: -1px; padding: 1.5px; border-radius: 8px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
 .ai.lead.pv .ai-card.x { border-color: transparent; box-shadow: var(--ai-shadow); }
 .ai.lead.pv::before, .ai.lead.pv .ai-card::before { animation: glowSpin 4s linear infinite var(--gd, 0s); }
 .ai.lead.pv.in::before, .ai.lead.pv.in .ai-card::before { animation: glowSpin 4s linear infinite var(--gd, 0s), glowIn 0.6s ease-out; }
 .ai.lead.out::before, .ai.lead.out .ai-card::before { animation: glowOut 0.3s ease-in forwards; }
+.ai.lead.hint::before { animation: glowSpin 4s linear infinite var(--gd, 0s), hintHalo 3.2s ease-in-out var(--hd, 0s) both; }
+.ai.lead.hint .ai-card::before { animation: glowSpin 4s linear infinite var(--gd, 0s), hintRing 3.2s ease-in-out var(--hd, 0s) both; }
 @keyframes glowIn { from { opacity: 0; } }
 @keyframes glowOut { to { opacity: 0; } }
-.ai.lead:not(.pv) .ai-card.x { cursor: pointer; } /* closed back on the grid: a click shows it again */
+@keyframes hintHalo { 0%, 100% { opacity: 0; } 20%, 58% { opacity: 0.6; } 39% { opacity: 0.2; } }
+@keyframes hintRing { 0%, 100% { opacity: 0; } 20%, 58% { opacity: 1; } 39% { opacity: 0.35; } }
+.ai.lead .ai-card.x { cursor: pointer; } /* a click puts its plan on the grid, and another takes it off */
 .ai-declined { display: flex; align-items: center; gap: 4px; margin: 2px 0 0; color: var(--text-3); font-size: 13px; line-height: 18px; }
 .ai-declined .btn { margin-left: -2px; }
 .ai-card.c { padding: 12px 14px; gap: 6px; }
@@ -505,6 +510,7 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .ai-meta { margin: 0; color: var(--text-2); font-size: 13px; line-height: 18px; }
 .ai-whol { display: grid; gap: 2px; padding-top: 8px; border-top: 1px solid var(--line); color: var(--text-2); font-size: 13px; line-height: 18px; }
 .ai-pv { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--selected-bar); font-size: 13px; }
+.ai-pv.off { color: var(--text-2); }
 .fc.fly { box-shadow: 0 8px 18px rgba(139, 92, 246, 0.4), 0 0 14px rgba(245, 87, 127, 0.35); }
 /* Smaller cards, so more decisions fit beside the grid. */
 .ai-card.x.v2 { padding: 12px 14px; gap: 8px; }
@@ -585,7 +591,7 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 @keyframes edgeBloom { from { opacity: 0.55; } }
 @keyframes edgeBreathe { to { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) {
-  .ai.lead.pv::before, .ai.lead.pv .ai-card::before, .fc.ai-in, .fc.ai-in::before, .ai-t, .row.draft::before, .row.draft::after, .row.draft.enter, .ai-edge i::before, .grid.ai-glow .ae-wide { animation: none; }
+  .ai.lead.pv::before, .ai.lead.pv .ai-card::before, .ai.lead.hint::before, .ai.lead.hint .ai-card::before, .fc.ai-in, .fc.ai-in::before, .ai-t, .row.draft::before, .row.draft::after, .row.draft.enter, .ai-edge i::before, .grid.ai-glow .ae-wide { animation: none; }
 }
 /* ---------- Opening ----------
    So the page never flashes half-built: the sun comes up and the day is named while the board loads, then the sign-in
@@ -603,7 +609,6 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 @keyframes sunUp { from { transform: translateY(100%); } to { transform: translateY(42%); } }
 @keyframes hzDraw { from { transform: scaleX(0); } }
 @keyframes introText { from { opacity: 0; transform: translateY(8px); } }
-/* Last beat: the first decision glows once, and its Show me button calls for a click. */
 
 .hmove.ai-made .hm-t b .ic { display: inline-block; margin-right: 4px; vertical-align: -2px; }
 .hfam { cursor: grab; }
@@ -1860,7 +1865,7 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .tour-dots i { width: 6px; height: 6px; border-radius: 3px; background: var(--line-strong); transition: width 0.3s ease, background-color 0.3s ease; }
 .tour-dots i.past { background: var(--text-3); }
 .tour-dots i.on { width: 16px; background: var(--flap); }
-/* The tour presses the assistant's Show me itself: a quick push, then the fix plays. */
+/* The tour clicks the assistant's card itself: a quick push, then the fix plays. */
 .tour-press { transform: scale(0.94); box-shadow: 0 0 0 4px rgba(43, 42, 90, 0.16); transition: transform 0.12s ease, box-shadow 0.12s ease; }
 .nav-item.tour-press { background: rgba(255, 255, 255, 0.24); box-shadow: none; }
 @media (prefers-reduced-motion: reduce) { .si-bar { display: none; } }
@@ -2914,7 +2919,7 @@ function handUndoEntry(head) {
   const lost = keep.filter(m => !HMOVES.includes(m) && (!m.grp || m.text)).length;
   handSave();
   logChange(`Undid: ${head.text}`);
-  if (head.grp) { AI_CACHE.key = ''; if (aiDecisions().some(d => d.id === head.grp)) { S.aiOpen = head.grp; aiShowSoon(); } } // the suggestion is back on top, on the grid
+  if (head.grp) { AI_CACHE.key = ''; if (aiDecisions().some(d => d.id === head.grp)) { S.aiOpen = head.grp; aiHintSoon(); } } // the suggestion is back on top, and its card glows a moment
   S.toast = null;
   renderAll();
   const also = lost ? ` ${lost} later ${lost === 1 ? 'move' : 'moves'} relied on it, so ${lost === 1 ? 'it was' : 'they were'} undone too.` : '';
@@ -3282,25 +3287,23 @@ const aiGlowDriver = r => !!S.aiPv && !S.pvWas?.has(r.id) && HMOVES.some(m => m.
 // Glows drawn again (a re-render) start mid-cycle, in step with the ones they replace. 24 s fits every glow loop.
 const glowDelay = () => `${-Math.round(performance.now() % 24000)}ms`;
 // An arrow in the grid's left margin, beside the pickup times, from the reservation the families leave to the one
-// they join. It shows for the open suggestion while both rows are on the grid.
+// they join. It shows while the suggestion's plan is on the grid and both rows are there.
 function aiArrows() {
   rowsEl.querySelector('.ai-arrows')?.remove();
-  const d = HAND && aiOn() && isLive() && S.view === 'grid' ? aiDecisions().find(x => x.id === S.aiOpen) : null;
-  if (!d || !d.arrows) return;
+  const d = HAND && aiOn() && isLive() && S.view === 'grid' ? aiShown() : null;
+  if (!d || !d.arrows) { aiArrows.last = null; return; } // shown again later, it draws itself again
   const base = rowsEl.getBoundingClientRect(), mid = id => { const el = rowsEl.querySelector(`.row[data-v="${id}"]`); if (!el) return null; const b = el.getBoundingClientRect(); return b.top - base.top + b.height / 2; };
-  // Selected, it's a plain navy line. While the plan is on the grid (not saved yet) it takes the AI colors, cool where
-  // the families leave and warm where they land, with a spark running along it.
-  const pv = S.aiPv === d.id;
+  // Not saved yet, so it takes the AI colors: cool where the families leave and warm where they land, with a spark
+  // running along it.
   const paths = d.arrows.map(([a, b]) => [mid(a), mid(b)]).filter(([y1, y2]) => y1 != null && y2 != null && y1 !== y2).map(([y1, y2], i) => {
     const s = Math.sign(y2 - y1), r = Math.min(4, Math.abs(y2 - y1) / 2), line = `M18 ${y1} H${8 + r} Q8 ${y1} 8 ${y1 + s * r} V${y2 - s * r} Q8 ${y2} ${8 + r} ${y2} H14`;
-    if (!pv) return `<path class="ai-arrow-line" d="${line}"/><circle cx="18" cy="${y1}" r="2.5"/><path d="M13 ${y2 - 4} L18 ${y2} L13 ${y2 + 4} Z"/>`;
     return `<linearGradient id="aiArr${i}" gradientUnits="userSpaceOnUse" x1="0" y1="${y1}" x2="0" y2="${y2}"><stop offset="0" stop-color="#4d7cff"/><stop offset=".4" stop-color="#8b5cf6"/><stop offset=".75" stop-color="#e64f9a"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient>
       <path class="ai-arrow-line" style="stroke:url(#aiArr${i})" d="${line}"/><path class="ai-arrow-pulse" d="${line}"/>
       <circle cx="18" cy="${y1}" r="2.5" style="fill:#4d7cff"/><path d="M13 ${y2 - 4} L18 ${y2} L13 ${y2 + 4} Z" style="fill:#ff8a3d"/>`;
   });
   if (!paths.length) return;
-  const fresh = aiArrows.last !== d.id + S.aiPv; aiArrows.last = d.id + S.aiPv;
-  rowsEl.insertAdjacentHTML('beforeend', `<svg class="ai-arrows ${pv ? 'pv' : ''}" width="24" height="${rowsEl.scrollHeight}" aria-hidden="true">${paths.join('')}</svg>`);
+  const fresh = aiArrows.last !== d.id; aiArrows.last = d.id;
+  rowsEl.insertAdjacentHTML('beforeend', `<svg class="ai-arrows pv" width="24" height="${rowsEl.scrollHeight}" aria-hidden="true">${paths.join('')}</svg>`);
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // A new suggestion draws its arrow from the old reservation to the new one, after the families land.
   if (fresh && !still) rowsEl.querySelectorAll('.ai-arrows .ai-arrow-line').forEach(line => {
@@ -3348,7 +3351,7 @@ function aiPreview(id) {
   const d = aiDecisions().find(x => x.id === id);
   if (!d) return;
   aiUnpreview(true);
-  S.aiOpen = id;
+  S.aiOpen = id; S.aiHint = null;
   renderRows(); aiScrollTo(d.touch);
   aiFly(d.anim, () => {
     S.pvWas = new Map(LIVE.map(r => [r.id, structuredClone(r)])); // the board as booked, which the grid keeps showing
@@ -3358,8 +3361,8 @@ function aiPreview(id) {
   });
   renderRail(); updateHeader();
 }
-// An open suggestion is always on the grid: opening one plays it there (nothing is saved), and closing it puts the
-// board back. Approve saves it, Decline drops it from the list; Escape or opening a ride closes it.
+// Clicking a suggestion plays it on the grid (nothing is saved); clicking the same card again, Escape, or opening a
+// ride takes it off and puts the board back as booked. Approve saves it, Decline drops it from the list.
 function aiSelect(id) {
   if (!aiDecisions().some(x => x.id === id)) return;
   const go = () => {
@@ -3378,19 +3381,25 @@ function glowFade(then) {
   el.classList.add('out');
   setTimeout(then, 280);
 }
+// Off the grid: the card stays open, so one more click plays it again.
 function aiClose() {
-  glowFade(() => { aiUnpreview(true); S.aiOpen = null; renderRows(); renderRail(); updateHeader(); say('Put back. Nothing changed.'); });
+  glowFade(() => { aiUnpreview(true); renderRows(); renderRail(); updateHeader(); say('Put back. Nothing changed.'); });
 }
-// Show the open suggestion when the board is up and free (after it builds, an approval, a decline or an undo).
+// Point at the suggestion on top when the board is up and free (after it builds, an approval, a decline or an undo):
+// its card glows for a moment and fades. Nothing goes on the grid until the dispatcher clicks it.
 const aiCanShow = () => HAND && aiOn() && isLive() && S.view === 'grid' && S.railOpen && !onbBusy() && !S.modal && !INTRO;
-function aiShowSoon(ms = 700, focus) {
+const HINT_MS = 3200;
+function aiHintSoon(ms = 700, focus) {
   setTimeout(() => {
-    if (!aiCanShow()) return;
-    if (!S.aiOpen || !aiDecisions().some(d => d.id === S.aiOpen)) S.aiOpen = (aiDecisions()[0] || {}).id || null;
-    if (!S.aiOpen || S.aiPv === S.aiOpen) return;
+    if (!aiCanShow() || S.aiPv) return;
     const keep = focus || rail.contains(document.activeElement);
-    aiPreview(S.aiOpen);
-    if (keep) rail.querySelector('.ai.lead .ai-card')?.focus({ preventScroll: true });
+    if (!S.aiOpen || !aiDecisions().some(d => d.id === S.aiOpen)) { S.aiOpen = (aiDecisions()[0] || {}).id || null; renderRail(); }
+    const el = S.aiOpen && rail.querySelector(`.ai.lead[data-aicard="${S.aiOpen}"]`);
+    if (!el) return;
+    const hint = S.aiHint = { id: S.aiOpen, at: performance.now() };
+    el.style.setProperty('--hd', '0ms'); el.classList.add('hint');
+    setTimeout(() => { if (S.aiHint !== hint) return; S.aiHint = null; rail.querySelector('.ai.lead.hint')?.classList.remove('hint'); }, HINT_MS);
+    if (keep) el.querySelector('.ai-card')?.focus({ preventScroll: true });
   }, ms);
 }
 // Decline: the suggestion leaves the list and nothing on the board changes. The problem stays for the dispatcher to
@@ -3404,9 +3413,9 @@ function aiDecline(id) {
     S.aiOpen = (aiDecisions()[0] || {}).id || null;
     logChange(`Declined: ${d.title}`);
     renderRows(); renderRail(); updateHeader();
-    toast(`Declined: ${d.title}. Nothing changed.`, () => { S.aiDeclined.delete(id); AI_CACHE.key = ''; S.aiOpen = id; aiUnpreview(true); renderRail(); updateHeader(); aiShowSoon(0, true); });
+    toast(`Declined: ${d.title}. Nothing changed.`, () => { S.aiDeclined.delete(id); AI_CACHE.key = ''; S.aiOpen = id; aiUnpreview(true); renderRail(); updateHeader(); aiHintSoon(0, true); });
     railFocus();
-    aiShowSoon();
+    aiHintSoon();
   });
 }
 function aiUnpreview(quiet) {
@@ -3439,7 +3448,7 @@ function aiApprove(id, ed) {
   toast(`${title} (${confs.join(', ')}). ${told.length ? `Texted ${andList(told)}.` : ''}${upTo.length ? ` ${andList(upTo)} got the upgrade text.` : ''}`, handUndo);
   S.aiApprovedAt = performance.now();
   railFocus();
-  aiShowSoon(1100);
+  aiHintSoon(1100); // the next one glows a moment; it plays when clicked
 }
 // After Approve or Undo, focus goes to the decision now on top, so the keyboard carries on from there.
 function railFocus() {
@@ -3467,7 +3476,7 @@ function draftApprove(id) {
   if (said.length) { HMOVES.push({ t: 'edit', from: id, set, pv: true, grp: d.id }); handRebuild(); }
   aiApprove(d.id, said.length ? { said: said.join(', '), driver: set.driver } : null);
 }
-// The card: the move as code chips, one line on why, and the cost. "Show me" acts it out on the grid.
+// The card: the move as code chips, one line on why, and the cost. A click acts it out on the grid.
 function aiChips(fams, cls = '') { return fams.map(f => `<b class="fc ${cls}" >${famMark(cls)}${famCode(f)}${famSr(cls)}</b>`).join(''); }
 function aiTo(d) {
   if (d.to) return aiChips(d.to);
@@ -3485,10 +3494,11 @@ function aiCardHTML(d) {
   const details = why ? `<div class="why"><ul>${d.why.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''; // the reasons; who hears about it is on the card itself
   // Before Approve, the card names everyone it texts. Nobody hears about anything until then.
   const sends = tell.length ? `<p class="ai-tell">${ic('sms', 14)}<span>Approve texts ${andList(tell.map(x => `<b>${esc(x.name)}</b>`))}.</span></p>` : '';
-  return `<div class="ai lead ${pv ? 'pv' : ''} ${pv && S.pvIn ? 'in' : ''}" data-aicard="${d.id}"><article class="ai-card x v2" tabindex="-1" aria-label="${esc(d.title)}">
+  const hintAt = !pv && S.aiHint?.id === d.id ? performance.now() - S.aiHint.at : HINT_MS; // a redraw mid-glow carries on
+  return `<div class="ai lead ${pv ? 'pv' : ''} ${pv && S.pvIn ? 'in' : ''} ${hintAt < HINT_MS ? 'hint' : ''}" data-aicard="${d.id}" style="--hd:${-Math.round(hintAt < HINT_MS ? hintAt : 0)}ms"><article class="ai-card x v2" tabindex="-1" aria-label="${esc(d.title)}">
     <div class="prob"><span class="t">${esc(d.title)}</span><span class="actby">act by</span><span class="tnum">${d.actBy}</span></div>
     ${body}${details}
-    ${pv ? `<p class="ai-pv">${ic('spark', 13)}<span>Showing on the grid. Nothing changes until you approve.</span></p>` : ''}
+    ${pv ? `<p class="ai-pv">${ic('spark', 13)}<span>Showing on the grid. Nothing changes until you approve. Click the card to hide it.</span></p>` : `<p class="ai-pv off">${ic('spark', 13)}<span>Click the card to see it on the grid.</span></p>`}
     ${sends}
     <div class="actions"><button class="btn pri sm" data-a="ai-approve" data-v="${d.id}">Approve</button>
       <button class="btn sec sm" data-a="ai-decline" data-v="${d.id}">Decline</button>
@@ -3726,7 +3736,7 @@ const S = {
   vehicle: 'all', source: 'all', q: '',
   tod: 'all', driverF: 'all', puF: 'all',   // time of day, driver, pickup place
   openCard: 'c1', adjust: {}, why: {}, resolved: {}, order: [],
-  aiOpen: null, aiPv: null, aiWhy: {}, aiDeclined: new Set(), aiApprovedAt: 0, // assistant on the by-hand board
+  aiOpen: null, aiPv: null, aiHint: null, aiWhy: {}, aiDeclined: new Set(), aiApprovedAt: 0, // assistant on the by-hand board
   huDismissed: {},
   railOpen: true,
   railTab: 'board',              // board | email
@@ -3994,8 +4004,8 @@ const MEGA = {
         <div class="mm-col mm-item" style="--i:3"><h4>Shortcuts</h4><div class="keys">
           <div><kbd>/</kbd>Search rides</div><div><kbd>N</kbd>New reservation</div>
           <div><kbd>↑</kbd><kbd>↓</kbd>Move between rides</div><div><kbd>Enter</kbd>Open a ride</div><div><kbd>Shift</kbd><kbd>F10</kbd>A ride’s menu</div>
-          <div><kbd>J</kbd><kbd>K</kbd>Next or previous decision, shown on the grid</div><div><kbd>A</kbd>Approve the decision in focus</div><div><kbd>D</kbd>Decline it</div>
-          <div><kbd>Esc</kbd>Close a menu, or put a suggestion back</div>
+          <div><kbd>J</kbd><kbd>K</kbd>Next or previous decision, shown on the grid</div><div><kbd>S</kbd>Show or hide the open decision on the grid</div><div><kbd>A</kbd>Approve the decision in focus</div><div><kbd>D</kbd>Decline it</div>
+          <div><kbd>Esc</kbd>Close a menu, or take a suggestion off the grid</div>
         </div></div>
       </div>
     </div>`;
@@ -4487,7 +4497,7 @@ function renderRows() {
   // With the Email tab up, the rides of the open email are the ones marked, on whatever day they fall.
   const lm = S.railTab === 'email' ? leadMail() : null;
   const mailSel = new Set(lm && sameDay(lm.day || TODAY, viewDate()) ? mailRides(lm).map(r => r.id) : []);
-  const aiSel = new Set(HAND && aiOn() && live && !lm ? aiTouched() : []);
+  const aiSel = new Set(HAND && aiOn() && live && !lm && S.aiPv ? aiTouched() : []); // only while its plan is on the grid
   // Counts stay as booked while a suggestion is on show: a ride it would make isn't booked yet.
   const booked = rs => rs.filter(r => !isDraft(r)).length, cnt = $('ctxCount');
   if (cnt) { cnt.textContent = booked(list); $('ctxNoun').textContent = booked(list) === 1 ? 'ride' : 'rides'; }
@@ -8199,7 +8209,7 @@ document.addEventListener('click', e => {
     case 'mail-send-now': if (S.modal) { S.modal = null; renderModal(); } finishMail(v); break;
     case 'mail-gmail': toast('This would open Gmail. Not in the prototype yet.'); break;
     case 'row': {
-      if (S.aiPv && !isDraft(rideById(v))) { aiUnpreview(true); S.aiOpen = null; renderRail(); updateHeader(); } // opening a ride closes the suggestion; one it would make opens with it still on show
+      if (S.aiPv && !isDraft(rideById(v))) { aiUnpreview(true); renderRail(); updateHeader(); } // opening a ride takes the suggestion off the grid; one it would make opens with it still on show
       const r = rideById(v);
       if (!r) break;
       if (isLive() && r.card && !S.resolved[r.card] && S.openCard !== r.card) { S.openCard = r.card; renderRail(); }
@@ -8229,11 +8239,11 @@ document.addEventListener('click', e => {
     case 'ai-show': aiPreview(v); break;
     case 'ai-unshow': aiUnpreview(); break;
     case 'ai-decline': aiDecline(v); break;
-    case 'ai-undecline': { const o = S.aiOpen; aiUnpreview(true); S.aiDeclined.clear(); AI_CACHE.key = ''; S.aiOpen = o; renderRows(); renderRail(); updateHeader(); aiShowSoon(0, true); break; } // the list is frozen while a plan is on the grid: put it back, then show it again
+    case 'ai-undecline': { const o = S.aiOpen, was = S.aiPv; aiUnpreview(true); S.aiDeclined.clear(); AI_CACHE.key = ''; S.aiOpen = o; renderRows(); renderRail(); updateHeader(); if (was) aiSelect(was); else aiHintSoon(0, true); break; } // the list is frozen while a plan is on the grid: put it back, then show it again
     case 'ai-approve': glowFade(() => aiApprove(v)); break;
     case 'tour-replay': tourStart(true); break;
     case 'ai-why': S.aiWhy[v] = !S.aiWhy[v]; renderRail(); break;
-    case 'ai-toggle': aiUnpreview(true); store.set('sp-ai', aiOn() ? 'off' : 'on'); AI_CACHE.key = ''; S.aiOpen = aiOn() ? (aiDecisions()[0] || {}).id || null : null; renderAll(); aiShowSoon(); break;
+    case 'ai-toggle': aiUnpreview(true); store.set('sp-ai', aiOn() ? 'off' : 'on'); AI_CACHE.key = ''; S.aiOpen = aiOn() ? (aiDecisions()[0] || {}).id || null : null; renderAll(); aiHintSoon(); break;
     case 'h-copy': handCopy(); break;
     case 'h-reset': handReset(); break;
     case 'h-mode': store.set('sp-mode', v); location.reload(); break;
@@ -8538,19 +8548,22 @@ function gridKeys(e) {
   if (to && to !== row) { row.tabIndex = -1; to.tabIndex = 0; to.focus({ preventScroll: true }); to.scrollIntoView({ block: 'nearest' }); }
   return true;
 }
-// The decisions are a queue: J and K step through them (each one plays on the grid), A approves the open one and D
-// declines it. Both need the card in focus and the plan on the grid, and never fire on a held-down key; A also waits a
-// beat after an approval, so a quick second A can't text the next set of people before their plan is on screen.
+// The decisions are a queue: J and K step through them (each one plays on the grid), S shows or hides the open one,
+// A approves it and D declines it. A and D need the card in focus and never fire on a held-down key. A also needs the
+// plan on the grid, and waits a beat after an approval, so a quick second A can't text the next set of people unseen.
 function decisionKeys(e) {
   if (e.metaKey || e.ctrlKey || e.altKey || S.ctxMenu || S.menu || S.mega || !HAND || !aiOn() || !isLive() || !S.railOpen || S.view !== 'grid') return false;
   const k = e.key.toLowerCase(), list = aiDecisions();
   if ((k === 'j' || k === 'k') && list.length) {
     const i = list.findIndex(d => d.id === S.aiOpen), next = list[Math.max(0, Math.min(list.length - 1, i < 0 ? 0 : i + (k === 'j' ? 1 : -1)))];
     aiSelect(next.id);
+  } else if (k === 's' && S.aiOpen && !e.repeat) {
+    if (S.aiPv === S.aiOpen) aiClose(); else aiSelect(S.aiOpen);
   } else if ((k === 'a' || k === 'd') && S.aiOpen && e.target.closest?.('.ai.lead')) {
     if (e.repeat || performance.now() - S.aiApprovedAt < 1200) return true;
-    if (S.aiPv !== S.aiOpen) say('It’s on its way to the grid. Look first, then decide.');
-    else if (k === 'a') glowFade(() => aiApprove(S.aiOpen)); else aiDecline(S.aiOpen);
+    if (k === 'd') aiDecline(S.aiOpen);
+    else if (S.aiPv !== S.aiOpen) say('Press S to see it on the grid first, then approve.');
+    else glowFade(() => aiApprove(S.aiOpen));
   }
   else return false;
   e.preventDefault();
@@ -8562,7 +8575,8 @@ function say(text) {
   el.textContent = '';
   requestAnimationFrame(() => { el.textContent = text; });
 }
-rail.addEventListener('click', e => { if (e.target.closest('button, a, select, input, textarea')) return; const c = e.target.closest('.ai.lead'); if (c && S.aiPv !== c.dataset.aicard) aiSelect(c.dataset.aicard); });
+// The open card is a switch: a click puts its plan on the grid, the next click takes it off. Reading its reasons doesn't.
+rail.addEventListener('click', e => { if (e.target.closest('button, a, select, input, textarea, .why')) return; const c = e.target.closest('.ai.lead'); if (!c) return; if (S.aiPv === c.dataset.aicard) aiClose(); else aiSelect(c.dataset.aicard); });
 rowsEl.addEventListener('focusin', e => { const r = e.target.closest?.('.row[data-a="row"]'); if (r) S.gridFocus = r.dataset.v; });
 document.addEventListener('click', e => {
   const k = e.target.closest?.('.skip');
@@ -8693,8 +8707,9 @@ function introEnd(go) {
   I.anims.forEach(a => a.finish());
   if (go) I.then?.();
 }
-// For someone who skips the tour, and anyone coming back: the board ends on the first suggestion, played on the grid.
-function introSpot() { aiShowSoon(200); }
+// For someone who skips the tour, and anyone coming back: the board ends with the first suggestion glowing a moment.
+// The grid stays as booked until they click it.
+function introSpot() { aiHintSoon(300); }
 
 buildHeader();
 renderThead();
@@ -8793,7 +8808,7 @@ const TOUR_STEPS = [
     title: () => 'One row is one ride',
     body: () => { const m = /^(\d+)([A-Z])$/.exec(tourFam()?.textContent.trim() || ''); return `${m ? `${m[0]} is a family: group ${m[1]}, family ${m[2]}.` : 'Codes like 3C are families: group 3, family C.'} The driver chip is green on time, amber late, red past the limit.`; },
     holes: () => [trUnion(tourRows().map(trRect)) || tablewrap], anchor: () => tourFam() || tourRows()[0] },
-  // The tour presses Show me itself, so the families fly on the grid. Approving stays the dispatcher's call.
+  // The tour clicks the card itself, so the families fly on the grid. Approving stays the dispatcher's call.
   { view: 'grid', side: 'bottom',
     enter(t) {
       if (!S.railOpen) setRail(true);
@@ -8810,7 +8825,7 @@ const TOUR_STEPS = [
     },
     leave() { rail.querySelector('.tour-press')?.classList.remove('tour-press'); },
     title: () => 'The assistant suggests the fix',
-    body: () => `${HAND && aiDecisions().length ? 'Open a suggestion and it plays on the grid; nothing is saved.' : 'When a late flight breaks a ride, the fix shows up here.'} Approve when it looks right, or Decline; Undo takes it back.`,
+    body: () => `${HAND && aiDecisions().length ? 'Click a suggestion and it plays on the grid; click it again to take it off. Nothing is saved.' : 'When a late flight breaks a ride, the fix shows up here.'} Approve when it looks right, or Decline; Undo takes it back.`,
     holes: t => {
       const card = t.dec && rail.querySelector(`[data-aicard="${t.dec}"]`);
       if (!card) return [rail];
@@ -8981,5 +8996,5 @@ addEventListener('keydown', e => {
   else if (e.key === 'ArrowLeft') { e.preventDefault(); tourGo(TOUR.i - 1); }
 }, true);
 if (document.querySelector('.intro') || ses.get('sp-signed') !== 'yes') signInShow();
-else introSpot(); // a reload in the same tab: straight to the board, with the first suggestion on the grid
+else introSpot(); // a reload in the same tab: straight to the board, with the first suggestion glowing a moment
 </script>

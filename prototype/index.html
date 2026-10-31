@@ -244,7 +244,7 @@ button.count:hover { background: var(--pill); }
 /* The left gutter is 8px wider: it holds the assistant's transfer arrow, clear of the grid's glowing edge. */
 .table { min-width: 1040px; --gut: max(16px, calc((100% - var(--grid-max, 100%)) / 2)); --gutL: calc(var(--gut) + 8px); }
 .cols { display: grid; grid-template-columns: var(--cols); padding: 0 var(--gut) 0 var(--gutL); align-items: center; }
-.thead { position: sticky; top: 68px; z-index: 2; height: 34px; background: var(--panel); border-bottom: 1px solid var(--line-strong); }
+.thead { position: sticky; top: 40px; z-index: 2; height: 34px; background: var(--panel); border-bottom: 1px solid var(--line-strong); }
 .th[draggable="true"] { cursor: grab; user-select: none; }
 .th.dragging, .collist li.dragging { opacity: 0.4; }
 .th.drop-before { box-shadow: inset 2px 0 0 var(--flap); }
@@ -257,7 +257,7 @@ button.count:hover { background: var(--pill); }
 .row:hover { background: var(--hover); }
 .row.sel, .note.sel { background: var(--selected); box-shadow: inset 3px 0 0 var(--selected-bar); }
 .row.clickable { cursor: pointer; }
-.row[data-a="row"] { scroll-margin: 110px 0 24px; } /* moved to by the arrow keys: clear of the pinned day and column headers */
+.row[data-a="row"] { scroll-margin: 82px 0 24px; } /* moved to by the arrow keys: clear of the pinned day and column headers */
 .skip { position: fixed; left: 12px; top: -48px; z-index: 120; padding: 8px 14px; border-radius: 6px; background: var(--panel); color: var(--text); box-shadow: var(--pop-shadow); font-weight: 600; text-decoration: none; } /* light, so it stands out on the dark header */
 .skip:focus { top: 12px; }
 .qv-notes { margin: 12px 0 14px; padding: 0; list-style: none; display: grid; gap: 6px; color: var(--text-2); font-size: 13px; line-height: 18px; }
@@ -813,23 +813,25 @@ button.mres:hover { border-color: var(--line-strong); background: var(--hover); 
 .t3 { color: var(--text-2); }
 
 /* Time-of-day blocks: big, pinned headers so the day reads in four chunks */
-.blk-h { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 12px; width: 100%; height: 68px; padding: 0 var(--gut) 0 var(--gutL); background: var(--board); border-bottom: 1px solid var(--line-strong); color: var(--text); }
+.blk-h { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 10px; width: 100%; height: 40px; padding: 0 var(--gut) 0 var(--gutL); background: var(--board); border-bottom: 1px solid var(--line-strong); color: var(--text); }
 .blk + .blk .blk-h { border-top: 1px solid var(--line-strong); }
 .blk-h { background-image: var(--sky, none); }
-.blk-h > .ic:first-child { box-sizing: content-box; padding: 7px; border-radius: 9px; background: var(--sky-tile, transparent); color: var(--sky-icon, var(--text-2)); }
+/* The parts of the day are a quiet band: the sky stays as the band's color, the icon is plain, and the rides under it
+   come first. Evening is a warm coral, the sunset in the logo, so violet only ever means the assistant. */
+.blk-h > .ic:first-child { flex: none; color: var(--sky-icon, var(--text-2)); }
 /* Each part of the day is painted as its sky: night, sunrise, lemon noon, Key West sunset (from the user's photo).
    Afternoon stays yellow, not sky blue, so it never matches the blue ride-progress tints. */
-#blk-overnight { --sky: linear-gradient(90deg, #262a52 0%, #3d4279 100%); --sky-tile: linear-gradient(135deg, #2f3374, #5d63ad); --sky-icon: #ffffff; }
-#blk-morning { --sky: linear-gradient(90deg, #ffd8bb 0%, #fff1e3 100%); --sky-tile: linear-gradient(135deg, #ff9a66, #ffd39b); --sky-icon: #5b2a0c; }
-#blk-afternoon { --sky: linear-gradient(90deg, #f8eda8 0%, #fdf9df 100%); --sky-tile: linear-gradient(135deg, #f0bf00, #ffe46b); --sky-icon: #463900; }
-#blk-evening { --sky: linear-gradient(90deg, #e4799a 0%, #9488cb 100%); --sky-tile: linear-gradient(135deg, #c93a5e, #f07a62); --sky-icon: #ffffff; }
+#blk-overnight { --sky: linear-gradient(90deg, #262a52 0%, #3d4279 100%); --sky-icon: #ffffff; }
+#blk-morning { --sky: linear-gradient(90deg, #ffd8bb 0%, #fff1e3 100%); --sky-icon: #b4501a; }
+#blk-afternoon { --sky: linear-gradient(90deg, #f8eda8 0%, #fdf9df 100%); --sky-icon: #8a6a00; }
+#blk-evening { --sky: linear-gradient(90deg, #f3a07f 0%, #fbdccb 100%); --sky-icon: #9a3412; }
 #blk-overnight .blk-h { --text: #f4f3fb; --text-2: #e4e3f3; --text-3: #d2d1ea; --pill: rgba(255, 255, 255, 0.08); }
 #blk-overnight .now-tag { background: #ffffff; color: #262a52; }
-#blk-evening .blk-h { --text: #26142a; --text-2: #2f1c35; --text-3: #3a2541; }
-.blk-h > b { font-weight: 600; font-size: 24px; line-height: 30px; }
-.blk-h .rng { color: var(--text-3); font-size: 17px; }
-.blk-h .bc { color: var(--text-2); font-size: 16px; }
-.blk-h .bc b { font: 600 22px/24px var(--f-num); color: var(--text); }
+#blk-evening .blk-h { --text: #2a160f; --text-2: #3d2216; --text-3: #4a2c1f; }
+.blk-h > b { font-weight: 600; font-size: 16px; line-height: 20px; }
+.blk-h .rng { color: var(--text-2); font-size: 13px; } /* 13px on a light sky: a step darker than muted, for contrast */
+.blk-h .bc { color: var(--text-2); font-size: 13px; }
+.blk-h .bc b { font: 600 15px/18px var(--f-num); color: var(--text); }
 .blk-h:hover { background-image: linear-gradient(var(--pill), var(--pill)), var(--sky, none); }
 .blk-chev { color: var(--text-3); transition: transform 0.2s ease; }
 .blk.shut .blk-chev { transform: rotate(-90deg); }
@@ -1860,20 +1862,15 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 
 /* ---------- Laptop screens ----------
    The assistant stays beside the rides on any laptop: it narrows first, then the grid tucks away its least needed
-   columns (fitColumns). On a short screen the pinned day and column headers slim down, so more rides fit. */
+   columns (fitColumns). On a short screen the pinned column header slims down too, so more rides fit. */
 @media (max-width: 1365px) { :root { --rail-w: 320px; } }
 @media (max-width: 1180px) { :root { --rail-w: 288px; } }
 @media (min-width: 861px) and (max-width: 1100px) {
   body:is([data-view="grid"], [data-view="timeline"]) .app { height: 100%; } /* the board keeps its own screen; other pages scroll */
 }
 @media (max-height: 860px) {
-  .blk-h { height: 48px; gap: 10px; }
-  .blk-h > .ic:first-child { padding: 4px; border-radius: 7px; }
-  .blk-h > b { font-size: 20px; line-height: 24px; }
-  .blk-h .rng { font-size: 15px; }
-  .blk-h .bc b { font-size: 19px; line-height: 22px; }
-  .thead { top: 48px; height: 30px; }
-  .row[data-a="row"] { scroll-margin-top: 86px; }
+  .thead { height: 30px; }
+  .row[data-a="row"] { scroll-margin-top: 78px; }
 }
 /* ---------- Narrow screens ---------- */
 @media (max-width: 1180px) {
@@ -4472,7 +4469,7 @@ function renderRows() {
   for (const { b, rows } of byBlock) {
     const nowHere = live && NOW >= b.from && NOW <= b.to, shut = !!S.collapsed[b.id];
     html += `<section class="blk ${shut ? 'shut' : ''}" id="blk-${b.id}">
-      <button class="blk-h" id="blkh-${b.id}" data-a="blk" data-v="${b.id}" aria-expanded="${!shut}">${ic(b.icon, 24)}<b>${b.name}</b><span class="rng num">${fmt(b.from)} – ${fmt(b.to)}</span>${nowHere ? '<span class="now-tag">Now</span>' : ''}<span class="spacer"></span><span class="bc"><b class="num">${booked(rows)}</b> ${booked(rows) === 1 ? 'ride' : 'rides'}</span>${ic('chev', 14, 'blk-chev')}</button>`;
+      <button class="blk-h" id="blkh-${b.id}" data-a="blk" data-v="${b.id}" aria-expanded="${!shut}">${ic(b.icon, 18)}<b>${b.name}</b><span class="rng num">${fmt(b.from)} – ${fmt(b.to)}</span>${nowHere ? '<span class="now-tag">Now</span>' : ''}<span class="spacer"></span><span class="bc"><b class="num">${booked(rows)}</b> ${booked(rows) === 1 ? 'ride' : 'rides'}</span>${ic('chev', 14, 'blk-chev')}</button>`;
     if (!shut) {
       // Each part of the day is a grid of its own, named by its header ("Morning 06:00 – 11:59, 12 rides").
       html += `<div class="blk-g" role="grid" aria-labelledby="blkh-${b.id}"><div class="thead cols" role="row">${THEAD}</div>`;

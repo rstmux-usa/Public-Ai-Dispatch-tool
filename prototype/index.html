@@ -3700,7 +3700,7 @@ const FILED = [
 const MAIL = Object.fromEntries(MAILS.concat(FILED).map(m => [m.id, m]));
 
 // ---------- Dispatcher change log ----------
-const ME = { name: 'Sasha Klein', initials: 'SK', role: 'Lead dispatcher · Day shift', shift: '06:00–14:00', signedIn: '05:52' };
+const ME = { name: 'Rich Klein', initials: 'RK', role: 'Lead dispatcher · Day shift', shift: '06:00–14:00', signedIn: '05:52' };
 const LOG = [
   { t: '09:46', who: 'me', text: 'Marked Colleen Brady as Arrived' },
   { t: '09:44', who: 'me', text: 'Marked Martin J. Kessler as Done' },
@@ -4775,7 +4775,7 @@ const PERMS = [['approve', 'Approve suggested fixes'], ['billing', 'See and edit
 const ROLES = [['owner', 'Owner'], ['lead', 'Lead dispatcher'], ['dispatcher', 'Dispatcher'], ['accounting', 'Accounting']];
 const USERS = [
   ['Avery Lin', 'Owner', 'Weekdays', '08:02 today'],
-  ['Sasha Klein (you)', 'Lead dispatcher', 'Day shift 06:00–14:00', 'Signed in 05:52'],
+  ['Rich Klein (you)', 'Lead dispatcher', 'Day shift 06:00–14:00', 'Signed in 05:52'],
   ['Marco Ruiz', 'Dispatcher', 'Night shift 22:00–06:00', 'Signed out 05:58'],
   ['Ines Varga', 'Accounting', 'Weekdays', 'Yesterday 17:40'],
 ];
@@ -8727,7 +8727,7 @@ function onbTrap(e, box) {
 // ----- Sign-in -----
 const siFormHTML = () => `<div class="si-brand">${ic('sun', 26)}<b>Sunset &amp; Palms</b></div>
     <h1 class="si-h" id="siTitle">Sign in to Dispatch</h1>
-    <label class="si-f"><span>Email</span><input class="inp" value="sasha.klein@sunsetpalms.example" readonly tabindex="-1" autocomplete="off" spellcheck="false"></label>
+    <label class="si-f"><span>Email</span><input class="inp" value="rich.klein@sunsetpalms.example" readonly tabindex="-1" autocomplete="off" spellcheck="false"></label>
     <label class="si-f"><span>Password</span><input class="inp si-pw" value="••••••••••••" readonly tabindex="-1" autocomplete="off" aria-label="Password, filled in"></label>
     <button class="btn pri si-btn" data-si="go">Sign in</button>
     <p class="si-wait" role="status"><span class="si-bar" aria-hidden="true"><i></i></span><span>Signing you in…</span></p>`;

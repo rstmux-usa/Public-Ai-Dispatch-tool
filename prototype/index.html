@@ -12,7 +12,8 @@
    with a sunset edge, and each part of the day painted as its sky. Sunset colors stay in the chrome, never in rows or buttons. */
 :root {
   --board: #f3ede4; --panel: #ffffff; --raised: #f6f1ea; --hover: #fbf8f3; --ai-bg: #fbf8fd;
-  --selected: #f4effc; --selected-bar: #6d3fd0;
+  --selected: #eeeef3; --selected-bar: #2b2a5a; /* selection is the board's navy, so violet only ever means the assistant */
+  --ai-ink: #6236c9; /* text the assistant proposes, not saved yet: one solid color, never a gradient */
   --line: #ebe3d7; --line-strong: #d9cfc0;
   --text: #1b1a30; --text-2: #43425d; --text-3: #62617c;
   --flap: #2b2a5a; --flap-hover: #3a3973; --flap-text: #f6f4ee; --flap-split: rgba(255, 255, 255, 0.18);
@@ -36,6 +37,7 @@
   --panel-shadow: 0 8px 16px rgba(19, 32, 48, 0.16);
   --ease-panel: cubic-bezier(0.5, 0, 0, 0.75);
   --row-h: 36px; --note-h: 24px;
+  --rail-w: 360px; /* the assistant beside the grid; narrower on a laptop (see Laptop screens) */
   --hdr-h: 56px;
   --f-ui: "Barlow Semi Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
   --f-num: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
@@ -103,7 +105,7 @@ button.count:hover { background: var(--pill); }
 .tz { font-weight: 600; font-size: 12px; line-height: 16px; letter-spacing: 0.06em; color: var(--text-3); }
 .hbtn { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 4px; color: var(--text); transition: background-color 0.33s ease; }
 .hbtn:hover, .hbtn.open { background: var(--pill); }
-.avatar { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--text); font: 600 10.5px/1 var(--f-ui); letter-spacing: 0.02em; }
+.avatar { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--text); font: 600 11px/1 var(--f-ui); letter-spacing: 0.02em; }
 .avatar.xl { width: 56px; height: 56px; border-width: 2px; font-size: 20px; background: var(--raised); }
 
 /* ---------- Drop panel (Tesla-style) ---------- */
@@ -175,10 +177,14 @@ button.count:hover { background: var(--pill); }
 
 /* Settings panel */
 .set-card { width: 280px; display: flex; flex-direction: column; gap: 10px; padding: 18px; border: 1px solid var(--line); border-radius: 8px; }
+/* Three cards don't fit beside the settings links on a laptop; squeezed into one row they broke their text word by
+   word. Two to a row, each keeps a readable width. */
+.mm-main.set-grid { display: grid; grid-template-columns: repeat(2, minmax(220px, 280px)); gap: 20px; align-content: start; }
+.set-grid .set-card { width: auto; }
 .set-card h4 { padding-left: 0; margin-bottom: 0; }
 .set-card p { color: var(--text-2); }
 .seg { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--line-strong); border-radius: 7px; align-self: flex-start; }
-.seg button { height: 28px; padding: 0 12px; border-radius: 5px; color: var(--text-2); }
+.seg button { flex: none; height: 28px; padding: 0 12px; border-radius: 5px; color: var(--text-2); white-space: nowrap; } /* a segment never breaks "20 min" over two lines */
 .seg button:hover:not(.on) { color: var(--text); }
 .seg button.on { background: var(--raised); color: var(--text); font-weight: 600; }
 .switch { display: flex; align-items: center; gap: 10px; }
@@ -243,17 +249,25 @@ button.count:hover { background: var(--pill); }
 .th.dragging, .collist li.dragging { opacity: 0.4; }
 .th.drop-before { box-shadow: inset 2px 0 0 var(--flap); }
 .th.drop-after { box-shadow: inset -2px 0 0 var(--flap); }
-.th-end { justify-self: end; }
+.th-end { justify-self: end; display: flex; align-items: center; gap: 2px; }
+.th-more { color: var(--text-3); font: 600 12px/16px var(--f-num); cursor: help; } /* columns tucked away to fit */
 .th-end .iconbtn { color: var(--text-3); }
 .th { font-weight: 600; font-size: 12px; line-height: 16px; letter-spacing: 0.06em; color: var(--text-3); text-transform: uppercase; white-space: nowrap; }
 .row { height: var(--row-h); background: var(--panel); border-bottom: 1px solid var(--line); }
 .row:hover { background: var(--hover); }
 .row.sel, .note.sel { background: var(--selected); box-shadow: inset 3px 0 0 var(--selected-bar); }
 .row.clickable { cursor: pointer; }
+.row[data-a="row"] { scroll-margin: 110px 0 24px; } /* moved to by the arrow keys: clear of the pinned day and column headers */
+.skip { position: fixed; left: 12px; top: -48px; z-index: 120; padding: 8px 14px; border-radius: 6px; background: var(--panel); color: var(--text); box-shadow: var(--pop-shadow); font-weight: 600; text-decoration: none; } /* light, so it stands out on the dark header */
+.skip:focus { top: 12px; }
+.qv-notes { margin: 12px 0 14px; padding: 0; list-style: none; display: grid; gap: 6px; color: var(--text-2); font-size: 13px; line-height: 18px; }
+.qv-notes li { display: flex; gap: 6px; align-items: flex-start; }
+.qv-notes .ic { flex: none; margin-top: 2px; color: var(--text-3); }
 .cell { display: flex; align-items: center; gap: 6px; height: 100%; min-width: 0; overflow: hidden; white-space: nowrap; }
 .cell.loc { padding-right: 14px; }
 .cell.c-pax { padding-right: 16px; }
-.fl { display: flex; align-items: center; gap: 8px; flex: none; margin-left: 4px; }
+.fl { display: flex; align-items: center; gap: 8px; flex: 0 1 auto; min-width: 0; margin-left: 4px; } /* in a narrow column the status label ends in “…” instead of running into the next column */
+.fl .land { flex: none; }
 .flags { display: flex; align-items: center; gap: 4px; flex: none; color: var(--text-3); }
 .flags .due { color: var(--needs); }
 .flags .last { color: var(--delayed); }
@@ -268,7 +282,10 @@ button.count:hover { background: var(--pill); }
 .fam { flex: none; margin-left: 6px; color: var(--text-3); font-size: 13px; white-space: nowrap; }
 /* Family codes (3A, 3B, 3C): neutral when fine, amber on a late flight, solid red for the family that breaks the van. */
 .fcodes { display: flex; gap: 3px; min-width: 0; overflow: hidden; }
-.fc { flex: none; display: inline-grid; place-items: center; min-width: 26px; height: 20px; padding: 0 4px; border-radius: 5px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); color: var(--text); font: 600 13px/20px var(--f-num); }
+.fg { font-style: normal; }
+.fcodes.short .fc.same .fg { display: none; } /* a crowded row: "10A B C D E" */
+.fc-more { cursor: help; }
+.fc { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 2px; min-width: 26px; height: 20px; padding: 0 4px; border-radius: 5px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); color: var(--text); font: 600 13px/20px var(--f-num); }
 .fc.late { background: var(--delayed-tint); box-shadow: inset 0 0 0 1px rgba(154, 88, 0, 0.28); color: var(--delayed); }
 .fc.breaks { background: var(--needs); box-shadow: none; color: #fff; }
 .party { font-weight: 500; }
@@ -348,20 +365,20 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .mi:hover { background: var(--raised); }
 
 /* ---------- Decision rail ---------- */
-.rail { flex: none; width: 360px; overflow-x: hidden; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--line); transition: width 0.45s var(--ease-panel), opacity 0.3s ease; scrollbar-width: none; }
+.rail { flex: none; width: var(--rail-w); overflow-x: hidden; overflow-y: auto; background: var(--panel); border-right: 1px solid var(--line); transition: width 0.45s var(--ease-panel), opacity 0.3s ease; scrollbar-width: none; }
 .rail::-webkit-scrollbar { display: none; }
 .rail.closed { width: 0; opacity: 0; border-right-width: 0; pointer-events: none; }
-.rail-in { width: 360px; padding: 0 18px 32px; display: flex; flex-direction: column; gap: 20px; }
+.rail-in { width: var(--rail-w); padding: 0 18px 32px; display: flex; flex-direction: column; gap: 20px; }
 .rail-top { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 8px; height: 52px; margin: 0 -18px; padding: 0 10px 0 18px; background: var(--panel); border-bottom: 1px solid var(--line); }
 .rail-top b { font-weight: 600; font-size: 16px; }
-.rt-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--ai-bg); box-shadow: inset 0 0 0 1px #e2d6f7; }
+.rt-mark { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); }
 .muted.sm { font-size: 13px; line-height: 18px; }
 .ai-launch { position: relative; display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 6px 0 9px; border-radius: 16px; background: var(--panel); font-weight: 600; white-space: nowrap; }
-.ai-launch::before { content: ""; position: absolute; inset: 0; padding: 1.5px; border-radius: 16px; background: var(--ring); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
-.ai-launch:hover { background: var(--ai-bg); }
+.ai-launch::before { content: ""; position: absolute; inset: 0; border-radius: 16px; box-shadow: inset 0 0 0 1px var(--line-strong); pointer-events: none; }
+.ai-launch:hover { background: var(--hover); }
 .ai-launch .badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--flap); color: var(--flap-text); font: 600 13px/20px var(--f-num); text-align: center; }
 .ai-launch .badge.zero { background: var(--raised); color: var(--text-2); }
-.opts { display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; }
+.opts { display: grid; gap: 2px; padding-top: 10px; border-top: 1px solid var(--line); }
 .opts-h { margin-bottom: 4px; font-weight: 600; font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
 .opt { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; align-items: baseline; gap: 8px; font-size: 13px; line-height: 18px; color: var(--text-2); }
 .opt b { font-weight: 600; color: var(--text); }
@@ -392,15 +409,17 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .sec-t.big .cnt { font-size: 18px; line-height: 22px; color: var(--text); }
 .cards { display: flex; flex-direction: column; gap: 10px; }
 .ai { position: relative; }
-.ai.lead::before { content: ""; position: absolute; inset: -2px; border-radius: 12px; background: conic-gradient(from var(--glow-a), var(--glow)); filter: blur(8px); opacity: 0.42; pointer-events: none; }
-/* While its plan is on the grid, the lead card's ring flows and glows brighter, like the grid's edge. */
-.ai.lead.pv::before { inset: -3px; filter: blur(12px); opacity: 0.6; }
+/* The glow means one thing: not saved yet. At rest the cards are plain, like every other card on the board; the open
+   one has a firmer border. Only while its plan is on the grid does the open card wear the ring and halo, with the
+   grid's edge, the moving chips and the new-ride row (and once, when the board first builds). */
+.ai-card { position: relative; display: flex; flex-direction: column; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.ai-card.x { padding: 16px 18px; gap: 10px; border-color: var(--line-strong); box-shadow: 0 4px 14px rgba(19, 32, 48, 0.08), 0 1px 2px rgba(19, 32, 48, 0.05); }
+.ai.lead.pv::before, .ai.lead.spot::before { content: ""; position: absolute; inset: -3px; border-radius: 11px; background: conic-gradient(from var(--glow-a), var(--glow)); filter: blur(12px); opacity: 0.6; pointer-events: none; }
+.ai.lead.pv .ai-card::before, .ai.lead.spot .ai-card::before { content: ""; position: absolute; inset: -1px; padding: 1.5px; border-radius: 8px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.ai.lead.pv .ai-card.x { border-color: transparent; box-shadow: var(--ai-shadow); }
 .ai.lead.pv::before, .ai.lead.pv .ai-card::before { animation: glowSpin 4s linear infinite var(--gd, 0s); }
-.ai-card { position: relative; display: flex; flex-direction: column; width: 100%; background: var(--panel); border-radius: 10px; box-shadow: 0 1px 2px rgba(19, 32, 48, 0.06); }
-.ai-card::before { content: ""; position: absolute; inset: 0; padding: 1.5px; border-radius: 10px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
-.ai-card.x { padding: 16px 18px; gap: 10px; box-shadow: var(--ai-shadow); }
 .ai-card.c { padding: 12px 14px; gap: 6px; }
-.ai-card.c:hover { background: var(--ai-bg); }
+.ai-card.c:hover { background: var(--hover); border-color: var(--line-strong); }
 .ai-card.h { flex-direction: row; align-items: flex-start; gap: 10px; padding: 12px 10px 12px 14px; color: var(--text-2); }
 .ai-card.h .ic:first-child { margin-top: 2px; }
 .prob { display: flex; align-items: center; gap: 8px; }
@@ -411,7 +430,7 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .tnum { font: 600 16px/20px var(--f-num); color: var(--text); }
 .detail { color: var(--text-2); }
 .ailabel { display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 11px; line-height: 14px; letter-spacing: 0.08em; text-transform: uppercase; }
-.ailabel span { background: var(--ink); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ailabel span { color: var(--ai-ink); }
 .fix { display: flex; align-items: center; gap: 8px; font-weight: 600; }
 .fixline { display: flex; align-items: flex-start; gap: 6px; color: var(--text-2); }
 .fixline .ic { margin-top: 3px; }
@@ -426,7 +445,7 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .cost { display: flex; gap: 8px; }
 .cost .k { flex: none; color: var(--text-3); }
 .actions { display: flex; align-items: center; gap: 8px; }
-.why { padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--ai-bg); color: var(--text-2); }
+.why { padding-top: 10px; border-top: 1px solid var(--line); color: var(--text-2); } /* sections divided by a line, not boxes inside the card */
 .why ul { margin: 0; padding-left: 16px; display: grid; gap: 4px; }
 .why-btn .ic { transition: transform 0.15s; }
 .why-btn.open .ic { transform: rotate(90deg); }
@@ -476,7 +495,7 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .ai-own { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 5px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--line); font-weight: 600; font-size: 13px; white-space: nowrap; }
 .ai-story { margin: 0; }
 .ai-meta { margin: 0; color: var(--text-2); font-size: 13px; line-height: 18px; }
-.ai-whol { display: grid; gap: 2px; color: var(--text-2); font-size: 13px; line-height: 18px; }
+.ai-whol { display: grid; gap: 2px; padding-top: 8px; border-top: 1px solid var(--line); color: var(--text-2); font-size: 13px; line-height: 18px; }
 .ai-pv { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--selected-bar); font-size: 13px; }
 .fc.fly { box-shadow: 0 8px 18px rgba(139, 92, 246, 0.4), 0 0 14px rgba(245, 87, 127, 0.35); }
 /* Smaller cards, so more decisions fit beside the grid. */
@@ -485,10 +504,21 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .ai-card.v2 .ai-story, .ai-card.v2 .why { font-size: 13px; line-height: 19px; }
 .ai-card.c.v2 { padding: 10px 12px; gap: 4px; }
 .ai-card.c.v2 .fixline > span:last-child { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 13px; line-height: 18px; }
-.ai-card.v2 .opts { padding: 8px 10px; }
-.row.ghost { background: repeating-linear-gradient(-45deg, transparent 0 6px, var(--raised) 6px 12px); }
-.row.ghost .pickup, .row.ghost .conf { color: var(--text-3); text-decoration: line-through; }
-.ghost-t { color: var(--text-3); font-style: italic; white-space: nowrap; }
+.ai-card.v2 .opts { padding-top: 8px; }
+/* A suggestion on show: the booked ride stays as booked. A family it would move out fades in place, and a line
+   under the row says what would change. */
+.fc.gone { background: transparent; box-shadow: none; outline: 1px dashed var(--line-strong); outline-offset: -1px; color: var(--text-3); text-decoration: line-through; }
+.pv-note .note-t { display: flex; align-items: center; gap: 5px; color: var(--text-2); }
+.pv-note .note-t .ic { flex: none; }
+.pv-note .note-t b { font-weight: 600; color: var(--text); }
+.ai-tell { display: flex; align-items: flex-start; gap: 6px; margin: 0; color: var(--text-2); font-size: 13px; line-height: 18px; }
+.ai-tell .ic { flex: none; margin-top: 2px; color: var(--text-3); }
+.ai-tell b { font-weight: 600; color: var(--text); }
+.ai-whol b { font-weight: 600; color: var(--text); }
+.ai-whol .bubble { max-width: none; margin: 2px 0 4px; padding: 8px 12px; font-size: 13px; line-height: 18px; }
+.ai.lead { scroll-margin-top: 64px; } /* clear of the rail's pinned header when it scrolls into view */
+.ai-card.x:focus-visible { outline-offset: 3px; }
+.hm-undo { flex: none; align-self: flex-start; margin: -4px -6px 0 0; }
 .ai-res { display: inline-flex; align-items: center; gap: 3px; }
 .cf { margin-left: 4px; color: var(--text-3); font: 500 12px/20px var(--f-num); white-space: nowrap; }
 /* The transfer, drawn in the grid's 24px left margin beside the pickup times, under the pinned headers. */
@@ -502,7 +532,7 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 @property --glow-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 @keyframes glowSpin { to { --glow-a: 360deg; } }
 @keyframes inkFlow { to { background-position: 200% 0; } }
-.ai-arrows { filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.55)) drop-shadow(0 0 6px rgba(245, 87, 127, 0.35)); }
+.ai-arrows.pv { filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.55)) drop-shadow(0 0 6px rgba(245, 87, 127, 0.35)); } /* only while the plan is on the grid */
 .ai-arrows .ai-arrow-line { stroke-width: 2.5; }
 .ai-arrows .ai-arrow-pulse { fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; opacity: 0.95; }
 /* A family the suggestion moves: a flowing ring and a soft glow around its code. */
@@ -510,7 +540,7 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .fc.ai-in::before { content: ""; position: absolute; inset: 0; padding: 1.5px; border-radius: 5px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: glowSpin 3s linear infinite var(--gd, 0s); pointer-events: none; }
 @keyframes chipGlow { to { box-shadow: 0 0 12px 1px rgba(245, 87, 127, 0.45), 0 0 4px rgba(139, 92, 246, 0.5); } }
 /* The conf # the families land in, or the ride whose driver changes. */
-.ai-t { background: var(--ink-flow) 0 0 / 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 700; animation: inkFlow 3s linear infinite var(--gd, 0s); }
+.ai-t { color: var(--ai-ink); font-weight: 700; }
 /* A ride the suggestion would make. It isn't booked: it glows until you approve it, and opens filled in. */
 .row.draft, .row.draft.sel, .row.draft.open { position: relative; z-index: 1; background: var(--ai-bg); box-shadow: none; }
 .row.draft::before, .row.draft::after { content: ""; position: absolute; top: 2px; bottom: 2px; left: calc(var(--gutL) - 6px); right: calc(var(--gut) - 10px); border-radius: 7px; pointer-events: none; }
@@ -520,12 +550,12 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .row.draft.enter { animation: draftIn 0.7s 0.45s cubic-bezier(.3, .7, .2, 1) both; }
 @keyframes draftIn { from { opacity: 0; clip-path: inset(50% 0); } }
 .draft-tag { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 7px; border-radius: 11px; background: var(--panel); box-shadow: inset 0 0 0 1px #d9c8f5; font-weight: 600; font-size: 12px; white-space: nowrap; }
-.draft-tag span { background: var(--ink); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.draft-tag span { color: var(--ai-ink); }
 .qv.draft { position: relative; background: var(--ai-bg); box-shadow: none; }
 .qv.draft::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, #4d7cff, #8b5cf6, #f5577f, #ff9640); }
 .qv-note { margin: -4px 0 12px; color: var(--text-2); font-size: 13px; line-height: 18px; }
 .qv h3.ai-h { display: flex; align-items: center; gap: 6px; }
-.qv h3.ai-h span { background: var(--ink); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.qv h3.ai-h span { color: var(--ai-ink); }
 .qv-grid label.ai-f .inp, .qv-grid label.ai-f select { border-color: #cdb9f3; background-color: var(--panel); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08); }
 /* The grid's edge while a suggestion is on it, like Apple Intelligence's glow around the screen: a thin flowing
    line, a soft band that fades inward, and a wide bloom that breathes. It means: not saved yet. */
@@ -581,7 +611,8 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .qv-veh { grid-template-columns: 64px minmax(0, 1fr); gap: 4px 12px; }
 .qv-veh dd { font-weight: 600; }
 .qv-veh dd span { font-weight: 400; }
-.veh-bad { color: var(--needs); font-weight: 600; }
+.veh-bad { display: inline-flex; align-items: center; gap: 3px; min-width: 0; color: var(--needs); font-weight: 600; }
+.veh-bad .ic { flex: none; }
 .up-tag { padding: 0 6px; border-radius: 4px; background: var(--ontime-tint); color: var(--ontime); font-style: normal; font-weight: 600; font-size: 12px; line-height: 20px; white-space: nowrap; }
 
 /* ---------- Assistant tabs + email ---------- */
@@ -924,10 +955,10 @@ button.mres:hover { border-color: var(--line-strong); background: var(--hover); 
 .fld.err .inp, .fld.err select, .rt-stop.err .inp { border-color: var(--needs); }
 /* Assistant fill */
 .nr-ai { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 1px solid #e2d6f7; border-radius: 10px; background: var(--ai-bg); text-align: left; color: var(--text-2); transition: box-shadow 0.2s ease; }
-button.nr-ai:hover { box-shadow: var(--ai-shadow); }
+button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .nr-ai > span { flex: 1; }
 .nr-ai b { margin-right: 6px; color: var(--text); font-weight: 600; }
-.nr-ai.open { display: grid; gap: 10px; box-shadow: var(--ai-shadow); }
+.nr-ai.open { display: grid; gap: 10px; box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .nr-ai-h { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
 .nr-ai-h span { width: 100%; }
 .nr-ai .ta { height: 150px; background: var(--panel); }
@@ -1011,7 +1042,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .veh.on, .drv.on { background: var(--raised); border-color: var(--text); box-shadow: inset 0 0 0 0.5px var(--text); }
 .veh:disabled, .drv:disabled { border-style: dashed; color: var(--text-3); cursor: not-allowed; }
 .veh-n { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-weight: 600; }
-.veh-n em { padding: 0 6px; border-radius: 4px; background: var(--raised); color: var(--text-2); font-style: normal; font-weight: 600; font-size: 10.5px; line-height: 16px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.veh-n em { padding: 0 6px; border-radius: 4px; background: var(--raised); color: var(--text-2); font-style: normal; font-weight: 600; font-size: 11px; line-height: 16px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
 .veh.on .veh-n em { background: var(--panel); }
 .veh-c { display: flex; align-items: center; gap: 4px; color: var(--text-3); font-size: 13px; line-height: 18px; }
 .veh-c .ic + .ic, .veh-c .ic:nth-of-type(2) { margin-left: 6px; }
@@ -1139,7 +1170,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .tl-b.st-done, .tl-b.st-noshow, .tl-b.st-cancelled { background: var(--raised); border-color: transparent; color: var(--text-3); }
 .tl-b.st-noshow .tl-p, .tl-b.st-cancelled .tl-p { text-decoration: line-through; }
 .tl-b.dec { box-shadow: inset 3px 0 0 var(--selected-bar); }
-.tl-b.sel { z-index: 2; border-color: var(--selected-bar); background: var(--selected); color: var(--text); box-shadow: inset 3px 0 0 var(--selected-bar), var(--ai-shadow); }
+.tl-b.sel { z-index: 2; border-color: var(--selected-bar); background: var(--selected); color: var(--text); box-shadow: inset 3px 0 0 var(--selected-bar), 0 4px 12px rgba(19, 32, 48, 0.12); }
 .tl-b.over { border: 1.5px solid var(--needs); }
 .tl-ov { position: absolute; top: 3px; right: 4px; padding: 0 5px; border-radius: 3px; background: var(--needs); color: #fff; font: 600 10px/14px var(--f-ui); font-style: normal; letter-spacing: 0.04em; text-transform: uppercase; }
 .tl-b.dim { opacity: 0.35; }
@@ -1180,6 +1211,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .mp-row { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 8px 10px; border-radius: 8px; text-align: left; }
 .mp-row:hover { background: var(--hover); }
 .mp-row.on { background: var(--raised); box-shadow: inset 3px 0 0 var(--flap); }
+.maplibregl-marker:hover, .maplibregl-marker:focus-within { z-index: 5; } /* a pile of cars at SEA: the one you point at comes to the front */
 .mp-row-t { flex: 1; display: grid; min-width: 0; }
 .mp-row-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 24px; }
 .mp-row-h .rs { flex: none; }
@@ -1401,6 +1433,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .co-wait, .co-extra { display: grid; gap: 2px; }
 .co-wait .inp { width: 64px; text-align: center; }
 .co-wait small { color: var(--text-3); font-size: 12px; line-height: 16px; }
+.fld > small.muted { font-size: 12px; line-height: 16px; } /* notes under a field, at the 12px floor */
 .co-extra .inp { width: 100%; }
 .co-tot { font-weight: 600; font-size: 17px; }
 .co-how { display: flex; align-items: center; gap: 6px; color: var(--text-2); }
@@ -1733,7 +1766,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .rq-when span { color: var(--text-2); }
 .rq-when .pt { padding: 2px 8px; border-radius: 6px; background: var(--flap); color: var(--flap-text); font: 600 22px/28px var(--f-num); }
 .rq-facts { color: var(--text-2); }
-.rq-note { display: grid; gap: 2px; margin: 0; padding: 10px 14px; border-left: 3px solid var(--line-strong); border-radius: 0 8px 8px 0; background: var(--hover); color: var(--text); }
+.rq-note { display: grid; gap: 2px; margin: 0; padding: 10px 14px; border-radius: 8px; background: var(--raised); color: var(--text); } /* the customer's words, as a quote: no callout stripe */
 .rq-note span { color: var(--text-3); font-weight: 600; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
 .rq-f { display: flex; align-items: center; gap: 8px; padding: 12px 32px; border-top: 1px solid var(--line); background: var(--panel); }
 .rq-f .btn { height: 36px; }
@@ -1825,6 +1858,23 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
 .nav-item.tour-press { background: rgba(255, 255, 255, 0.24); box-shadow: none; }
 @media (prefers-reduced-motion: reduce) { .si-bar { display: none; } }
 
+/* ---------- Laptop screens ----------
+   The assistant stays beside the rides on any laptop: it narrows first, then the grid tucks away its least needed
+   columns (fitColumns). On a short screen the pinned day and column headers slim down, so more rides fit. */
+@media (max-width: 1365px) { :root { --rail-w: 320px; } }
+@media (max-width: 1180px) { :root { --rail-w: 288px; } }
+@media (min-width: 861px) and (max-width: 1100px) {
+  body:is([data-view="grid"], [data-view="timeline"]) .app { height: 100%; } /* the board keeps its own screen; other pages scroll */
+}
+@media (max-height: 860px) {
+  .blk-h { height: 48px; gap: 10px; }
+  .blk-h > .ic:first-child { padding: 4px; border-radius: 7px; }
+  .blk-h > b { font-size: 20px; line-height: 24px; }
+  .blk-h .rng { font-size: 15px; }
+  .blk-h .bc b { font-size: 19px; line-height: 22px; }
+  .thead { top: 48px; height: 30px; }
+  .row[data-a="row"] { scroll-margin-top: 86px; }
+}
 /* ---------- Narrow screens ---------- */
 @media (max-width: 1180px) {
   .mm { flex-wrap: wrap; gap: 28px; padding: 24px 20px 32px; }
@@ -1835,12 +1885,6 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
   .app { height: auto; min-height: 100%; }
   .hdr { grid-template-columns: 1fr auto; row-gap: 4px; padding-block: 8px; }
   .nav { grid-column: 1 / -1; grid-row: 2; justify-self: start; margin-left: -16px; }
-  .main { flex-direction: column; }
-  .table-wrap { max-height: 70vh; }
-  .rail { width: auto; overflow: visible; border-right: 0; border-bottom: 1px solid var(--line); }
-  .rail-in { width: auto; }
-  .rail.closed { display: none; }
-  .ctx .search { width: 100%; margin-left: 0; }
   .settings { flex-direction: column; }
   .set-nav { width: auto; display: flex; gap: 4px; padding: 10px 12px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
   .set-nav h5 { display: none; }
@@ -1850,6 +1894,14 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
   .msg-list { border-right: 0; border-bottom: 1px solid var(--line); }
   .srow { grid-template-columns: 1fr; gap: 10px; }
 }
+@media (max-width: 860px) { /* a tablet or phone: the assistant goes above the rides */
+  .main { flex-direction: column; }
+  .table-wrap { max-height: 70vh; }
+  .rail { width: auto; overflow: visible; border-right: 0; border-bottom: 1px solid var(--line); }
+  .rail-in { width: auto; }
+  .rail.closed { display: none; }
+  .ctx .search { width: 100%; margin-left: 0; }
+}
 @media (max-width: 640px) {
   .hdr { grid-template-columns: 1fr; padding-inline: 16px; }
   .hdr-r { justify-content: flex-start; flex-wrap: wrap; margin-left: -6px; }
@@ -1857,6 +1909,7 @@ button.nr-ai:hover { box-shadow: var(--ai-shadow); }
   .counts { gap: 14px; }
   .daycard { width: 140px; }
   .mm-cal, .log, .help-col, .set-card { width: 100%; }
+  .mm-main.set-grid { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -1883,6 +1936,7 @@ if (introUp) document.body.insertAdjacentHTML('afterbegin', `<div class="intro" 
 </script>
 
 <div class="app">
+  <a class="skip" href="#rows" data-to="rides">Skip to rides</a><a class="skip" href="#rail" data-to="decisions">Skip to decisions</a>
   <header class="hdr" id="hdr"></header>
   <div class="main" id="main">
     <aside class="rail" id="rail" aria-label="Assistant"></aside>
@@ -1915,6 +1969,7 @@ if (introUp) document.body.insertAdjacentHTML('afterbegin', `<div class="intro" 
 <div id="overlay"></div>
 <div class="dlg-back" id="dlg" hidden></div>
 <div class="toast" id="toast" role="status" hidden></div>
+<div class="sr" id="srLive" aria-live="polite"></div>
 
 <script>
 /* Sunset & Palms dispatch prototype.
@@ -2453,7 +2508,7 @@ const PAE_FROM = ['Las Vegas', 'Phoenix', 'San Diego', 'Palm Springs', 'Burbank'
 const BFI_FROM = ['Teterboro', 'Van Nuys', 'Aspen', 'Scottsdale', 'San Jose'];
 
 function dayCount(d) {
-  if (sameDay(d, TODAY)) return LIVE.filter(r => !r.quote && !r.hidden).length; // Trip Count, cancelled and no-shows included
+  if (sameDay(d, TODAY)) return (S.pvWas ? [...S.pvWas.values()] : LIVE).filter(r => !r.quote && !r.hidden).length; // Trip Count, cancelled and no-shows included; a preview counts as booked
   if (futureCache.has(seedOf(d))) return futureCache.get(seedOf(d)).filter(r => !r.quote && !r.hidden).length; // counts new bookings
   const rnd = mulberry32(seedOf(d) * 7 + 3);
   const base = [49, 44, 38, 41, 52, 58, 63][d.getDay()];
@@ -2843,16 +2898,27 @@ function lateDelta(was) {
   const made = LIVE.filter(r => r.late && !r.hidden && was.get(r.id) !== r.late).map(r => ` ${r.driver} is now ${r.late.replace('~', 'about ')} for ${rideSaid(r)}.`);
   return fixed.concat(made).join('');
 }
-function handUndo() {
+// An entry in the moves list is a move by hand, or an approved suggestion: its first move carries the words.
+const handEntries = () => HMOVES.filter(m => !m.pv && (!m.grp || m.text));
+const handUndo = () => { const last = handEntries().pop(); if (last) handUndoEntry(last); };
+// Undo any entry, not only the last one. A suggestion undoes as one. Later moves that only worked on top of it
+// can't stay, so they go too, and the toast says so. Whoever was texted about it hears that it's off.
+function handUndoEntry(head) {
   aiUnpreview(true);
-  const m = HMOVES.pop();
-  if (!m) return;
-  while (m.grp && HMOVES.length && HMOVES[HMOVES.length - 1].grp === m.grp) HMOVES.pop(); // an approved suggestion undoes as one
-  handRebuild(); handSave();
-  logChange(`Undid: ${m.text}`);
+  const keep = HMOVES.filter(m => head.grp ? m.grp !== head.grp : m !== head);
+  HMOVES = keep; handRebuild();
+  const cut = new Set(keep.filter(m => m.grp && !HMOVES.includes(m)).map(m => m.grp)); // a suggestion that lost a move goes whole
+  if (cut.size) { HMOVES = HMOVES.filter(m => !cut.has(m.grp)); handRebuild(); }
+  const lost = keep.filter(m => !HMOVES.includes(m) && (!m.grp || m.text)).length;
+  handSave();
+  logChange(`Undid: ${head.text}`);
+  if (head.grp) { AI_CACHE.key = ''; if (aiDecisions().some(d => d.id === head.grp)) S.aiOpen = head.grp; } // the suggestion is back on top
   S.toast = null;
   renderAll();
-  toast(`Undid: ${m.text}.`);
+  const also = lost ? ` ${lost} later ${lost === 1 ? 'move' : 'moves'} relied on it, so ${lost === 1 ? 'it was' : 'they were'} undone too.` : '';
+  const tell = head.told && head.told.length ? ` ${andList(head.told)} ${head.told.length === 1 ? 'gets' : 'get'} a text that it’s off.` : '';
+  toast(`Undid: ${head.text}.${also}${tell}`);
+  railFocus();
 }
 function handReset() {
   aiUnpreview(true);
@@ -2873,6 +2939,7 @@ function handRailHTML(done) {
       <span class="hm-n num">${n + 1}</span>
       <div class="hm-t"><b>${m.ai ? ic('spark', 13) : ''}${esc(m.text)}</b><span>${esc(m.sub)}</span>${m.ai ? '<span class="muted">Suggested by the assistant · approved by you</span>' : ''}
         <textarea class="inp hm-why" rows="2" data-hwhy="${i}" placeholder="Why?" aria-label="Why, for move ${n + 1}">${esc(m.why || '')}</textarea></div>
+      <button class="btn ghost sm hm-undo" data-a="h-undo-one" data-v="${i}" aria-label="Undo move ${n + 1}: ${esc(m.text)}">Undo</button>
     </li>`).join('');
   return `<section class="sec"><div class="sec-t ${done ? '' : 'big'}">${done ? ic('history', 15) : ''}<b>${done ? 'Done' : 'Your moves'}</b><span class="cnt">${saved.length}</span></div>
       ${done ? '' : '<p class="muted sm">The Lumora groups are as booked, and nothing is fixed. Each family has a code: 3C is the third family in Group 3. Red is the family that breaks its van. Drag a ride onto another ride to put them in one car. To move one family, open the ride and drag the family.</p>'}
@@ -2880,7 +2947,7 @@ function handRailHTML(done) {
         <div class="actions"><button class="btn sec sm" data-a="h-undo">Undo last move</button><button class="btn ghost sm" data-a="h-copy">Copy moves</button><span class="spacer"></span><button class="btn ghost sm" data-a="h-reset">Start over</button></div>`
         : `<p class="muted">${done ? 'Approved suggestions and your own moves land here.' : 'No moves yet. Each one lands here so you can write down why.'}</p>`}
     </section>
-    <p class="h-mode"><button class="btn ghost sm" data-a="h-mode" data-v="staged">Show the old staged board</button></p>`;
+    ${/[?&]staged\b/.test(location.search) ? '<p class="h-mode"><button class="btn ghost sm" data-a="h-mode" data-v="staged">Show the old staged board</button></p>' : ''}`;
 }
 
 // Dragging on the grid: a ride onto another ride, or one family (from the open ride) onto a ride or its own car.
@@ -3052,6 +3119,15 @@ function simulate(moves) {
 function aiWho(ids, after) {
   return ids.map(id => after.get(id)).filter(r => r && !r.hidden).map(r => `${driverSaid(r)}: ${r.fam && r.fam.every(famCode) ? codesShort(r.fam) : r.party} at ${fmt(r.pickup)}, ${cf(r)}`);
 }
+// Everyone Approve texts, named before it's pressed: the drivers on the new plan, the driver taken off the ride,
+// and a passenger who gets the free upgrade text (with the text itself). The toast after Approve names the same people.
+function aiTell(d) {
+  const drivers = d.who.map(w => { const i = w.indexOf(': '); return { name: w.slice(0, i), what: w.slice(i + 2) }; }).filter(x => !/No driver/.test(x.name));
+  const off = d.off && !drivers.some(x => x.name === d.off) ? [{ name: d.off, what: `taken off ${d.offRide}` }] : [];
+  const ups = S.msgOn.upgrade ? d.ups.map(r => ({ name: r.party, what: 'the free upgrade text', text: autoText('upgrade', r) })) : [];
+  return drivers.concat(off, ups);
+}
+const andList = xs => xs.length < 2 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
 function aiActBy(ids, after) {
   const t = Math.min(...ids.flatMap(id => [findRide(id), after.get(id)]).filter(r => r && !r.hidden).map(r => r.pickup)) - 30;
   return t <= NOW ? 'now' : fmt(t - t % 5);
@@ -3168,6 +3244,8 @@ function aiDecisions() {
   for (const d of list) {
     const after = simulate(d.moves), ids = [...new Set(d.touch)];
     d.who = aiWho(ids, after); d.actBy = aiActBy(ids, after);
+    d.ups = d.moves.filter(m => m.t === 'edit' && m.set.car).map(m => after.get(m.from)).filter(r => r && carFit(r.car, r) === 'upgrade');
+    if (d.off) d.offRide = rideSaid(findRide(d.touch[0]));
     d.codes = Object.fromEntries(ids.map(id => [id, codeOf(after.get(id) || findRide(id))])); // a ride the fix makes has its code already
     d.sortAt = d.actBy === 'now' ? 0 : tm(d.actBy);
   }
@@ -3196,7 +3274,8 @@ const aiShown = () => S.aiPv ? aiDecisions().find(x => x.id === S.aiPv) : null;
 const aiMovedFam = name => !!aiShown()?.anim.includes(name);
 const isDraft = r => !!(S.aiPv && r && HMOVES.some(m => m.pv && m.nid === r.id));
 function aiGlowConf(r) { const d = aiShown(); return !!d && (d.arrows ? d.arrows.some(([, b]) => b === r.id) : d.touch.includes(r.id)); }
-const aiGlowDriver = r => !!S.aiPv && HMOVES.some(m => m.pv && m.t === 'edit' && m.from === r.id && m.set.driver);
+// Only on a ride the suggestion would make: a booked ride keeps its booked driver, and its note says who'd drive.
+const aiGlowDriver = r => !!S.aiPv && !S.pvWas?.has(r.id) && HMOVES.some(m => m.pv && m.t === 'edit' && m.from === r.id && m.set.driver);
 // Glows drawn again (a re-render) start mid-cycle, in step with the ones they replace. 24 s fits every glow loop.
 const glowDelay = () => `${-Math.round(performance.now() % 24000)}ms`;
 // An arrow in the grid's left margin, beside the pickup times, from the reservation the families leave to the one
@@ -3206,16 +3285,19 @@ function aiArrows() {
   const d = HAND && aiOn() && isLive() && S.view === 'grid' ? aiDecisions().find(x => x.id === S.aiOpen) : null;
   if (!d || !d.arrows) return;
   const base = rowsEl.getBoundingClientRect(), mid = id => { const el = rowsEl.querySelector(`.row[data-v="${id}"]`); if (!el) return null; const b = el.getBoundingClientRect(); return b.top - base.top + b.height / 2; };
-  // In the AI colors: cool where the families leave, warm where they land.
+  // Selected, it's a plain navy line. While the plan is on the grid (not saved yet) it takes the AI colors, cool where
+  // the families leave and warm where they land, with a spark running along it.
+  const pv = S.aiPv === d.id;
   const paths = d.arrows.map(([a, b]) => [mid(a), mid(b)]).filter(([y1, y2]) => y1 != null && y2 != null && y1 !== y2).map(([y1, y2], i) => {
     const s = Math.sign(y2 - y1), r = Math.min(4, Math.abs(y2 - y1) / 2), line = `M18 ${y1} H${8 + r} Q8 ${y1} 8 ${y1 + s * r} V${y2 - s * r} Q8 ${y2} ${8 + r} ${y2} H14`;
+    if (!pv) return `<path class="ai-arrow-line" d="${line}"/><circle cx="18" cy="${y1}" r="2.5"/><path d="M13 ${y2 - 4} L18 ${y2} L13 ${y2 + 4} Z"/>`;
     return `<linearGradient id="aiArr${i}" gradientUnits="userSpaceOnUse" x1="0" y1="${y1}" x2="0" y2="${y2}"><stop offset="0" stop-color="#4d7cff"/><stop offset=".4" stop-color="#8b5cf6"/><stop offset=".75" stop-color="#e64f9a"/><stop offset="1" stop-color="#ff8a3d"/></linearGradient>
       <path class="ai-arrow-line" style="stroke:url(#aiArr${i})" d="${line}"/><path class="ai-arrow-pulse" d="${line}"/>
       <circle cx="18" cy="${y1}" r="2.5" style="fill:#4d7cff"/><path d="M13 ${y2 - 4} L18 ${y2} L13 ${y2 + 4} Z" style="fill:#ff8a3d"/>`;
   });
   if (!paths.length) return;
   const fresh = aiArrows.last !== d.id + S.aiPv; aiArrows.last = d.id + S.aiPv;
-  rowsEl.insertAdjacentHTML('beforeend', `<svg class="ai-arrows" width="24" height="${rowsEl.scrollHeight}" aria-hidden="true">${paths.join('')}</svg>`);
+  rowsEl.insertAdjacentHTML('beforeend', `<svg class="ai-arrows ${pv ? 'pv' : ''}" width="24" height="${rowsEl.scrollHeight}" aria-hidden="true">${paths.join('')}</svg>`);
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // A new suggestion draws its arrow from the old reservation to the new one, after the families land.
   if (fresh && !still) rowsEl.querySelectorAll('.ai-arrows .ai-arrow-line').forEach(line => {
@@ -3266,15 +3348,28 @@ function aiPreview(id) {
   S.aiOpen = id;
   renderRows(); aiScrollTo(d.touch);
   aiFly(d.anim, () => {
+    S.pvWas = new Map(LIVE.map(r => [r.id, structuredClone(r)])); // the board as booked, which the grid keeps showing
     HMOVES.push(...d.moves.map(m => Object.assign(structuredClone(m), { pv: true, grp: d.id })));
     S.aiPv = id; S.draftEnter = true; handRebuild(); flash(d.touch); renderRows(); aiScrollTo(d.touch);
+    say(`On the grid, not saved: ${d.title}. Escape puts it back.`);
   });
   renderRail(); updateHeader();
 }
+// Opening a card picks the suggestion: its rides are marked on the grid, and nothing moves until Show me.
+function aiSelect(id) {
+  const d = aiDecisions().find(x => x.id === id);
+  if (!d) return;
+  aiUnpreview(true);
+  S.aiOpen = id;
+  renderRows(); renderRail(); updateHeader(); aiScrollTo(d.touch);
+  const card = rail.querySelector(`[data-aicard="${id}"]`);
+  card?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  card?.querySelector('.ai-card')?.focus({ preventScroll: true });
+}
 function aiUnpreview(quiet) {
   if (!S.aiPv) return;
-  HMOVES = HMOVES.filter(m => !m.pv); S.aiPv = null; handRebuild();
-  if (!quiet) { renderRows(); renderRail(); updateHeader(); }
+  HMOVES = HMOVES.filter(m => !m.pv); S.aiPv = null; S.pvWas = null; handRebuild();
+  if (!quiet) { renderRows(); renderRail(); updateHeader(); say('Put back. Nothing changed.'); }
 }
 // ed: what the dispatcher changed on a new ride before approving it ({ said, driver }).
 function aiApprove(id, ed) {
@@ -3288,15 +3383,22 @@ function aiApprove(id, ed) {
   const title = swap ? d.title.replace(`${swap[0]} drives`, `${swap[1]} drives`) : d.title;
   const who = d.who.map(w => swap && w.startsWith(`${swap[0]}:`) ? swap[1] + w.slice(swap[0].length) : w);
   mine.forEach((m, i) => { delete m.pv; Object.assign(m, { ai: true, text: i ? '' : title, sub: i ? '' : `${d.story}${ed ? ` You changed it: ${ed.said}.` : ''} ${who.join('. ')}.`, why: i ? '' : d.why[0] }); });
-  S.aiPv = null; handSave(); handDriverLate();
+  S.aiPv = null; S.pvWas = null; handSave(); handDriverLate();
+  $('srLive').textContent = ''; // the preview it described is saved now; the toast says what happened
   const told = [...new Set(d.who.map(w => w.split(':')[0]).concat(d.off || []).map(w => swap && w === swap[0] ? swap[1] : w).filter(w => !/No driver/.test(w)))];
-  const up = mine.some(m => m.t === 'edit' && m.set.car && carFit(m.set.car, findRide(m.from)) === 'upgrade') && S.msgOn.upgrade ? ' Upgrade text sent.' : '';
+  const upTo = S.msgOn.upgrade ? mine.filter(m => m.t === 'edit' && m.set.car && carFit(m.set.car, findRide(m.from)) === 'upgrade').map(m => findRide(m.from).party) : [];
+  if (mine[0]) mine[0].told = told.concat(upTo); // undo tells the same people it's off
   logChange(`Approved: ${title}`);
   flash(d.touch);
   S.aiOpen = null; aiDecisions(); S.aiOpen = (AI_CACHE.list[0] || {}).id || null;
   renderRows(); renderRail(); renderCtx(); updateHeader();
   const confs = [...new Set(d.touch.map(findRide).filter(r => r && !r.hidden).map(cf))];
-  toast(`${title} (${confs.join(', ')}). ${told.length ? `${told.join(', ')} notified.` : ''}${up}`, handUndo);
+  toast(`${title} (${confs.join(', ')}). ${told.length ? `Texted ${andList(told)}.` : ''}${upTo.length ? ` ${andList(upTo)} got the upgrade text.` : ''}`, handUndo);
+  railFocus();
+}
+// After Approve or Undo, focus goes to the decision now on top, so the keyboard carries on from there.
+function railFocus() {
+  requestAnimationFrame(() => (rail.querySelector('.ai.lead .ai-card') || rail.querySelector('.sec-t.big'))?.focus());
 }
 // Approve from a new ride's reservation: anything the dispatcher changed goes in with the suggestion, as one group.
 function draftApprove(id) {
@@ -3321,7 +3423,7 @@ function draftApprove(id) {
   aiApprove(d.id, said.length ? { said: said.join(', '), driver: set.driver } : null);
 }
 // The card: the move as code chips, one line on why, and the cost. "Show me" acts it out on the grid.
-function aiChips(fams, cls = '') { return fams.map(f => `<b class="fc ${cls}" >${famCode(f)}</b>`).join(''); }
+function aiChips(fams, cls = '') { return fams.map(f => `<b class="fc ${cls}" >${famMark(cls)}${famCode(f)}${famSr(cls)}</b>`).join(''); }
 function aiTo(d) {
   if (d.to) return aiChips(d.to);
   if (d.toOwn) return `<span class="ai-own">${ic('car', 14)}own car${d.toOwn !== 'affiliate' ? ` · ${esc(d.toOwn)}` : ''}</span>`;
@@ -3332,15 +3434,19 @@ function aiCardHTML(d) {
   // Each side carries its conf number: the reservation the families leave, and the one they join.
   const [fromId, toId] = d.arrows ? d.arrows[0] : [d.touch[0], null], cfOf = id => id ? `<span class="cf">${esc((d.codes && d.codes[id]) || codeOf(findRide(id)))}</span>` : '';
   const move = `<div class="ai-move"><span class="ai-res">${d.from ? aiChips(d.from, d.kind === 'driver' ? '' : 'breaks') : `<span class="ai-own">${esc(rideSaid(findRide(d.touch[0])).replace(/’s ride$/, ''))}</span>`}${cfOf(fromId)}</span><span class="ai-arrow" aria-label="to">→</span><span class="ai-res">${aiTo(d)}${cfOf(toId)}</span></div>`;
-  const meta = `<p class="ai-meta">${esc(d.cost)} · ${esc(d.who[0] || '')}</p>`;
+  const tell = aiTell(d);
+  const meta = `<p class="ai-meta">${esc(d.cost)}</p>`;
   const body = `${move}<p class="ai-story">${esc(d.story)}</p>${meta}`;
   const details = why ? `<div class="why"><ul>${d.why.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
     <div class="opts"><span class="opts-h">Ways to cover it, in-house first</span>${d.options.map((o, i) => `<div class="opt ${o.pick ? 'pick' : ''}"><span class="opt-n num">${i + 1}</span><span class="opt-t"><b>${esc(o.label)}</b> ${esc(o.text)}</span><span class="opt-c ${o.bad ? 'bad' : ''}">${esc(o.cost)}</span></div>`).join('')}</div>
-    <div class="ai-whol"><span class="opts-h">Who hears about it</span>${d.who.map(w => `<span>${esc(w)}</span>`).join('')}</div>` : '';
-  return `<div class="ai lead ${pv ? 'pv' : ''}" data-aicard="${d.id}"><article class="ai-card x v2" aria-label="${esc(d.title)}">
+    <div class="ai-whol"><span class="opts-h">Who hears about it</span>${tell.map(x => `<span><b>${esc(x.name)}</b>: ${esc(x.what)}</span>${x.text ? `<p class="bubble">${esc(x.text)}</p>` : ''}`).join('')}</div>` : '';
+  // Before Approve, the card names everyone it texts. Nobody hears about anything until then.
+  const sends = tell.length ? `<p class="ai-tell">${ic('sms', 14)}<span>Approve texts ${andList(tell.map(x => `<b>${esc(x.name)}</b>`))}.</span></p>` : '';
+  return `<div class="ai lead ${pv ? 'pv' : ''}" data-aicard="${d.id}"><article class="ai-card x v2" tabindex="-1" aria-label="${esc(d.title)}">
     <div class="prob"><span class="t">${esc(d.title)}</span><span class="actby">act by</span><span class="tnum">${d.actBy}</span></div>
     ${body}${details}
     ${pv ? `<p class="ai-pv">${ic('spark', 13)}<span>Showing on the grid. Nothing changes until you approve.</span></p>` : ''}
+    ${sends}
     <div class="actions"><button class="btn pri sm" data-a="ai-approve" data-v="${d.id}">Approve</button>
       <button class="btn sec sm" data-a="${pv ? 'ai-unshow' : 'ai-show'}" data-v="${d.id}">${pv ? 'Put back' : 'Show me'}</button>
       <span class="spacer"></span><button class="btn ghost sm why-btn ${why ? 'open' : ''}" data-a="ai-why" data-v="${d.id}" aria-expanded="${why}">Details ${ic('right', 14)}</button></div>
@@ -3355,7 +3461,7 @@ function aiRailHTML() {
   const gates = aiGate().map(({ code, f, hit, T }) => `<div class="gate-card"><div class="gate-h"><b class="num">${code}</b><span class="spacer"></span><span class="gate-d">+${f.late} min, at the gate</span></div>
     <p>${hit ? `If it leaves like that, ${esc(codesShort(hit.B))} (${cf(hit.R)}) would make ${esc(famCode(hit.first) || hit.first[0])} wait ${hit.sp.wait} min. Ready once it takes off: ${esc(T ? `${codesShort(hit.B)} ride with ${codesShort(T.t.fam)}, ${cf(T.t)} (${T.pax} of ${T.seats} seats)` : `${codesShort(hit.B)} get their own car`)}.` : 'Nothing breaks even if it leaves this late.'} Nothing changes until it takes off.</p></div>`).join('');
   const heads = aiHeads().map(r => `<div class="ai"><div class="ai-card h">${ic('spark', 16)}<p>${esc(`${r.driver} is about ${drvLate(r)} min late for ${rideSaid(r)} (${cf(r)}), after ${r.lateWhy}. ${promised(r) ? `That’s ${S.cfg.promise - drvLate(r)} min before our on-time promise makes the ride free, so keep an eye on it.` : `That’s inside the ${S.cfg.limit} min limit, so nothing to change.`}`)}</p></div></div>`).join('');
-  return `<section class="sec"><div class="sec-t big"><b>Decisions</b><span class="cnt">${list.length}</span></div>${cards}</section>
+  return `<section class="sec"><div class="sec-t big" tabindex="-1"><b>Decisions</b><span class="cnt">${list.length}</span></div>${cards}</section>
     ${gates ? `<section class="sec"><div class="sec-t">${ic('clock', 15)}<b>Waiting for takeoff</b></div>${gates}</section>` : ''}
     ${heads ? `<section class="sec"><div class="sec-t">${ic('bulb', 15)}<b>Heads-up</b></div><div class="cards">${heads}</div></section>` : ''}
     ${handRailHTML(true)}`;
@@ -3603,6 +3709,7 @@ const S = {
   colOn: { pickup: true, status: true, party: true, pax: true, pu: true, do: true, vehicle: true, driver: true, conf: true },
   statusNames: { assigned: 'Assigned', ontheway: 'En route', arrived: 'Arrived', customerin: 'Picked up', done: 'Done' },
   msgOn: { confirm: true, reminder: true, offer: true, otw: true, upgrade: true, arrived: true, final: false, receipt: true },
+  fit: { hide: [], tight: false }, // columns tucked away so the grid fits the window (fitColumns)
   msgSel: 'otw',
   wake: { Mike: true, Emily: true, Sarah: false, Chris: false, Jason: true, Tony: true, Kyle: false, Danny: true, Brian: false },
   perms: {
@@ -3670,8 +3777,8 @@ function updateHeader() {
   const open = unresolved().length;
   $('counts').innerHTML = `
     <button class="count" data-a="all-rides" title="Show all of today’s rides"><span class="n">${dayCount(TODAY)}</span><span class="l">rides</span></button>
-    ${HAND && aiOn() ? `<button class="count" data-a="need-you" aria-expanded="${S.railOpen}" title="${S.railOpen ? 'Hide the assistant' : 'Show decisions'}"><span class="dot ${aiDecisions().length ? '' : 'off'}"></span><span class="n">${aiDecisions().length}</span><span class="l">${aiDecisions().length === 1 ? 'decision' : 'decisions'}</span></button>`
-      : HAND ? `<button class="count" data-a="need-you" aria-expanded="${S.railOpen}" title="${S.railOpen ? 'Hide your moves' : 'Show your moves'}"><span class="n">${handCount()}</span><span class="l">${handCount() === 1 ? 'move' : 'moves'}</span></button>`
+    ${HAND && aiOn() ? `<button class="count" data-a="need-you" title="Go to the decisions"><span class="dot ${aiDecisions().length ? '' : 'off'}"></span><span class="n">${aiDecisions().length}</span><span class="l">${aiDecisions().length === 1 ? 'decision' : 'decisions'}</span></button>`
+      : HAND ? `<button class="count" data-a="need-you" title="Go to your moves"><span class="n">${handCount()}</span><span class="l">${handCount() === 1 ? 'move' : 'moves'}</span></button>`
       : `<button class="count" data-a="need-you" aria-expanded="${S.railOpen && S.railTab === 'board'}" title="${S.railOpen && S.railTab === 'board' ? 'Hide the assistant' : 'Show decisions'}"><span class="dot ${open ? '' : 'off'}"></span><span class="n">${open}</span><span class="l">${open === 1 ? 'decision' : 'decisions'}</span></button>`}`;
   const dg = fmt(NOW).replace(':', ''), lt = localTime();
   $('clock').innerHTML = `<span class="clk-city">Seattle</span>
@@ -3825,20 +3932,26 @@ const MEGA = {
         <div class="help-col mm-item" style="--i:1"><h4>Driver status</h4><div class="legend">
           ${[['assigned', 'Driver and car are set.'], ['ontheway', 'Driver is heading to the pickup, on time.'], ['arrived', 'Driver is at the pickup, waiting.'], ['customerin', 'Passenger is in the car. The ride is underway.'], ['done', 'Finished and closed.']].map(([k, t]) => `<span class="k"><span class="rs ${k}">${chipInner(k)}</span></span><p>${t}</p>`).join('')}
           <span class="k"><span class="rs assigned late">${chipInner('assigned')}<b class="lt">+12</b></span></span><p>The driver is running a little late. The passenger’s wait stays inside the limit.</p>
-          <span class="k"><span class="rs latebad">${ic('alert', 12)}<span>Late <b class="lt">30</b></span></span></span><p>The passenger would wait past the limit. Act now.</p>
+          <span class="k"><span class="rs latebad">${ic('alert', 12)}<span>Late <b class="lt">30</b> min</span></span></span><p>The passenger would wait past the limit. Act now.</p>
         </div></div>
         <div class="help-col mm-item" style="--i:2"><h4>Words on the board</h4><div class="terms">
           <div><b>Decisions</b><span>A problem the tool can’t settle alone. Each one comes with a suggested fix.</span></div>
-          <div><b>Delayed at the gate</b><span>The airline announced a delay, but the plane hasn’t taken off. The tool waits for takeoff, because the time can still change.</span></div>
+          <div><b>Waiting for takeoff</b><span>The airline announced a delay, but the plane hasn’t taken off. The tool waits for takeoff, because the time can still change.</span></div>
+          <div><b>Family codes</b><span>3C is the third family in Group 3 of a company group. Red means the family breaks its van; amber means its flight runs late while others in the van fly another flight.</span></div>
+          <div><b>The glow</b><span>A plan on the grid that isn’t saved yet. Approve saves it; Escape puts it back.</span></div>
+          <div><b>Free at 15</b><span>A private ride becomes free when the driver is 15 min late: our on-time promise.</span></div>
           <div><b>Heads-up</b><span>Worth knowing. No action needed.</span></div>
-          <div><b>Email</b><span>Requests from the dispatch inbox. The assistant finds the ride, prepares the change and drafts the reply. Nothing goes out until you approve.</span></div>
+          <div><b>Inbox</b><span>Email and texts in one place. For each request the assistant finds the ride, prepares the change and drafts the reply. Nothing goes out until you approve.</span></div>
           <div><b>Shared van</b><span>The bracket joins parties riding together. Red means the plan broke.</span></div>
         </div></div>
       </div>
       <div class="mm-side">
         <div class="mm-col mm-item" style="--i:3"><h4>New here?</h4><button class="mm-link" data-a="tour-replay"><span class="ck">${ic('help', 16)}</span><span>Replay the tour</span></button></div>
         <div class="mm-col mm-item" style="--i:3"><h4>Shortcuts</h4><div class="keys">
-          <div><kbd>/</kbd>Search rides</div><div><kbd>Esc</kbd>Close a menu</div>
+          <div><kbd>/</kbd>Search rides</div><div><kbd>N</kbd>New reservation</div>
+          <div><kbd>↑</kbd><kbd>↓</kbd>Move between rides</div><div><kbd>Enter</kbd>Open a ride</div><div><kbd>Shift</kbd><kbd>F10</kbd>A ride’s menu</div>
+          <div><kbd>J</kbd><kbd>K</kbd>Next or previous decision</div><div><kbd>S</kbd>Show me, or put it back</div><div><kbd>A</kbd>Approve the decision in focus</div>
+          <div><kbd>Esc</kbd>Close a menu, or put a preview back</div>
         </div></div>
       </div>
     </div>`;
@@ -3847,7 +3960,7 @@ const MEGA = {
     const lt = localTime();
     const link = s => `<button class="mm-link" data-a="open-settings" data-v="${s.id}"><span class="ck">${ic(s.icon, 16)}</span><span>${s.name}</span></button>`;
     return `<div class="mm">
-      <div class="mm-main">
+      <div class="mm-main set-grid">
         <div class="set-card mm-item" style="--i:0"><h4>Shared van wait limit</h4><p>How long one party may wait for another before the tool flags it.</p>${segCtl('limit', [[20, '20 min'], [25, '25 min'], [30, '30 min']])}</div>
         <div class="set-card mm-item" style="--i:1"><h4>Clock</h4><p>The board always runs on Seattle time. You can show your own time next to it.</p>${switchCtl('showLocal', `Also show my time${lt.zone ? ` (${esc(lt.zone)})` : ''}`)}</div>
         <div class="set-card mm-item" style="--i:2"><h4>Row height</h4><p>Compact fits more rides on the screen.</p>${segCtl('compact', [[false, 'Comfortable'], [true, 'Compact']])}</div>
@@ -3955,13 +4068,13 @@ function renderCtx() {
 const COLS = {
   pickup: { label: 'PU time', w: '64px', lock: true, desc: 'Pickup time, in Seattle time. For a flight, it’s when the party reaches the curb, not when the plane lands.', cell: r => `<span class="pickup num">${fmt(r.pickup)}</span>` },
   status: { label: 'Driver status', w: '100px', desc: 'Where the driver is on this ride. Flight status sits next to the flight, so the two never mix.', cell: r => isDraft(r) ? `<span class="draft-tag">${ic('spark', 12)}<span>Not booked yet</span></span>` : chipHTML(r) },
-  party: { label: 'Party', w: 'minmax(150px, 240px)', lock: true, desc: 'Who rides, with flags and late notes.', cell: (r, o) => partyHTML(r, o) },
+  party: { label: 'Party', w: 'minmax(140px, 240px)', tw: 'minmax(130px, 240px)', lock: true, desc: 'Who rides, with flags and late notes.', cell: (r, o) => partyHTML(r, o) },
   pax: { label: 'Pax', w: '64px', desc: 'Number of passengers. Open the ride to see each family.', cls: 'c-pax', cell: r => `${ic('users', 14)}<span${r.pax > seatsOf(r) ? ` class="over" title="${r.pax} people, ${seatsOf(r)} seats in the ${esc(carKind(r))}"` : ''}>${r.pax}</span>${r.bags == null ? '' : `<span class="gap"></span>${ic('bag', 14)}<span>${r.bags}</span>`}` },
-  pu: { label: 'PU location', w: 'minmax(290px, 440px)', lock: true, desc: 'Pickup place and street. Airport pickups add the flight, landing time and flight status.', cls: 'loc', title: r => locTitle(r.pu), cell: r => puHTML(r) },
-  do: { label: 'DO location', w: 'minmax(128px, 280px)', desc: 'Drop-off place and street.', cls: 'loc', title: r => locTitle(r.do), cell: r => doHTML(r) },
+  pu: { label: 'PU location', w: 'minmax(240px, 440px)', tw: 'minmax(210px, 440px)', lock: true, desc: 'Pickup place and street. Airport pickups add the flight, landing time and flight status.', cls: 'loc', title: r => locTitle(r.pu), cell: r => puHTML(r) },
+  do: { label: 'DO location', w: 'minmax(120px, 280px)', desc: 'Drop-off place and street.', cls: 'loc', title: r => locTitle(r.do), cell: r => doHTML(r) },
   // What the passenger booked. Red when the driver's car is smaller than that: the ride can't go as assigned.
   vehicle: { label: 'Vehicle', w: '66px', desc: 'What the passenger booked. Open the ride to see the driver’s actual car.', cell: r => carTooSmall(r)
-    ? `<span class="trunc veh-bad" title="${esc(`${r.driver}’s ${carWord(DRIVERS[r.driver])} is smaller than the ${vtypeOf(r.vehicle).name} they booked. Pick another driver.`)}">${esc(r.vehicle)}</span>`
+    ? `<span class="veh-bad" title="${esc(smallNote(r))}">${ic('alert', 12)}<span class="trunc">${esc(r.vehicle)}</span><span class="sr">, car too small</span></span>`
     : `<span class="trunc" title="${esc(r.vehicle)}">${esc(r.vehicle)}</span>` },
   driver: { label: 'Driver', w: '56px', desc: 'In-house driver, or the affiliate on a farm-out.', cell: r => r.driver ? `<span class="trunc ${aiGlowDriver(r) ? 'ai-t' : ''}" ${r.aff ? `title="${esc(AFF_NAMES[r.driver] || r.driver)} (affiliate)"` : ''}>${esc(r.driver)}</span>` : '<span class="muted" title="No driver yet">—</span>' },
   conf: { label: 'Conf', w: '60px', desc: 'Confirmation code: the passenger’s initials and a number. Customers, drivers and affiliates all go by it. Hover for the Limo Anywhere record.', cell: r => `<span class="num conf ${aiGlowConf(r) ? 'ai-t' : ''}" title="Limo Anywhere record #${r.conf}">${esc(codeOf(r))}</span>` },
@@ -3974,27 +4087,46 @@ const COLS = {
   phone: { label: 'Passenger phone', w: '118px', desc: 'Lead passenger’s mobile.', cell: r => `<span class="num t2">${r.phone}</span>` },
   notes: { label: 'Trip notes', w: 'minmax(160px, 300px)', desc: 'Child seats, VIP requests, cruise bags and other notes.', cell: r => r.notes ? `<span class="trunc t3" title="${esc(r.notes)}">${esc(r.notes)}</span>` : '<span class="muted">—</span>' },
 };
+// The columns the dispatcher chose (Settings → Grid columns), and the ones the grid shows right now.
 const visCols = () => S.colOrder.filter(id => S.colOn[id]);
-function gridMinWidth() {
+const gridCols = () => visCols().filter(id => !S.fit.hide.includes(id));
+const colW = id => (S.fit.tight && COLS[id].tw) || COLS[id].w;
+function gridMinWidth(cols = gridCols()) {
   let w = 40 + 40; // side padding (the left one holds the arrow) + the last column with the column settings button
-  for (const id of visCols()) w += parseInt(COLS[id].w.replace('minmax(', ''), 10) + (id === 'party' ? 14 : 0);
+  for (const id of cols) w += parseInt(colW(id).replace('minmax(', ''), 10) + (id === 'party' ? 14 : 0);
   return w;
 }
 function gridMaxWidth() {
   let w = 40; // the column settings button
-  for (const id of visCols()) w += parseInt(COLS[id].w.split(',').pop().replace(/\D/g, ''), 10) + (id === 'party' ? 14 : 0);
+  for (const id of gridCols()) w += parseInt(colW(id).split(',').pop().replace(/\D/g, ''), 10) + (id === 'party' ? 14 : 0);
   return w;
 }
+// On a laptop the grid may be narrower than its columns. Rather than cut off the right edge (where Driver sits), the
+// least needed columns step aside first: Pax, then DO location, then Conf. Then the two widest narrow a little.
+// Pickup time, party, pickup place, status, vehicle and driver always stay. Everything comes back when there's room,
+// and the open ride still shows it all.
+const FIT_DROP = ['pax', 'do', 'conf'];
+function fitColumns() {
+  const avail = tablewrap.clientWidth;
+  if (!avail || tablewrap.hidden) return false; // the timeline is up: keep the last fit
+  const was = JSON.stringify(S.fit);
+  S.fit = { hide: [], tight: false };
+  for (const id of FIT_DROP) { if (gridMinWidth() <= avail) break; if (S.colOn[id]) S.fit.hide.push(id); }
+  if (gridMinWidth() > avail) S.fit.tight = true;
+  return JSON.stringify(S.fit) !== was;
+}
+new ResizeObserver(() => { if (fitColumns()) { renderThead(); renderRows(); } else fitChips(); }).observe(tablewrap);
 // The bracket column for shared vans always sits right before Party. Each part of the day repeats the column
 // headers under its own title; drag a header left or right to move the column.
 let THEAD = '';
 function renderThead() {
-  const vis = visCols(), t = $('table');
-  t.style.setProperty('--cols', vis.map(id => (id === 'party' ? '14px ' : '') + COLS[id].w).join(' ') + ' minmax(40px, 1fr)');
+  fitColumns();
+  const vis = gridCols(), t = $('table'), away = S.fit.hide.map(id => COLS[id].label);
+  t.style.setProperty('--cols', vis.map(id => (id === 'party' ? '14px ' : '') + colW(id)).join(' ') + ' minmax(40px, 1fr)');
   t.style.minWidth = gridMinWidth() + 'px';
   t.closest('.grid').style.setProperty('--grid-max', gridMaxWidth() + 'px');
-  THEAD = vis.map(id => (id === 'party' ? '<div></div>' : '') + `<div class="th" draggable="true" data-col="${id}" title="Drag to move this column">${COLS[id].label}</div>`).join('') +
-    `<div class="th-end"><button class="iconbtn" data-a="open-settings" data-v="columns" title="Choose and arrange columns" aria-label="Choose and arrange columns">${ic('sliders', 15)}</button></div>`;
+  THEAD = vis.map(id => (id === 'party' ? '<div role="columnheader"><span class="sr">Shared van</span></div>' : '') + `<div class="th" role="columnheader" draggable="true" data-col="${id}" title="Drag to move this column">${COLS[id].label}</div>`).join('') +
+    `<div class="th-end">${away.length ? `<span class="th-more" title="${esc(`${andList(away)} ${away.length === 1 ? 'is' : 'are'} tucked away to fit this window. Open a ride to see ${away.length === 1 ? 'it' : 'them'}, or make the window wider.`)}">+${away.length}</span>` : ''}<button class="iconbtn" data-a="open-settings" data-v="columns" title="Choose and arrange columns" aria-label="Choose and arrange columns${away.length ? `. ${esc(andList(away))} tucked away to fit this window` : ''}">${ic('sliders', 15)}</button></div>`;
 }
 
 // The day splits into four blocks so the grid reads in chunks.
@@ -4050,20 +4182,22 @@ function markHit(text, q) {
 function hitLineHTML(r, o) {
   const h = rideHit(r, S.q);
   if (!h || !h.why) return '';
-  const k = visCols().indexOf('party');
+  const k = gridCols().indexOf('party');
   const more = (h.more || []).filter(Boolean).map(x => x === h.tel ? `<mark>${esc(x)}</mark>` : markHit(String(x), h.q));
-  return `<div class="note hitline cols ${o.sel ? 'sel' : ''}" data-a="row" data-v="${r.id}">${'<div></div>'.repeat(k)}
+  return `<div class="note hitline cols ${o.sel ? 'sel' : ''}" data-a="row" data-v="${r.id}" role="row">${'<div></div>'.repeat(k)}
     <div class="cell bracket-cell">${o.between ? bracketHTML('mid', r.broken) : ''}</div>
-    <div class="note-t" style="grid-column:${k + 2} / -1">${ic(h.icon, 13)}<b>${markHit(h.why, h.q)}</b>${more.map(x => `<span>${x}</span>`).join('')}</div></div>`;
+    <div class="note-t" role="gridcell" style="grid-column:${k + 2} / -1">${ic(h.icon, 13)}<b>${markHit(h.why, h.q)}</b>${more.map(x => `<span>${x}</span>`).join('')}</div></div>`;
 }
 
 // ---------- Grid rows ----------
+// A suggestion on show never moves a booked ride: it keeps its booked time and its place on the grid.
+const bookedAt = r => S.pvWas?.get(r.id)?.pickup ?? r.pickup;
 function visibleRides(o = {}) {
   const q = S.q.trim().toLowerCase();
   const ghosts = S.aiPv ? aiTouched() : [];
   const list = ridesFor(viewDate()).filter(r => {
     if (r.hidden && !ghosts.includes(r.id)) return false;
-    if (!o.ignoreTod && S.tod !== 'all' && blockOf(r.pickup) !== S.tod) return false;
+    if (!o.ignoreTod && S.tod !== 'all' && blockOf(bookedAt(r)) !== S.tod) return false;
     if (S.driverF !== 'all' && (S.driverF === 'none' ? r.driver && r.driver !== '—' : r.driver !== S.driverF)) return false;
     if (S.puF !== 'all' && puKey(r) !== S.puF) return false;
     const f = o.anyStatus ? 'all' : S.filter;
@@ -4078,8 +4212,8 @@ function visibleRides(o = {}) {
   });
   // Shared vans stay together, anchored at the group's earliest pickup.
   const grp = {};
-  for (const r of list) if (r.g) { const g = grp[r.g] || (grp[r.g] = { t: Infinity, s: Infinity }); g.t = Math.min(g.t, r.pickup); g.s = Math.min(g.s, r.seq); }
-  const key = r => r.g ? [grp[r.g].t, grp[r.g].s, r.gi] : [r.pickup, r.seq, 0];
+  for (const r of list) if (r.g) { const g = grp[r.g] || (grp[r.g] = { t: Infinity, s: Infinity }); g.t = Math.min(g.t, bookedAt(r)); g.s = Math.min(g.s, r.seq); }
+  const key = r => r.g ? [grp[r.g].t, grp[r.g].s, r.gi] : [bookedAt(r), r.seq, 0];
   return list.sort((a, b) => { const ka = key(a), kb = key(b); return ka[0] - kb[0] || ka[1] - kb[1] || ka[2] - kb[2]; });
 }
 
@@ -4102,15 +4236,48 @@ function promiseHTML(r) {
   const bad = m >= S.cfg.promise;
   return `<span class="promise ${bad ? 'bad' : ''}" title="${esc(`On-time promise: at ${S.cfg.promise} min late a private ride is free. ${r.driver} is about ${m} min late${bad ? '' : `, ${S.cfg.promise - m} min to spare`}.`)}">${bad ? 'Free ride' : `Free at ${S.cfg.promise}`}</span>`;
 }
+// Why a driver is late, in words. The chip's hover text, the quick view and the row's spoken summary share it.
+function lateNote(r) {
+  const late = drvLate(r), bad = lateBad(r);
+  return !late ? '' : `${r.driver} is about ${late} min late${r.lateWhy ? `, busy with ${r.lateWhy}` : ''}${promised(r)
+    ? (bad ? `. At ${S.cfg.promise} min late the ride is free: our on-time promise` : `, ${S.cfg.promise - late} min before the on-time promise makes the ride free`)
+    : bad ? `, past the ${S.cfg.limit} min wait limit` : ', still inside the wait limit'}.`;
+}
+const smallNote = r => `${r.driver}’s ${carWord(DRIVERS[r.driver])} is smaller than the ${vtypeOf(r.vehicle).name} they booked. Pick another driver.`;
+// Everything a row otherwise says only in hover text, as sentences: for keyboard users in the quick view, and read aloud.
+function rowWhy(r) {
+  const out = [lateNote(r), carTooSmall(r) ? smallNote(r) : ''];
+  if (S.cfg.flagMg && r.mg) out.push(`Meet & greet sign: ${r.sign}.`);
+  if (S.cfg.flagChild && r.child) out.push(`Child seat ×${r.child}.`);
+  if (S.cfg.flagLast && lastMinute(r)) out.push(`Booked at ${r.lastMin}, less than ${S.cfg.lastHours} hours before pickup.`);
+  if (S.cfg.flagDue && r.due) out.push('Balance due.');
+  const mq = mailFor(r.id);
+  if (mq) out.push(`Email from ${mq.from}: ${mq.fix()}.`);
+  return out.filter(Boolean);
+}
+// What a screen reader hears on a row: the ride in a few short sentences, with the reasons from rowWhy.
+function rowSaid(r) {
+  const p = PL[r.pu], d = PL[r.do], coded = r.fam && r.fam.every(famCode);
+  const fam = f => `${famCode(f)}${famGone(f, r) ? ' moves out if you approve' : famState(f, r) === 'breaks' ? ' breaks the van' : famState(f, r) === 'late' ? ' flight late' : ''}`;
+  const from = p.code ? `${r.flight}${r.lands && r.lands !== '—' ? `, lands ${r.lands}` : ''}${r.fsLabel ? `, ${r.fsLabel}` : ''}` : p.name;
+  return [
+    `${fmt(r.pickup)}, ${codeOf(r)}, ${isDraft(r) ? 'new ride, not booked yet' : rsName(r.ride)}`,
+    `${coded ? `Families ${r.fam.map(fam).join(', ')}` : r.party}, ${r.pax} ${r.pax === 1 ? 'person' : 'people'}`,
+    `From ${from}, to ${d.code ? r.dflight || 'the airport' : d.name}`,
+    `${r.vehicle}, ${r.driver && r.driver !== '—' ? `driver ${r.driver}` : 'no driver yet'}`,
+    ...rowWhy(r).map(w => w.replace(/\.$/, '')),
+    r.wait ? `${r.wait.ready.replace(/ ·$/, '')}, ${r.wait.text}, limit ${S.cfg.limit}` : '',
+    r.pvNote ? `If you approve: ${r.pvNote}` : '',
+  ].filter(Boolean).join('. ') + '.';
+}
 function chipHTML(r) {
   const late = drvLate(r), bad = lateBad(r);
   const cls = `rs ${r.ride}${late ? (bad ? ' latebad' : ' late') : ''}`;
-  const inner = !late ? chipInner(r.ride) : bad ? `${ic('alert', 12)}<span>Late <b class="lt">${late}</b></span>`
+  const inner = !late ? chipInner(r.ride) : bad ? `${ic('alert', 12)}<span>Late <b class="lt">${late}</b> min</span>`
     : `${ic(RS[r.ride][1], 12)}<span>${esc(rsName(r.ride))}</span><b class="lt">+${late}</b>`;
-  const note = !late ? '' : `${r.driver} is about ${late} min late${r.lateWhy ? `, busy with ${r.lateWhy}` : ''}${promised(r)
-    ? (bad ? `. At ${S.cfg.promise} min late the ride is free: our on-time promise` : `, ${S.cfg.promise - late} min before the on-time promise makes the ride free`)
-    : bad ? `, past the ${S.cfg.limit} min wait limit` : ', still inside the wait limit'}. `;
-  if (isLive() && !r.quote) return `<button class="${cls}" data-a="status-menu" data-v="${r.id}" aria-haspopup="menu" title="${esc(note)}Change driver status">${inner}</button>`;
+  const note = late ? `${lateNote(r)} ` : '';
+  // Not a tab stop of its own: the row is one stop, and its menu (Shift+F10) has Change status.
+  if (isLive() && !r.quote) return `<button class="${cls}" data-a="status-menu" data-v="${r.id}" aria-haspopup="menu" tabindex="-1" title="${esc(note)}Change driver status">${inner}</button>`;
   return `<span class="${cls}" title="${r.quote ? 'Quote sent, not booked yet' : esc(note) + 'Driver status updates on the day of the ride'}">${inner}</span>`;
 }
 function fsHTML(r) {
@@ -4145,7 +4312,7 @@ function doHTML(r) {
   const p = PL[r.do];
   return p.code ? `<span class="flight num trunc" title="${p.name}">${esc(r.dflight || 'Airport')}</span>` : placeHTML(r.do);
 }
-const locTitle = key => { const p = PL[key]; return esc(`${p.name}, ${p.addr}`); };
+const locTitle = key => { const p = PL[key]; return esc(p.addr.startsWith(p.name) ? p.addr : `${p.name}, ${p.addr}`); }; // a place named by its street says it once
 const lastMinute = r => r.lastMin && r.pickup - tm(r.lastMin) < Number(S.cfg.lastHours) * 60;
 // Red: this family breaks the van. Amber: its flight is late while others in the car fly something else
 // (with one flight, the flight column already says it). Otherwise quiet.
@@ -4154,16 +4321,48 @@ function famState(f, r) {
   const fl = FLIGHTS[f[2]], mixed = new Set(r.fam.map(x => x[2])).size > 1;
   return mixed && fl.late && (fl.gate || tm(fl.lands) > NOW) ? 'late' : '';
 }
-const famChip = (f, r) => `<b class="fc ${famState(f, r)} ${aiMovedFam(f[0]) ? 'ai-in' : ''}" data-fam="${esc(f[0])}">${famCode(f)}</b>`;
+// A family the suggestion on show would move out stays on its booked ride, faded, with no data-fam: the chip that
+// flies is the one in the ride it joins.
+const famGone = (f, r) => !!r.pvGone && r.pvGone.includes(f[0]);
+// Red and amber never speak by color alone: a red chip carries an alert, an amber one a clock, and both say it aloud.
+const famMark = st => st === 'breaks' ? ic('alert', 11) : st === 'late' ? ic('clock', 11) : '';
+const famSr = st => st === 'breaks' ? '<span class="sr">, breaks the van</span>' : st === 'late' ? '<span class="sr">, flight late</span>' : '';
+// The group number sits in its own tag, so a crowded row can drop it from chips that repeat the group ("10A B C").
+const famCodeHTML = f => { const c = famCode(f); return `<span><i class="fg">${c.slice(0, -1)}</i>${c.slice(-1)}</span>`; }; // one flex item, so the chip's icon gap stays outside the code
+const famChip = (f, r, same) => famGone(f, r) ? `<b class="fc gone ${same ? 'same' : ''}" title="${esc(`${famCode(f)} moves out if you approve`)}">${famCodeHTML(f)}</b>`
+  : `<b class="fc ${famState(f, r)} ${aiMovedFam(f[0]) ? 'ai-in' : ''} ${same ? 'same' : ''}" data-fam="${esc(f[0])}">${famMark(famState(f, r))}${famCodeHTML(f)}${famSr(famState(f, r))}</b>`;
 // Three or more families in a row from one group, in the same state, read as a range: 7A–F.
 function famChips(r) {
   const runs = [];
   for (const f of r.fam) {
-    const c = famCode(f), g = c.slice(0, -1), l = c.slice(-1), st = famState(f, r), last = runs[runs.length - 1];
+    const c = famCode(f), g = c.slice(0, -1), l = c.slice(-1), st = famGone(f, r) ? 'gone' : famState(f, r), last = runs[runs.length - 1];
     if (last && last.g === g && last.st === st && last.to.charCodeAt(0) + 1 === l.charCodeAt(0)) last.fams.push(f), last.to = l;
     else runs.push({ g, st, from: l, to: l, fams: [f] });
   }
-  return runs.map(x => x.fams.length >= 3 ? `<b class="fc ${x.st}">${x.g}${x.from}–${x.to}</b>` : x.fams.map(f => famChip(f, r)).join('')).join('');
+  let g = null; // the group of the chip before, so a repeat can be shortened when the row is crowded
+  return runs.map(x => {
+    const same = x.g === g; g = x.g;
+    return x.fams.length >= 3 ? `<b class="fc ${x.st}">${famMark(x.st)}${x.g}${x.from}–${x.to}${famSr(x.st)}</b>` : x.fams.map((f, i) => famChip(f, r, same || i > 0)).join('');
+  }).join('');
+}
+// A van with many families can be wider than a narrow Party column. A family never just vanishes at the edge: the chips
+// first drop their repeated group number ("10A B C D E"), then the last ones fold into "+N", red when one of them breaks
+// the van, with the codes on hover. Screen readers hear every family in the row's summary either way.
+function fitChips() {
+  for (const f of rowsEl.querySelectorAll('.row .fcodes')) {
+    f.classList.remove('short'); f.querySelector('.fc-more')?.remove(); f.querySelectorAll('.fc').forEach(c => { c.style.display = ''; });
+    const over = () => f.scrollWidth > f.clientWidth + 1;
+    if (!over()) continue;
+    f.classList.add('short');
+    if (!over()) continue;
+    const chips = [...f.querySelectorAll('.fc')], gone = [], more = Object.assign(document.createElement('b'), { className: 'fc fc-more' });
+    f.append(more);
+    while (chips.length > 1 && (!gone.length || over())) { const c = chips.pop(); c.style.display = 'none'; gone.unshift(c); more.textContent = `+${gone.length}`; }
+    const breaks = gone.some(c => c.classList.contains('breaks'));
+    more.classList.toggle('breaks', breaks);
+    if (breaks) more.insertAdjacentHTML('afterbegin', ic('alert', 11));
+    more.title = gone.map(c => c.textContent).join(' · '); // "10E, breaks the van
+  }
 }
 function partyHTML(r, o) {
   const f = [];
@@ -4182,33 +4381,55 @@ function partyHTML(r, o) {
 const bracketHTML = (pos, broken, label = '') => pos ? `<span class="bracket ${pos} ${broken ? 'broken' : ''}">${label ? `<b class="vl" title="Van ${label}">${label}</b>` : ''}<i class="v"></i>${pos === 'mid' ? '' : '<i class="h"></i>'}</span>` : '';
 
 function rowHTML(r, o) {
-  if (r.hidden) return ghostRowHTML(r, o);
   const tint = S.cfg.rowColor === 'row' && !o.sel && r.ride !== 'assigned' && r.ride !== 'quote' ? `tint-${r.ride}` : '';
   const draft = isDraft(r);
   const cls = ['row', 'cols', tint, r.ride === 'cancelled' && 'cx', o.sel && 'sel', S.open === r.id && 'open', 'clickable', S.flash.has(r.id) && 'flash', draft && 'draft', draft && S.draftEnter && 'enter'].filter(Boolean).join(' ');
-  const act = `data-a="row" data-v="${r.id}" tabindex="0" aria-expanded="${S.open === r.id}" title="${draft ? 'A new ride the assistant would make. Not booked yet: click to see it filled in' : 'Click to open · right-click for more'}"`;
-  const cells = visCols().map(id => {
+  const act = `data-a="row" data-v="${r.id}" role="row" tabindex="${o.tab ? 0 : -1}" aria-label="${esc(rowSaid(r))}" aria-expanded="${S.open === r.id}" title="${draft ? 'A new ride the assistant would make. Not booked yet: click to see it filled in' : 'Click to open · right-click for more'}"`;
+  const cells = gridCols().map(id => {
     const c = COLS[id];
-    const pre = id === 'party' ? `<div class="cell bracket-cell">${bracketHTML(o.pos, r.broken, o.pos === 'top' && r.g ? r.g[0] : '')}</div>` : '';
-    return `${pre}<div class="cell ${c.cls || ''}" ${c.title ? `title="${c.title(r)}"` : ''}>${c.cell(r, o)}</div>`;
+    const pre = id === 'party' ? `<div class="cell bracket-cell" role="gridcell">${bracketHTML(o.pos, r.broken, o.pos === 'top' && r.g ? r.g[0] : '')}</div>` : '';
+    return `${pre}<div class="cell ${c.cls || ''}" role="gridcell" ${c.title ? `title="${c.title(r)}"` : ''}>${c.cell(r, o)}</div>`;
   }).join('');
   return `<div class="${cls}" ${act}>${cells}</div>`;
 }
-// A ride emptied by the suggestion on show: its time and conf stay, and it says where the families went.
-function ghostRowHTML(r, o) {
-  const d = aiDecisions().find(x => x.id === S.aiOpen), to = d && d.arrows && (d.arrows.find(([a]) => a === r.id) || [])[1];
-  const cells = visCols().map(id => {
-    const pre = id === 'party' ? '<div class="cell bracket-cell"></div>' : '';
-    const body = id === 'pickup' || id === 'conf' ? COLS[id].cell(r, o) : id === 'party' ? `<span class="ghost-t">${to ? `Merged into ${esc((d.codes && d.codes[to]) || codeOf(findRide(to)))}` : 'Not needed'}</span>` : id === 'driver' ? `<span class="ghost-t">${esc(r.driver || '')}${DRIVERS[r.driver] ? ' is free' : ''}</span>` : '';
-    return `${pre}<div class="cell ${COLS[id].cls || ''}">${body}</div>`;
-  }).join('');
-  return `<div class="row cols ghost ${o.sel ? 'sel' : ''}" data-v="${r.id}" aria-hidden="true">${cells}</div>`;
+// While a suggestion is on show, a booked ride it touches still shows what's booked: time, driver, car, status and
+// its place on the grid. Only the family chips act out the move (leaving ones fade, joining ones glow), and a line
+// under the row says what would change. Rides it doesn't touch draw as they are.
+function pvRow(r) {
+  const was = S.aiPv && S.pvWas && S.pvWas.get(r.id);
+  if (!was) return null;
+  const now = r.hidden ? [] : r.fam || [], had = was.fam || [];
+  const came = now.filter(f => !had.some(x => x[0] === f[0])), gone = had.filter(f => !now.some(x => x[0] === f[0]));
+  const note = pvSaid(r, was, came, gone);
+  return note ? Object.assign(structuredClone(was), { fam: was.fam && had.concat(came), pvGone: gone.map(f => f[0]), pvNote: note }) : null;
+}
+// "3C gets their own car, KR 37 · pickup 10:56, not 12:05"
+function pvSaid(r, was, came, gone) {
+  const bits = [], dest = new Map();
+  for (const f of gone) { const to = LIVE.find(x => !x.hidden && x.fam && x.fam.some(y => y[0] === f[0])); if (to) dest.set(to, (dest.get(to) || []).concat([f])); }
+  for (const [to, fs] of dest) bits.push(isDraft(to) ? `${codesShort(fs)} ${fs.length > 1 ? 'get' : 'gets'} their own car, ${cf(to)}` : `${codesShort(fs)} ${fs.length > 1 ? 'move' : 'moves'} to ${cf(to)}`);
+  if (r.hidden) return bits.concat(DRIVERS[was.driver] ? `${was.driver} is free` : []).join(' · ');
+  if (came.length) bits.push(`${codesShort(came)} ${came.length > 1 ? 'join' : 'joins'}: ${r.pax} of ${seatsOf(r)} seats`);
+  // Say who leaves at the new time, so it can't be read as the time of the ride the families move to.
+  const now = r.fam || [], who = came.length ? 'everyone' : now.length && now.every(famCode) ? codesShort(now) : 'pickup';
+  if (r.pickup !== was.pickup) bits.push(who === 'pickup' ? `pickup ${fmt(r.pickup)}, not ${fmt(was.pickup)}` : `${who} ${who === 'everyone' || now.length === 1 ? 'leaves' : 'leave'} at ${fmt(r.pickup)}, not ${fmt(was.pickup)}`);
+  if (r.driver !== was.driver) bits.push(`${r.driver || 'No driver'} drives, not ${was.driver || 'nobody'}`);
+  if (r.car && r.car !== was.car && carFit(r.car, r) === 'upgrade') bits.push(`a free upgrade to ${an(carWord(r.car))}`);
+  if (drvLate(was) && !drvLate(r)) bits.push(`${r.driver} is on time`);
+  else if (drvLate(r) > drvLate(was)) bits.push(`${r.driver} would be about ${drvLate(r)} min late`);
+  return bits.join(' · ');
+}
+function pvNoteHTML(r, o) {
+  const k = gridCols().indexOf('party');
+  return `<div class="note pv-note cols ${o.sel ? 'sel' : ''}" role="row">${'<div></div>'.repeat(k)}
+    <div class="cell bracket-cell">${o.between ? bracketHTML('mid', r.broken) : ''}</div>
+    <div class="note-t" role="gridcell" style="grid-column:${k + 2} / -1">${ic('spark', 13)}<b>If you approve:</b> ${esc(r.pvNote)}</div></div>`;
 }
 function noteHTML(r, o) {
-  const k = visCols().indexOf('party');
-  return `<div class="note cols ${o.sel ? 'sel' : ''}">${'<div></div>'.repeat(k)}
+  const k = gridCols().indexOf('party');
+  return `<div class="note cols ${o.sel ? 'sel' : ''}" role="row">${'<div></div>'.repeat(k)}
     <div class="cell bracket-cell">${o.between ? bracketHTML('mid', r.broken) : ''}</div>
-    <div class="note-t" style="grid-column:${k + 2} / -1"><span class="ready">${esc(r.wait.ready)}</span> <span class="wait">${esc(r.wait.text)} (limit ${S.cfg.limit})</span></div></div>`;
+    <div class="note-t" role="gridcell" style="grid-column:${k + 2} / -1"><span class="ready">${esc(r.wait.ready)}</span> <span class="wait">${esc(r.wait.text)} (limit ${S.cfg.limit})</span></div></div>`;
 }
 function emptyHTML() {
   const d = viewDate();
@@ -4235,37 +4456,49 @@ function renderRows() {
   const lm = S.railTab === 'email' ? leadMail() : null;
   const mailSel = new Set(lm && sameDay(lm.day || TODAY, viewDate()) ? mailRides(lm).map(r => r.id) : []);
   const aiSel = new Set(HAND && aiOn() && live && !lm ? aiTouched() : []);
-  const cnt = $('ctxCount');
-  if (cnt) { cnt.textContent = list.length; $('ctxNoun').textContent = list.length === 1 ? 'ride' : 'rides'; }
+  // Counts stay as booked while a suggestion is on show: a ride it would make isn't booked yet.
+  const booked = rs => rs.filter(r => !isDraft(r)).length, cnt = $('ctxCount');
+  if (cnt) { cnt.textContent = booked(list); $('ctxNoun').textContent = booked(list) === 1 ? 'ride' : 'rides'; }
   // A shared van belongs to the block of its earliest pickup, so a group never splits across blocks.
   const anchor = {};
-  for (const r of list) if (r.g) anchor[r.g] = Math.min(anchor[r.g] ?? Infinity, r.pickup);
-  const timeOf = r => r.g ? anchor[r.g] : r.pickup;
+  for (const r of list) if (r.g) anchor[r.g] = Math.min(anchor[r.g] ?? Infinity, bookedAt(r));
+  const timeOf = r => r.g ? anchor[r.g] : bookedAt(r);
   const byBlock = BLOCKS.map(b => ({ b, rows: list.filter(r => timeOf(r) >= b.from && timeOf(r) <= b.to) })).filter(x => x.rows.length);
   if (!list.length) { rowsEl.innerHTML = emptyHTML(); return; }
+  // One tab stop for all the rides: the row last focused, else the first. Arrow keys move between them (gridKeys).
+  const tabId = list.some(r => r.id === S.gridFocus) ? S.gridFocus : list[0].id;
+  const refocus = rowsEl.contains(document.activeElement) ? document.activeElement.closest('.row[data-v]')?.dataset.v : null;
   let html = '';
   for (const { b, rows } of byBlock) {
     const nowHere = live && NOW >= b.from && NOW <= b.to, shut = !!S.collapsed[b.id];
     html += `<section class="blk ${shut ? 'shut' : ''}" id="blk-${b.id}">
-      <button class="blk-h" data-a="blk" data-v="${b.id}" aria-expanded="${!shut}">${ic(b.icon, 24)}<b>${b.name}</b><span class="rng num">${fmt(b.from)} – ${fmt(b.to)}</span>${nowHere ? '<span class="now-tag">Now</span>' : ''}<span class="spacer"></span><span class="bc"><b class="num">${rows.length}</b> ${rows.length === 1 ? 'ride' : 'rides'}</span>${ic('chev', 14, 'blk-chev')}</button>`;
+      <button class="blk-h" id="blkh-${b.id}" data-a="blk" data-v="${b.id}" aria-expanded="${!shut}">${ic(b.icon, 24)}<b>${b.name}</b><span class="rng num">${fmt(b.from)} – ${fmt(b.to)}</span>${nowHere ? '<span class="now-tag">Now</span>' : ''}<span class="spacer"></span><span class="bc"><b class="num">${booked(rows)}</b> ${booked(rows) === 1 ? 'ride' : 'rides'}</span>${ic('chev', 14, 'blk-chev')}</button>`;
     if (!shut) {
-      html += `<div class="thead cols">${THEAD}</div>`;
+      // Each part of the day is a grid of its own, named by its header ("Morning 06:00 – 11:59, 12 rides").
+      html += `<div class="blk-g" role="grid" aria-labelledby="blkh-${b.id}"><div class="thead cols" role="row">${THEAD}</div>`;
       for (const r of rows) {
         const members = r.g ? rows.filter(x => x.g === r.g) : [];
         let pos = null;
         if (members.length > 1) { const k = members.indexOf(r); pos = k === 0 ? 'top' : k === members.length - 1 ? 'bottom' : 'mid'; }
         const open = live && r.card && !S.resolved[r.card];
         const sel = lm ? mailSel.has(r.id) : (open && S.openCard === r.card) || aiSel.has(r.id);
-        html += rowHTML(r, { pos, sel, open });
-        if (live && r.wait && !r.hidden) html += noteHTML(r, { between: pos === 'top' || pos === 'mid', sel });
+        const v = pvRow(r) || r, between = pos === 'top' || pos === 'mid';
+        html += rowHTML(v, { pos, sel, open, tab: r.id === tabId });
+        if (live && v.wait && !v.hidden) html += noteHTML(v, { between, sel });
+        if (v.pvNote) html += pvNoteHTML(v, { between, sel });
         // Searching: why this row matched, when the row doesn't show it ("Booked by Michelle Reyes").
         if (S.q.trim() && !r.hidden) html += hitLineHTML(r, { between: pos === 'top' || pos === 'mid', sel });
-        if (S.open === r.id) html += quickHTML(r);
+        if (S.open === r.id) html += `<div role="row"><div role="gridcell">${quickHTML(r)}</div></div>`;
       }
+      html += '</div>';
     }
     html += '</section>';
   }
   rowsEl.innerHTML = html;
+  fitChips();
+  if (!rowsEl.querySelector('.row[data-a="row"][tabindex="0"]')) rowsEl.querySelector('.row[data-a="row"]')?.setAttribute('tabindex', '0'); // its part of the day is folded
+  rowsEl.querySelectorAll('.th-end .iconbtn').forEach((b, i) => { if (i) b.tabIndex = -1; }); // one column-settings stop, not four
+  if (refocus) rowsEl.querySelector(`.row[data-v="${refocus}"]`)?.focus({ preventScroll: true }); // a redraw keeps your place
   aiArrows();
   S.qvEnter = false; S.draftEnter = false; // the slide plays once, when the reservation opens
 }
@@ -4319,7 +4552,7 @@ function renderRail() {
   const note = isLive() ? '' : `<p class="rail-ctx">${ic('info', 14)}<span>This panel always shows today, live. You’re planning ${dayLabel(viewDate())} in the grid.</span></p>`;
   if (HAND) {
     // The assistant can be switched off to dispatch by hand; the board and the moves are the same either way.
-    const on = aiOn(), sw = `<label class="ai-switch"><span>Assistant</span><button class="switch" role="switch" aria-checked="${on}" data-a="ai-toggle" aria-label="Assistant"><span class="track"></span></button></label>`;
+    const on = aiOn(), sw = `<label class="ai-switch"><span${on ? ' class="sr"' : ''}>Assistant</span><button class="switch" role="switch" aria-checked="${on}" data-a="ai-toggle" aria-label="Assistant"><span class="track"></span></button></label>`;
     rail.innerHTML = `<div class="rail-in">
       <div class="rail-top solo">${on ? `<span class="rt-mark">${ic('spark', 18)}</span><b>Assistant</b>` : `<span class="rt-mark hand">${ic('route', 18)}</span><b>Dispatch by hand</b>`}<span class="spacer"></span>${sw}<button class="iconbtn" data-a="rail-close" aria-label="Close the panel" title="Close">${ic('panelClose', 18)}</button></div>
       <div class="rail-panel">${note}${on ? aiRailHTML() : handRailHTML()}</div></div>`;
@@ -4535,7 +4768,7 @@ const SETS = {
         BLOCKS.map(b => srow(b.name, `${fmt(b.from)} – ${fmt(b.to)}`, `<button class="switch" role="switch" aria-checked="${!S.collapsed[b.id]}" data-a="blk" data-v="${b.id}" aria-label="Show ${b.name} open"><span class="track"></span></button>`)).join(''));
   },
   columns() {
-    const order = S.colOrder, shown = visCols().length, w = gridMinWidth();
+    const order = S.colOrder, shown = visCols().length, w = gridMinWidth(visCols());
     const items = order.map((id, i) => {
       const c = COLS[id], on = !!S.colOn[id];
       return `<li class="${on ? '' : 'off'}" draggable="true" data-col="${id}">
@@ -4546,7 +4779,7 @@ const SETS = {
       </li>`;
     }).join('');
     return card('Row color', '', srow('Color by status', 'Tint only the status chip, or the whole row like a classic dispatch grid.', segCtl('rowColor', [['chip', 'Status chip only'], ['row', 'Whole row']]))) +
-      card('Columns', `${shown} of ${order.length} shown. Drag a column, or use the arrows: the top of the list is the left side of the grid. You can also drag a column header on the grid.`,
+      card('Columns', `${shown} of ${order.length} shown.${S.fit.hide.length ? ` On this window, ${andList(S.fit.hide.map(id => COLS[id].label))} ${S.fit.hide.length === 1 ? 'is' : 'are'} tucked away to fit; ${S.fit.hide.length === 1 ? 'it comes' : 'they come'} back on a wider screen.` : ''} Drag a column, or use the arrows: the top of the list is the left side of the grid. You can also drag a column header on the grid.`,
         `<ul class="collist">${items}</ul>` + (w > 1040 ? noteLine(`These columns need ${w}px. On a 1440 screen with the decision rail open, the grid will scroll sideways.`, true) : ''),
         '<button class="btn ghost sm" data-a="cols-reset">Reset</button>');
   },
@@ -4855,6 +5088,7 @@ function quickHTML(r) {
     <section class="qv-col">
       <h3>Pickup</h3>
       <div class="qv-pu"><span class="pt num">${fmt(r.pickup)}</span><p>${esc(pickupWhy(r))}</p></div>
+      ${rowWhy(r).length ? `<ul class="qv-notes">${rowWhy(r).map(w => `<li>${ic('info', 14)}<span>${esc(w)}</span></li>`).join('')}</ul>` : ''}
       ${r.flight ? `<div class="qv-fl"><span class="flight num">${esc(r.flight)}</span>${landHTML(r)}${fsHTML(Object.assign({}, r, { fsLabel: fsFull(r) }))}</div>${f && f.why ? `<p class="qv-why">${esc(f.why)}.</p>` : ''}` : ''}
       <h3 class="qv-h2">Vehicle</h3>${vehHTML(r)}
       ${c ? `<button class="qv-dec" data-a="qv-card" data-v="${c.id}">${ic('spark', 15)}<span>Part of a decision: <b>${esc(c.title)}</b></span>${ic('right', 14)}</button>` : ''}
@@ -7042,7 +7276,7 @@ function mpZoom(v) {
 // The grid's status chip as plain text: the grid's own chip is a button, and the list row already is one.
 function mpChip(r) {
   const late = drvLate(r), bad = lateBad(r);
-  const inner = !late ? chipInner(r.ride) : bad ? `${ic('alert', 12)}<span>Late <b class="lt">${late}</b></span>` : `${ic(RS[r.ride][1], 12)}<span>${esc(rsName(r.ride))}</span><b class="lt">+${late}</b>`;
+  const inner = !late ? chipInner(r.ride) : bad ? `${ic('alert', 12)}<span>Late <b class="lt">${late}</b> min</span>` : `${ic(RS[r.ride][1], 12)}<span>${esc(rsName(r.ride))}</span><b class="lt">+${late}</b>`;
   return `<span class="rs ${r.ride}${late ? (bad ? ' latebad' : ' late') : ''}">${inner}</span>`;
 }
 function mpSideHTML() {
@@ -7119,7 +7353,8 @@ const firstOf = name => name.split(' ')[0] === 'Dr.' ? name : name.split(' ')[0]
 // The automatic text a status change sends, filled in for this ride.
 function autoText(id, r) {
   const m = MSGS.find(x => x.id === id), drv = r.driver && !AFF_NAMES[r.driver] ? r.driver : 'Your chauffeur';
-  const v = { 'Passenger first name': firstOf(r.party), 'Driver first name': drv, 'Car': `${vtypeOf(r.vehicle).name}`, 'Tracking link': `sunsetpalms.example/t/${r.conf}`, 'Company': S.cfg.company, 'Conf #': codeOf(r), 'Pickup date': dayLabel(TODAY), 'Pickup time': fmt(r.pickup) };
+  // An upgrade names the bigger car the passenger gets, not the one they booked.
+  const v = { 'Passenger first name': firstOf(r.party), 'Driver first name': drv, 'Car': id === 'upgrade' && r.car ? carWord(r.car) : vtypeOf(r.vehicle).name, 'Tracking link': `sunsetpalms.example/t/${r.conf}`, 'Company': S.cfg.company, 'Conf #': codeOf(r), 'Pickup date': dayLabel(TODAY), 'Pickup time': fmt(r.pickup) };
   return m.text.replace(/\{([^}]+)\}/g, (_, k) => v[k] ?? k);
 }
 const mt = (t, d) => fmt(Math.max(0, Math.min(NOW, tm(t) + (d || 0))));
@@ -7458,7 +7693,7 @@ function renderCloseout() {
     body = `<div class="co-inv"><div class="co-inv-list">${invs.map(i => `<button class="rq-i ${sel && sel.name === i.name ? 'on' : ''}" data-a="co-inv" data-v="${esc(i.name)}"><span class="rq-ic">${ic('building', 16)}</span><span class="rq-t"><b>${esc(i.name)}</b><span>${i.rides.length} rides this month</span></span><span class="rq-tag ${i.status === 'sent' ? 'sent' : 'new'}">${i.status === 'sent' ? 'Sent' : usd(i.total)}</span></button>`).join('')}</div>
       <div class="co-inv-doc">${coInvoiceHTML(sel)}<div class="co-inv-acts">${sel ? (sel.status === 'sent' ? `<p class="rq-done">${ic('checkc', 16)}Sent ${S.co.inv[`${sel.name}@`] || ''}</p>` : `<span class="muted">Emailed as a PDF to the account’s billing contact.</span><span class="spacer"></span><button class="btn pri" data-a="co-send-inv" data-v="${esc(sel.name)}">${ic('send', 14)}Send invoice · ${usd(sel.total)}</button>`) : ''}</div></div></div>`;
   }
-  el.innerHTML = `<header class="pg-h"><div><span class="ed-k">Office</span><h2>Close-out</h2><p>${dayLabel(TODAY)}. Finished rides get their wait time and extras, then you charge and settle.</p></div>
+  el.innerHTML = `<header class="pg-h"><div><h2>Close-out</h2><p>${dayLabel(TODAY)}. Finished rides get their wait time and extras, then you charge and settle.</p></div>
       <div class="pg-stats"><div><b class="num">${usd(sum(todo))}</b><span>to settle</span></div><div><b class="num">${usd(done.reduce((s, r) => s + S.co.settled[r.id].amt, 0))}</b><span>settled today</span></div><div><b class="num">${usd(invs.filter(i => i.status !== 'sent').reduce((s, i) => s + i.total, 0))}</b><span>on open invoices</span></div></div></header>
     <div class="pg-bar"><div class="seg" role="radiogroup" aria-label="Show">${tabs}</div></div>
     <div class="pg-body">${body}</div>`;
@@ -7584,7 +7819,7 @@ function renderReports() {
   const segs = [['In-house', inh, 'k0'], ...affs.map(([n, v], i) => [n, v, `k${i + 1}`])];
   const approved = S.order.length, open = unresolved().length, rqDone = REQUESTS.filter(q => rqState(q).status !== 'new').length;
   const revTable = `<table class="cu-tbl"><thead><tr><th>Month</th><th class="r">Revenue</th><th class="r">Trips, about</th></tr></thead><tbody>${REV12.map(([m, v]) => `<tr><td>${m}</td><td class="r num">${usd(v)}</td><td class="r num">${Math.round(v / 156).toLocaleString('en-US')}</td></tr>`).join('')}</tbody></table>`;
-  el.innerHTML = `<header class="pg-h"><div><span class="ed-k">Office</span><h2>Reports</h2><p>The last 12 months, and today live off the board.</p></div></header>
+  el.innerHTML = `<header class="pg-h"><div><h2>Reports</h2><p>The last 12 months, and today live off the board.</p></div></header>
     <div class="pg-body rp">
       <section class="rp-hero"><span>Revenue, last 12 months</span><b class="num">$1,258,523</b><div class="rp-tiles">
         <div><b class="num">8,061</b><span>trips, about 22 a day</span></div><div><b class="num">$156</b><span>average per trip</span></div>
@@ -7680,7 +7915,7 @@ function renderDriverApp() {
   const el = $('driverappPage');
   if (!el || el.hidden) return;
   const unassigned = LIVE.filter(r => isOpen(r) && (!r.driver || r.driver === '—')).sort((a, b) => a.pickup - b.pickup);
-  el.innerHTML = `<header class="pg-h"><div><span class="ed-k">Office</span><h2>Driver app</h2><p>What drivers hold in their hands, running on the same rides as the board.</p></div></header>
+  el.innerHTML = `<header class="pg-h"><div><h2>Driver app</h2><p>What drivers hold in their hands, running on the same rides as the board.</p></div></header>
     <div class="pg-body da">
       <div class="da-stage">${daPhoneHTML()}</div>
       <aside class="da-side">
@@ -7711,13 +7946,14 @@ function renderOverlay() {
     <div class="menu-h">Driver status · ${esc(r.party)}</div>
     ${RS_ORDER.map(k => `<button class="mi" role="menuitemradio" aria-checked="${r.ride === k}" data-a="set-status" data-v="${k}"><span class="rs ${k}">${chipInner(k)}</span>${r.ride === k ? ic('check', 14) : ''}</button>`).join('')}
   </div>`;
+  (overlay.querySelector('[aria-checked="true"]') || overlay.querySelector('.mi'))?.focus();
 }
 let toastTimer;
 // act: an optional second button, { label, fn }, such as "Show it" after a booking lands on another day.
 function toast(text, undo, act) {
   S.toast = { text, undo, act };
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { S.toast = null; renderToast(); }, act ? 9000 : 6000);
+  toastTimer = setTimeout(() => { S.toast = null; renderToast(); }, act || undo ? 10000 : 6000); // time to read it and undo
   renderToast();
 }
 function renderToast() {
@@ -7726,6 +7962,8 @@ function renderToast() {
 }
 
 function renderAll() {
+  document.body.dataset.view = S.view; // lets a small laptop keep the board on one screen (see Laptop screens)
+  if (S.aiPv && (S.view !== 'grid' || !isLive())) aiUnpreview(true); // a suggestion shows on today's grid only; anywhere else it's put back
   updateHeader();
   // The timeline is the grid's other face: same assistant rail, same day and search bar.
   const grid = S.view === 'grid' || S.view === 'timeline', settings = S.view === 'settings', requests = S.view === 'requests';
@@ -7907,7 +8145,7 @@ document.addEventListener('click', e => {
     case 'need-you': {
       closeMega();
       const onBoard = isLive() && (S.view === 'grid' || S.view === 'timeline');
-      if (onBoard && S.railOpen && S.railTab === 'board') { setRail(false); break; }
+      if (onBoard && S.railOpen && S.railTab === 'board') { rail.scrollTop = 0; railFocus(); break; } // a count takes you to what it counts; the panel's own button hides it
       if (!onBoard) { S.day = 'live'; S.view = 'grid'; S.filter = 'upcoming'; renderAll(); }
       const first = unresolved()[0];
       if (first) openCard(S.openCard && !S.resolved[S.openCard] ? S.openCard : first.id);
@@ -7942,7 +8180,7 @@ document.addEventListener('click', e => {
     case 'qv-draft-ok': draftApprove(v); break;
     case 'qv-close': { const id = S.open; S.open = null; renderRows(); rowsEl.querySelector(`.row[data-v="${id}"]`)?.focus(); break; }
     case 'qv-card': openCard(v); break;
-    case 'ctx': { const at = S.ctxMenu; S.ctxMenu = null; renderOverlay(); ctxAction(v, at.id, at); break; }
+    case 'ctx': { const at = S.ctxMenu; S.ctxMenu = null; renderOverlay(); ctxAction(v, at.id, at); if (document.activeElement === document.body) rowsEl.querySelector(`.row[data-v="${at.id}"]`)?.focus({ preventScroll: true }); break; }
     case 'ed-open': openEdit(v); break;
     case 'ed-close': closeModal(); break;
     case 'ed-save': saveEdit(v); break;
@@ -7956,7 +8194,8 @@ document.addEventListener('click', e => {
     case 'open-card': if (S.modal) { S.modal = null; renderModal(); } openCard(v); break;
     case 'approve': approve(v); break;
     case 'h-undo': handUndo(); break;
-    case 'ai-open': aiPreview(v); rail.querySelector(`[data-aicard="${v}"]`)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); break;
+    case 'h-undo-one': { const m = HMOVES[Number(v)]; if (m) handUndoEntry(m); break; }
+    case 'ai-open': aiSelect(v); break;
     case 'ai-show': aiPreview(v); break;
     case 'ai-unshow': aiUnpreview(); break;
     case 'ai-approve': aiApprove(v); break;
@@ -8163,10 +8402,13 @@ document.addEventListener('click', e => {
       renderOverlay(); break;
     }
     case 'set-status': {
-      const r = findRide(S.menu.id), prev = r.ride;
+      const r = findRide(S.menu.id), prev = r.ride, at = [...rowsEl.querySelectorAll('.row[data-a="row"]')].findIndex(x => x.dataset.v === r.id);
       S.menu = null; renderOverlay();
-      if (prev === v) break;
+      if (prev === v) { rowsEl.querySelector(`.row[data-v="${r.id}"]`)?.focus({ preventScroll: true }); break; }
       r.ride = v; flash([r.id]); renderRows();
+      // The menu is gone: back to the ride, or to the one now in its place when Done takes it off the list.
+      const rows = [...rowsEl.querySelectorAll('.row[data-a="row"]')];
+      (rows.find(x => x.dataset.v === r.id) || rows[Math.min(at, rows.length - 1)])?.focus({ preventScroll: true });
       logChange(`Marked ${r.party} as ${rsName(v)}`);
       // Settings → Messages decides which texts go out on a status change.
       const sent = v === 'ontheway' && S.msgOn.otw ? ' Tracking link texted to the passenger.'
@@ -8243,9 +8485,66 @@ document.addEventListener('input', e => {
     else if (e.target.id === 'nrAiText') { S.nr.ai.text = e.target.value; S.nr.dirty = true; }
   }
 });
+// Arrow keys inside a menu move between its items, as in any menu.
+function menuKeys(e) {
+  const menu = e.target.closest?.('[role="menu"]');
+  if (!menu || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return false;
+  e.preventDefault();
+  const items = [...menu.querySelectorAll('[role^="menuitem"]')], i = items.indexOf(e.target.closest('[role^="menuitem"]'));
+  const n = e.key === 'Home' ? 0 : e.key === 'End' ? items.length - 1 : (i + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+  items[n]?.focus();
+  return true;
+}
+// The rides are one tab stop. On a ride: up and down move a ride at a time, Page Up and Down ten, Home and End to
+// the ends, across the parts of the day. Enter opens it, Shift+F10 opens its menu.
+function gridKeys(e) {
+  const row = e.target.matches?.('.row[data-a="row"]') ? e.target : null, step = { ArrowDown: 1, ArrowUp: -1, PageDown: 10, PageUp: -10 }[e.key];
+  if (!row || (!step && e.key !== 'Home' && e.key !== 'End')) return false;
+  e.preventDefault();
+  const rows = [...rowsEl.querySelectorAll('.row[data-a="row"]')], i = rows.indexOf(row);
+  const to = rows[e.key === 'Home' ? 0 : e.key === 'End' ? rows.length - 1 : Math.max(0, Math.min(rows.length - 1, i + step))];
+  if (to && to !== row) { row.tabIndex = -1; to.tabIndex = 0; to.focus({ preventScroll: true }); to.scrollIntoView({ block: 'nearest' }); }
+  return true;
+}
+// The decisions are a queue: J and K step through them, S shows the open one on the grid or puts it back, and A approves
+// it. A only approves a plan you've seen on the grid (S first), with the card in focus, and never on a held-down key:
+// after an approval focus moves to the next card, so a second A must not text the next set of people unseen.
+function decisionKeys(e) {
+  if (e.metaKey || e.ctrlKey || e.altKey || S.ctxMenu || S.menu || S.mega || !HAND || !aiOn() || !isLive() || !S.railOpen || S.view !== 'grid') return false;
+  const k = e.key.toLowerCase(), list = aiDecisions();
+  if ((k === 'j' || k === 'k') && list.length) {
+    const i = list.findIndex(d => d.id === S.aiOpen), next = list[Math.max(0, Math.min(list.length - 1, i < 0 ? 0 : i + (k === 'j' ? 1 : -1)))];
+    aiSelect(next.id);
+  } else if (k === 's' && S.aiOpen) {
+    S.aiPv === S.aiOpen ? aiUnpreview() : aiPreview(S.aiOpen);
+    rail.querySelector('.ai.lead .ai-card')?.focus({ preventScroll: true }); // the card redraws: keep the keyboard on it
+  }
+  else if (k === 'a' && S.aiOpen && e.target.closest?.('.ai.lead')) {
+    if (e.repeat) return true;
+    if (S.aiPv === S.aiOpen) aiApprove(S.aiOpen); else say('Press S to see it on the grid first, then A to approve.');
+  }
+  else return false;
+  e.preventDefault();
+  return true;
+}
+// Said aloud by screen readers, out of sight: what the grid shows that a sighted dispatcher sees change.
+function say(text) {
+  const el = $('srLive');
+  el.textContent = '';
+  requestAnimationFrame(() => { el.textContent = text; });
+}
+rowsEl.addEventListener('focusin', e => { const r = e.target.closest?.('.row[data-a="row"]'); if (r) S.gridFocus = r.dataset.v; });
+document.addEventListener('click', e => {
+  const k = e.target.closest?.('.skip');
+  if (!k) return;
+  e.preventDefault();
+  if (k.dataset.to === 'rides') { if (S.view !== 'grid') { S.view = 'grid'; renderAll(); } rowsEl.querySelector('.row[data-a="row"][tabindex="0"]')?.focus(); }
+  else { if (!S.railOpen) setRail(true); (rail.querySelector('.ai.lead .ai-card') || rail.querySelector('.sec-t.big') || rail).focus(); }
+});
 document.addEventListener('keydown', e => {
   if (onbBusy()) return; // the sign-in or the tour has the keyboard
   const typing = e.target.matches?.('input, select, textarea');
+  if (menuKeys(e) || gridKeys(e) || (!typing && !S.modal && decisionKeys(e))) return;
   // The new reservation window: suggestion lists first, then the window itself.
   if (S.nr && TY && TY.el === e.target) {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); tyMove(e.key === 'ArrowDown' ? 1 : -1); return; }
@@ -8260,6 +8559,7 @@ document.addEventListener('keydown', e => {
     else if (S.ctxMenu) { const id = S.ctxMenu.id; S.ctxMenu = null; renderOverlay(); rowsEl.querySelector(`.row[data-v="${id}"]`)?.focus(); }
     else if (S.menu) { S.menu = null; renderOverlay(); }
     else if (S.open) { const id = S.open; S.open = null; renderRows(); rowsEl.querySelector(`.row[data-v="${id}"]`)?.focus(); }
+    else if (S.aiPv) aiUnpreview();
     else if (S.mega) { const name = S.mega; closeMega(); document.querySelector(`.hdr [data-menu="${name}"]`)?.focus(); }
   }
   if (e.key === '/' && !typing && !S.modal) { e.preventDefault(); closeMega(); $('q')?.focus(); }
@@ -8488,7 +8788,8 @@ const TOUR_STEPS = [
       if (!card) return [rail];
       if (S.aiPv !== t.dec) return [card];
       const rows = [...t.touch.map(id => rowsEl.querySelector(`.row[data-v="${id}"]`)), ...rowsEl.querySelectorAll('.row.draft')].filter(Boolean);
-      const lit = trUnion(rows.concat(rows.map(r => r.nextElementSibling).filter(n => n && n.classList.contains('note'))).map(trRect)), w = trRect(tablewrap);
+      const notes = rows.flatMap(r => { const out = []; for (let n = r.nextElementSibling; n && n.classList.contains('note'); n = n.nextElementSibling) out.push(n); return out; }); // the wait line and the "If you approve" line
+      const lit = trUnion(rows.concat(notes).map(trRect)), w = trRect(tablewrap);
       return [card, lit && w ? { l: w.l, r: w.r, t: Math.max(lit.t, w.t), b: Math.min(lit.b, w.b) } : null];
     },
     anchor: t => (t.dec && rail.querySelector(`[data-aicard="${t.dec}"]`)) || rail },
@@ -8602,7 +8903,7 @@ function tourEnd(done) {
   t.el.classList.add('out');
   setTimeout(() => t.el.remove(), onbStill() ? 0 : 320);
   // Finishing hands the keyboard to the fix on the grid; replaying from Help hands it back to Help.
-  (done ? rail.querySelector('[data-a="ai-approve"]') : t.fromHelp ? hdr.querySelector('[data-menu="help"]') : null)?.focus({ preventScroll: true });
+  (done ? rail.querySelector('.ai.lead .ai-card') : t.fromHelp ? hdr.querySelector('[data-menu="help"]') : null)?.focus({ preventScroll: true }); // the card, not Approve: one stray Enter must not text anyone
 }
 // Dim everything but the holes, ring them, and set the card beside the anchor where it fits (never over a hole).
 function tourPlace() {

@@ -1696,7 +1696,26 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .sms-row .btn { height: 44px; }
 .sms-row .btn .ic { margin-right: 4px; }
 .sms-ctx { min-height: 0; overflow: auto; display: grid; align-content: start; gap: 12px; padding: 20px 16px; border-left: 1px solid var(--line); }
-.sms-ctx h3 { margin: 0; color: var(--text-3); font-weight: 600; font-size: 11px; line-height: 16px; letter-spacing: 0.08em; text-transform: uppercase; }
+.sms-ctx h3 { margin: 0; font-weight: 600; font-size: 15px; line-height: 20px; }
+/* The assistant's plan for an email reads like a decision card: the move, then what changes, divided by lines, not boxes. */
+.mp { display: grid; gap: 12px; }
+.mp-h { display: grid; gap: 2px; }
+.sms-ctx .mp-t { font-size: 18px; line-height: 24px; }
+.mp-by { display: flex; align-items: center; gap: 6px; color: var(--text-3); font-size: 13px; line-height: 18px; }
+.mp-by .ic { flex: none; }
+.mp-by.wait { color: var(--delayed); font-weight: 600; }
+.mp-by.done .ic { color: var(--ontime); }
+.mp-note, .mp-warn { display: flex; align-items: flex-start; gap: 8px; color: var(--text-2); }
+.mp-note .ic, .mp-warn .ic { flex: none; margin-top: 3px; color: var(--text-3); }
+.mp-warn .ic { color: var(--delayed); }
+.mp-chg { display: grid; gap: 10px; margin: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.mp-chg dt { color: var(--text-3); font-size: 13px; line-height: 18px; }
+.mp-chg dd { margin: 0; }
+.mp-chg .was { color: var(--text-2); }
+.mp-chg .arr { margin: 0 6px; color: var(--text-3); }
+.mp-chg b { font-weight: 600; color: var(--ai-ink); } /* proposed, not saved until Approve */
+.mp .why-btn { justify-self: start; margin-left: -10px; }
+.mp + h3 { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line); }
 .sms-ride { display: grid; gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; }
 .sms-ride-h { display: flex; align-items: center; justify-content: space-between; }
 .sms-ride-h .t3 { color: var(--text-3); font-size: 13px; }
@@ -1731,8 +1750,18 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .em-note { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: var(--text-2); }
 .sms-row.end { justify-content: flex-end; align-items: center; gap: 12px; }
 .sms-acts .btn .ic { margin-right: 4px; }
-@media (max-width: 1180px) { .smsview { grid-template-columns: 300px minmax(0, 1fr); } .sms-ctx { display: none; } }
-@media (max-width: 760px) { .smsview { grid-template-columns: minmax(0, 1fr); grid-template-rows: 38vh minmax(480px, 1fr); } .sms-list { border-right: 0; border-bottom: 1px solid var(--line); } }
+/* The plan never hides: Approve makes the changes it lists. Narrower, it sits under the email. */
+@media (max-width: 1280px) { .smsview { grid-template-columns: 300px minmax(0, 1fr) 300px; } }
+@media (max-width: 1000px) {
+  .smsview { grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  .sms-list { grid-row: 1 / 3; }
+  .sms-ctx { grid-column: 2; border-left: 0; border-top: 1px solid var(--line); } /* the page scrolls here, so no inner scroll */
+}
+@media (max-width: 760px) {
+  .smsview { grid-template-columns: minmax(0, 1fr); grid-template-rows: 38vh minmax(480px, 1fr) auto; }
+  .sms-list { grid-row: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  .sms-ctx { grid-column: auto; }
+}
 
 /* ---------- Requests ---------- */
 .nav-n { display: inline-grid; place-items: center; min-width: 20px; height: 18px; margin-left: 6px; padding: 0 5px; border-radius: 9px; background: var(--flap); color: var(--flap-text); font-weight: 600; font-size: 12px; line-height: 1; vertical-align: 1px; }
@@ -7551,9 +7580,9 @@ function mailConvHTML(m) {
   else if (blocked) foot = `<footer class="sms-compose"><div class="mwait">${ic('hourglass', 14)}<span>Waits on a decision</span></div>
       <p class="em-note"><span>The answer depends on <b>${esc(CARD[m.decision].title)}</b>. Approve it first, and this reply follows the fix you choose.</span></p>
       <div class="sms-row end"><button class="btn pri" data-a="open-card" data-v="${m.decision}">${ic('spark', 14)}Open the decision</button></div></footer>`;
-  else if (open) foot = `<footer class="sms-compose"><span class="em-lbl">${gmailMark(13)}Reply by email to ${esc(m.from)} · prepared by the assistant</span>
+  else if (open) foot = `<footer class="sms-compose"><span class="em-lbl">${gmailMark(13)}Draft reply to ${esc(m.from)}</span>
       <textarea class="inp ta mta" data-mdraft="${m.id}" rows="7" aria-label="Email reply to ${esc(m.from)}">${esc(S.mailDraft[m.id] ?? m.reply())}</textarea>
-      <div class="sms-row end"><span class="muted sm">Approving sends it through Gmail and makes the change on the right.</span><button class="btn pri" data-a="mail-approve" data-v="${m.id}">${ic('send', 14)}Approve and send email</button></div></footer>`;
+      <div class="sms-row end"><span class="muted sm">Approving sends it through Gmail${m.changes().length ? ' and makes the changes shown' : ''}.</span><button class="btn pri" data-a="mail-approve" data-v="${m.id}">${ic('send', 14)}Approve and send email</button></div></footer>`;
   return `<header class="sms-ch"><div><b>${esc(m.from)}${m.org ? ` · ${esc(m.org)}` : ''}</b><span><span class="via">${gmailMark(12)}Gmail</span> · ${esc(m.addr)}</span></div>
       <button class="btn ghost sm" data-a="mail-open" data-v="${m.id}">${ic('external', 14)}Open in a window</button></header>
     <div class="sms-thread em-thread">${msg}${out}</div>${foot}`;
@@ -7576,15 +7605,33 @@ function smsCtxHTML(th) {
     ${dec ? `<button class="qv-dec" data-a="sms-card" data-v="${dec.id}">${ic('spark', 15)}<span>Part of a decision: <b>${esc(dec.title)}</b></span>${ic('right', 14)}</button>` : ''}
     ${rides.map(r => smsRideCard(r, th.kind)).join('') || '<p class="muted">Not tied to a ride.</p>'}`;
 }
+// The move is the heading and the assistant is named once, under it. What changes reads old → new, the new value in
+// the assistant's violet until Approve. Anything that needs a look stays in view; the other reasons wait behind Details.
+// The ride it found isn't repeated here: its card follows.
+function mailPlanHTML(m) {
+  const st = mailState(m.id), open = st === 'open', blocked = open && isBlocked(m), why = !!S.mailWhy[m.id];
+  const title = open ? m.fix() : val(st === 'waiting' ? m.waitTitle : m.doneTitle) || m.fix();
+  const by = blocked ? `<p class="mp-by wait">${ic('hourglass', 14)}<span>Waits on a decision</span></p>`
+    : open ? '<p class="mp-by">Prepared by the assistant</p>'
+    : st === 'waiting' ? `<p class="mp-by">${ic('hourglass', 14)}<span>${esc(val(m.waitMeta))}</span></p>`
+    : `<p class="mp-by done">${ic('checkc', 14)}<span>${esc(val(m.doneMeta))}</span></p>`;
+  if (!open) return `<div class="mp-h"><h3 class="mp-t">${esc(title)}</h3>${by}</div>`;
+  const newRes = !mailRides(m).length && m.newRes ? m.newRes()[0] : '';
+  const note = m.noMatch ? `<p class="mp-note">${ic('search', 15)}<span>${esc(m.noMatch())}</span></p>`
+    : newRes ? `<p class="mp-note">${ic('tag', 15)}<span>${esc(newRes)}</span></p>` : '';
+  const ch = m.changes();
+  const chg = ch.length ? `<dl class="mp-chg">${ch.map(([k, a, b]) => `<div><dt>${esc(k)}</dt><dd>${a ? `<span class="was">${esc(a)}</span><span class="arr" aria-hidden="true">→</span><span class="sr">becomes</span>` : ''}<b>${esc(b)}</b></dd></div>`).join('')}</dl>` : '';
+  const checks = m.checks().map(c => typeof c === 'string' ? { t: c } : { t: c.t, warn: true });
+  const warn = blocked ? '' : checks.filter(c => c.warn).map(c => `<p class="mp-warn">${ic('info', 15)}<span>${esc(c.t)}</span></p>`).join('');
+  const plain = checks.filter(c => !c.warn);
+  const details = plain.length ? `${why ? `<div class="why"><ul>${plain.map(c => `<li>${esc(c.t)}</li>`).join('')}</ul></div>` : ''}
+    <button class="btn ghost sm why-btn ${why ? 'open' : ''}" data-a="mail-why" data-v="${m.id}" aria-expanded="${why}">Details ${ic('right', 14)}</button>` : '';
+  return `<div class="mp-h"><h3 class="mp-t">${esc(title)}</h3>${by}</div>${note}${chg}${warn}${details}`;
+}
 function mailCtxHTML(m) {
-  const st = mailState(m.id);
-  if (st === 'filed') return `<h3>Why it was filed</h3><section class="ed-card"><div class="ailabel">${ic('spark', 14)}<span>Filed by the assistant</span></div><p>${esc(m.why)}</p><p class="muted sm">Gmail label: ${esc(m.label)}</p></section>`;
-  const open = st === 'open', blocked = open && isBlocked(m), rides = mailRides(m);
-  const label = blocked ? `<div class="mwait">${ic('hourglass', 14)}<span>Waits on a decision</span></div>`
-    : `<div class="ailabel">${ic('spark', 14)}<span>${open ? 'Prepared by the assistant' : st === 'waiting' ? 'Approved · waiting' : 'Done'}</span></div>`;
-  return `<h3>What the assistant prepared</h3>
-    <section class="ed-card">${label}<div class="fix">${ic(m.icon, 16)}<span>${esc(m.fix())}</span></div>
-      ${mailResHTML(m)}${open ? mailChangesHTML(m) + mailChecksHTML(m) : `<p class="t3">${esc(val(st === 'waiting' ? m.waitMeta : m.doneMeta))}</p>`}</section>
+  if (mailState(m.id) === 'filed') return `<h3>Why it was filed</h3><p>${esc(m.why)}</p>`;
+  const rides = mailRides(m);
+  return `<section class="mp" aria-label="What the assistant prepared">${mailPlanHTML(m)}</section>
     ${rides.length ? `<h3>${rides.length > 1 ? `${rides.length} rides` : 'The ride'}</h3>${rides.map(r => smsRideCard(r, 'mail')).join('')}` : ''}`;
 }
 function renderSms() {
@@ -8204,7 +8251,7 @@ document.addEventListener('click', e => {
     case 'mail-card': if (S.modal) closeModal(); openMailCard(v); break;
     case 'mail-open': S.modal = { kind: 'mail', id: v }; S.ctxMenu = null; S.menu = null; renderOverlay(); renderModal(); break;
     case 'mail-approve': if (S.modal) { S.modal = null; renderModal(); } approveMail(v); break;
-    case 'mail-why': S.mailWhy[v] = !S.mailWhy[v]; renderRail(); break;
+    case 'mail-why': S.mailWhy[v] = !S.mailWhy[v]; renderRail(); renderSms(); break;
     case 'mail-ride': showMailRide(v); break;
     case 'mail-send-now': if (S.modal) { S.modal = null; renderModal(); } finishMail(v); break;
     case 'mail-gmail': toast('This would open Gmail. Not in the prototype yet.'); break;

@@ -411,13 +411,21 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .ai { position: relative; }
 /* The glow means one thing: not saved yet. At rest the cards are plain, like every other card on the board; the open
    one has a firmer border. Only while its plan is on the grid does the open card wear the ring and halo, with the
-   grid's edge, the moving chips and the new-ride row (and once, when the board first builds). */
+   grid's edge, the moving chips and the new-ride row. The glow fades in when a plan goes on the grid and fades out
+   when it leaves (.in / .out), so it never pops. */
 .ai-card { position: relative; display: flex; flex-direction: column; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
 .ai-card.x { padding: 16px 18px; gap: 10px; border-color: var(--line-strong); box-shadow: 0 4px 14px rgba(19, 32, 48, 0.08), 0 1px 2px rgba(19, 32, 48, 0.05); }
-.ai.lead.pv::before, .ai.lead.spot::before { content: ""; position: absolute; inset: -3px; border-radius: 11px; background: conic-gradient(from var(--glow-a), var(--glow)); filter: blur(12px); opacity: 0.6; pointer-events: none; }
-.ai.lead.pv .ai-card::before, .ai.lead.spot .ai-card::before { content: ""; position: absolute; inset: -1px; padding: 1.5px; border-radius: 8px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+.ai.lead.pv::before, .ai.lead.out::before { content: ""; position: absolute; inset: -3px; border-radius: 11px; background: conic-gradient(from var(--glow-a), var(--glow)); filter: blur(12px); opacity: 0.6; pointer-events: none; }
+.ai.lead.pv .ai-card::before, .ai.lead.out .ai-card::before { content: ""; position: absolute; inset: -1px; padding: 1.5px; border-radius: 8px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
 .ai.lead.pv .ai-card.x { border-color: transparent; box-shadow: var(--ai-shadow); }
 .ai.lead.pv::before, .ai.lead.pv .ai-card::before { animation: glowSpin 4s linear infinite var(--gd, 0s); }
+.ai.lead.pv.in::before, .ai.lead.pv.in .ai-card::before { animation: glowSpin 4s linear infinite var(--gd, 0s), glowIn 0.6s ease-out; }
+.ai.lead.out::before, .ai.lead.out .ai-card::before { animation: glowOut 0.3s ease-in forwards; }
+@keyframes glowIn { from { opacity: 0; } }
+@keyframes glowOut { to { opacity: 0; } }
+.ai.lead:not(.pv) .ai-card.x { cursor: pointer; } /* closed back on the grid: a click shows it again */
+.ai-declined { display: flex; align-items: center; gap: 4px; margin: 2px 0 0; color: var(--text-3); font-size: 13px; line-height: 18px; }
+.ai-declined .btn { margin-left: -2px; }
 .ai-card.c { padding: 12px 14px; gap: 6px; }
 .ai-card.c:hover { background: var(--hover); border-color: var(--line-strong); }
 .ai-card.h { flex-direction: row; align-items: flex-start; gap: 10px; padding: 12px 10px 12px 14px; color: var(--text-2); }
@@ -447,8 +455,8 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .actions { display: flex; align-items: center; gap: 8px; }
 .why { padding-top: 10px; border-top: 1px solid var(--line); color: var(--text-2); } /* sections divided by a line, not boxes inside the card */
 .why ul { margin: 0; padding-left: 16px; display: grid; gap: 4px; }
-.why-btn .ic { transition: transform 0.15s; }
-.why-btn.open .ic { transform: rotate(90deg); }
+.why-btn .ic { transform: rotate(90deg); transition: transform 0.15s; } /* down: opens; up: closes */
+.why-btn.open .ic { transform: rotate(-90deg); }
 .select { position: relative; display: inline-flex; align-items: center; }
 .select select { appearance: none; -webkit-appearance: none; height: 26px; padding: 0 26px 0 8px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--panel); color: var(--text); font: 600 14px/20px var(--f-ui); cursor: pointer; }
 .select .ic { position: absolute; right: 7px; pointer-events: none; color: var(--text-3); }
@@ -596,10 +604,6 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 @keyframes hzDraw { from { transform: scaleX(0); } }
 @keyframes introText { from { opacity: 0; transform: translateY(8px); } }
 /* Last beat: the first decision glows once, and its Show me button calls for a click. */
-.ai.lead.spot::before { animation: glowSpin 1.8s linear, spotBloom 1.8s ease-out; }
-@keyframes spotBloom { 40% { inset: -7px; filter: blur(16px); opacity: 0.85; } }
-.ai.lead.spot [data-a="ai-show"] { animation: showCall 1.4s 0.5s ease-out 2; }
-@keyframes showCall { from { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.55); } to { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); } }
 
 .hmove.ai-made .hm-t b .ic { display: inline-block; margin-right: 4px; vertical-align: -2px; }
 .hfam { cursor: grab; }
@@ -1835,6 +1839,7 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .si-card.choice .avatar { align-self: center; margin-bottom: 2px; }
 .si-sub { margin-top: -10px; color: var(--text-2); }
 .si-card.choice .si-sub { margin-bottom: 6px; }
+.si-card.choice .si-never { height: 32px; margin-top: -4px; color: var(--text-2); font-size: 14px; }
 .si-foot { position: relative; z-index: 2; color: rgba(255, 255, 255, 0.92); font-size: 13px; line-height: 18px; text-shadow: 0 1px 3px rgba(21, 20, 44, 0.6); }
 
 .tour { position: fixed; inset: 0; z-index: 92; transition: opacity 0.3s ease; }
@@ -2909,7 +2914,7 @@ function handUndoEntry(head) {
   const lost = keep.filter(m => !HMOVES.includes(m) && (!m.grp || m.text)).length;
   handSave();
   logChange(`Undid: ${head.text}`);
-  if (head.grp) { AI_CACHE.key = ''; if (aiDecisions().some(d => d.id === head.grp)) S.aiOpen = head.grp; } // the suggestion is back on top
+  if (head.grp) { AI_CACHE.key = ''; if (aiDecisions().some(d => d.id === head.grp)) { S.aiOpen = head.grp; aiShowSoon(); } } // the suggestion is back on top, on the grid
   S.toast = null;
   renderAll();
   const also = lost ? ` ${lost} later ${lost === 1 ? 'move' : 'moves'} relied on it, so ${lost === 1 ? 'it was' : 'they were'} undone too.` : '';
@@ -3226,7 +3231,7 @@ function aiCar(L) {
 let AI_CACHE = { key: '', list: [] };
 function aiDecisions() {
   if (!aiOn() || S.aiPv) return AI_CACHE.list;
-  const key = JSON.stringify([S.cfg.limit, S.cfg.promiseOn, S.cfg.promise, LIVE.map(r => [r.id, r.driver, r.ride, r.pickup, r.hidden, r.car, (r.fam || []).length])]);
+  const key = JSON.stringify([[...S.aiDeclined], S.cfg.limit, S.cfg.promiseOn, S.cfg.promise, LIVE.map(r => [r.id, r.driver, r.ride, r.pickup, r.hidden, r.car, (r.fam || []).length])]);
   if (key === AI_CACHE.key) return AI_CACHE.list;
   const list = [];
   for (const R of LIVE.filter(r => r.broken && hMovable(r))) { const d = aiVan(R); if (d) list.push(d); }
@@ -3247,6 +3252,7 @@ function aiDecisions() {
     d.sortAt = d.actBy === 'now' ? 0 : tm(d.actBy);
   }
   list.sort((a, b) => a.sortAt - b.sortAt);
+  for (let k = list.length - 1; k >= 0; k--) if (S.aiDeclined.has(list[k].id)) list.splice(k, 1);
   AI_CACHE = { key, list };
   return list;
 }
@@ -3347,21 +3353,61 @@ function aiPreview(id) {
   aiFly(d.anim, () => {
     S.pvWas = new Map(LIVE.map(r => [r.id, structuredClone(r)])); // the board as booked, which the grid keeps showing
     HMOVES.push(...d.moves.map(m => Object.assign(structuredClone(m), { pv: true, grp: d.id })));
-    S.aiPv = id; S.draftEnter = true; handRebuild(); flash(d.touch); renderRows(); aiScrollTo(d.touch);
+    S.aiPv = id; S.draftEnter = true; S.pvIn = true; setTimeout(() => { S.pvIn = false; }, 700); handRebuild(); flash(d.touch); renderRows(); aiScrollTo(d.touch);
     say(`On the grid, not saved: ${d.title}. Escape puts it back.`);
   });
   renderRail(); updateHeader();
 }
-// Opening a card picks the suggestion: its rides are marked on the grid, and nothing moves until Show me.
+// An open suggestion is always on the grid: opening one plays it there (nothing is saved), and closing it puts the
+// board back. Approve saves it, Decline drops it from the list; Escape or opening a ride closes it.
 function aiSelect(id) {
+  if (!aiDecisions().some(x => x.id === id)) return;
+  const go = () => {
+    aiPreview(id);
+    const card = rail.querySelector(`[data-aicard="${id}"]`);
+    card?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    card?.querySelector('.ai-card')?.focus({ preventScroll: true });
+  };
+  S.aiPv && S.aiPv !== id ? glowFade(go) : go();
+}
+// The glow leaves the way it came: the card's ring fades and the grid's edge fades, then the board changes.
+function glowFade(then) {
+  const el = rail.querySelector('.ai.lead.pv');
+  tablewrap.parentElement.classList.remove('ai-glow');
+  if (!el || onbStill()) { then(); return; }
+  el.classList.add('out');
+  setTimeout(then, 280);
+}
+function aiClose() {
+  glowFade(() => { aiUnpreview(true); S.aiOpen = null; renderRows(); renderRail(); updateHeader(); say('Put back. Nothing changed.'); });
+}
+// Show the open suggestion when the board is up and free (after it builds, an approval, a decline or an undo).
+const aiCanShow = () => HAND && aiOn() && isLive() && S.view === 'grid' && S.railOpen && !onbBusy() && !S.modal && !INTRO;
+function aiShowSoon(ms = 700, focus) {
+  setTimeout(() => {
+    if (!aiCanShow()) return;
+    if (!S.aiOpen || !aiDecisions().some(d => d.id === S.aiOpen)) S.aiOpen = (aiDecisions()[0] || {}).id || null;
+    if (!S.aiOpen || S.aiPv === S.aiOpen) return;
+    const keep = focus || rail.contains(document.activeElement);
+    aiPreview(S.aiOpen);
+    if (keep) rail.querySelector('.ai.lead .ai-card')?.focus({ preventScroll: true });
+  }, ms);
+}
+// Decline: the suggestion leaves the list and nothing on the board changes. The problem stays for the dispatcher to
+// handle by hand; Undo, or "Show again" under the list, brings it back.
+function aiDecline(id) {
   const d = aiDecisions().find(x => x.id === id);
   if (!d) return;
-  aiUnpreview(true);
-  S.aiOpen = id;
-  renderRows(); renderRail(); updateHeader(); aiScrollTo(d.touch);
-  const card = rail.querySelector(`[data-aicard="${id}"]`);
-  card?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  card?.querySelector('.ai-card')?.focus({ preventScroll: true });
+  glowFade(() => {
+    aiUnpreview(true);
+    S.aiDeclined.add(id); AI_CACHE.key = '';
+    S.aiOpen = (aiDecisions()[0] || {}).id || null;
+    logChange(`Declined: ${d.title}`);
+    renderRows(); renderRail(); updateHeader();
+    toast(`Declined: ${d.title}. Nothing changed.`, () => { S.aiDeclined.delete(id); AI_CACHE.key = ''; S.aiOpen = id; aiUnpreview(true); renderRail(); updateHeader(); aiShowSoon(0, true); });
+    railFocus();
+    aiShowSoon();
+  });
 }
 function aiUnpreview(quiet) {
   if (!S.aiPv) return;
@@ -3391,7 +3437,9 @@ function aiApprove(id, ed) {
   renderRows(); renderRail(); renderCtx(); updateHeader();
   const confs = [...new Set(d.touch.map(findRide).filter(r => r && !r.hidden).map(cf))];
   toast(`${title} (${confs.join(', ')}). ${told.length ? `Texted ${andList(told)}.` : ''}${upTo.length ? ` ${andList(upTo)} got the upgrade text.` : ''}`, handUndo);
+  S.aiApprovedAt = performance.now();
   railFocus();
+  aiShowSoon(1100);
 }
 // After Approve or Undo, focus goes to the decision now on top, so the keyboard carries on from there.
 function railFocus() {
@@ -3434,18 +3482,16 @@ function aiCardHTML(d) {
   const tell = aiTell(d);
   const meta = `<p class="ai-meta">${esc(d.cost)}</p>`;
   const body = `${move}<p class="ai-story">${esc(d.story)}</p>${meta}`;
-  const details = why ? `<div class="why"><ul>${d.why.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>
-    <div class="opts"><span class="opts-h">Ways to cover it, in-house first</span>${d.options.map((o, i) => `<div class="opt ${o.pick ? 'pick' : ''}"><span class="opt-n num">${i + 1}</span><span class="opt-t"><b>${esc(o.label)}</b> ${esc(o.text)}</span><span class="opt-c ${o.bad ? 'bad' : ''}">${esc(o.cost)}</span></div>`).join('')}</div>
-    <div class="ai-whol"><span class="opts-h">Who hears about it</span>${tell.map(x => `<span><b>${esc(x.name)}</b>: ${esc(x.what)}</span>${x.text ? `<p class="bubble">${esc(x.text)}</p>` : ''}`).join('')}</div>` : '';
+  const details = why ? `<div class="why"><ul>${d.why.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''; // the reasons; who hears about it is on the card itself
   // Before Approve, the card names everyone it texts. Nobody hears about anything until then.
   const sends = tell.length ? `<p class="ai-tell">${ic('sms', 14)}<span>Approve texts ${andList(tell.map(x => `<b>${esc(x.name)}</b>`))}.</span></p>` : '';
-  return `<div class="ai lead ${pv ? 'pv' : ''}" data-aicard="${d.id}"><article class="ai-card x v2" tabindex="-1" aria-label="${esc(d.title)}">
+  return `<div class="ai lead ${pv ? 'pv' : ''} ${pv && S.pvIn ? 'in' : ''}" data-aicard="${d.id}"><article class="ai-card x v2" tabindex="-1" aria-label="${esc(d.title)}">
     <div class="prob"><span class="t">${esc(d.title)}</span><span class="actby">act by</span><span class="tnum">${d.actBy}</span></div>
     ${body}${details}
     ${pv ? `<p class="ai-pv">${ic('spark', 13)}<span>Showing on the grid. Nothing changes until you approve.</span></p>` : ''}
     ${sends}
     <div class="actions"><button class="btn pri sm" data-a="ai-approve" data-v="${d.id}">Approve</button>
-      <button class="btn sec sm" data-a="${pv ? 'ai-unshow' : 'ai-show'}" data-v="${d.id}">${pv ? 'Put back' : 'Show me'}</button>
+      <button class="btn sec sm" data-a="ai-decline" data-v="${d.id}">Decline</button>
       <span class="spacer"></span><button class="btn ghost sm why-btn ${why ? 'open' : ''}" data-a="ai-why" data-v="${d.id}" aria-expanded="${why}">Details ${ic('right', 14)}</button></div>
   </article></div>`;
 }
@@ -3458,7 +3504,8 @@ function aiRailHTML() {
   const gates = aiGate().map(({ code, f, hit, T }) => `<div class="gate-card"><div class="gate-h"><b class="num">${code}</b><span class="spacer"></span><span class="gate-d">+${f.late} min, at the gate</span></div>
     <p>${hit ? `If it leaves like that, ${esc(codesShort(hit.B))} (${cf(hit.R)}) would make ${esc(famCode(hit.first) || hit.first[0])} wait ${hit.sp.wait} min. Ready once it takes off: ${esc(T ? `${codesShort(hit.B)} ride with ${codesShort(T.t.fam)}, ${cf(T.t)} (${T.pax} of ${T.seats} seats)` : `${codesShort(hit.B)} get their own car`)}.` : 'Nothing breaks even if it leaves this late.'} Nothing changes until it takes off.</p></div>`).join('');
   const heads = aiHeads().map(r => `<div class="ai"><div class="ai-card h">${ic('spark', 16)}<p>${esc(`${r.driver} is about ${drvLate(r)} min late for ${rideSaid(r)} (${cf(r)}), after ${r.lateWhy}. ${promised(r) ? `That’s ${S.cfg.promise - drvLate(r)} min before our on-time promise makes the ride free, so keep an eye on it.` : `That’s inside the ${S.cfg.limit} min limit, so nothing to change.`}`)}</p></div></div>`).join('');
-  return `<section class="sec"><div class="sec-t big" tabindex="-1"><b>Decisions</b><span class="cnt">${list.length}</span></div>${cards}</section>
+  const declined = S.aiDeclined.size ? `<p class="ai-declined">${S.aiDeclined.size} declined<button class="btn ghost sm" data-a="ai-undecline">Show again</button></p>` : '';
+  return `<section class="sec"><div class="sec-t big" tabindex="-1"><b>Decisions</b><span class="cnt">${list.length}</span></div>${cards}${declined}</section>
     ${gates ? `<section class="sec"><div class="sec-t">${ic('clock', 15)}<b>Waiting for takeoff</b></div>${gates}</section>` : ''}
     ${heads ? `<section class="sec"><div class="sec-t">${ic('bulb', 15)}<b>Heads-up</b></div><div class="cards">${heads}</div></section>` : ''}
     ${handRailHTML(true)}`;
@@ -3679,7 +3726,7 @@ const S = {
   vehicle: 'all', source: 'all', q: '',
   tod: 'all', driverF: 'all', puF: 'all',   // time of day, driver, pickup place
   openCard: 'c1', adjust: {}, why: {}, resolved: {}, order: [],
-  aiOpen: null, aiPv: null, aiWhy: {},  // assistant on the by-hand board
+  aiOpen: null, aiPv: null, aiWhy: {}, aiDeclined: new Set(), aiApprovedAt: 0, // assistant on the by-hand board
   huDismissed: {},
   railOpen: true,
   railTab: 'board',              // board | email
@@ -3947,8 +3994,8 @@ const MEGA = {
         <div class="mm-col mm-item" style="--i:3"><h4>Shortcuts</h4><div class="keys">
           <div><kbd>/</kbd>Search rides</div><div><kbd>N</kbd>New reservation</div>
           <div><kbd>↑</kbd><kbd>↓</kbd>Move between rides</div><div><kbd>Enter</kbd>Open a ride</div><div><kbd>Shift</kbd><kbd>F10</kbd>A ride’s menu</div>
-          <div><kbd>J</kbd><kbd>K</kbd>Next or previous decision</div><div><kbd>S</kbd>Show me, or put it back</div><div><kbd>A</kbd>Approve the decision in focus</div>
-          <div><kbd>Esc</kbd>Close a menu, or put a preview back</div>
+          <div><kbd>J</kbd><kbd>K</kbd>Next or previous decision, shown on the grid</div><div><kbd>A</kbd>Approve the decision in focus</div><div><kbd>D</kbd>Decline it</div>
+          <div><kbd>Esc</kbd>Close a menu, or put a suggestion back</div>
         </div></div>
       </div>
     </div>`;
@@ -4250,6 +4297,7 @@ function rowWhy(r) {
   if (S.cfg.flagDue && r.due) out.push('Balance due.');
   const mq = mailFor(r.id);
   if (mq) out.push(`Email from ${mq.from}: ${mq.fix()}.`);
+  if (r.wait && isLive()) out.push(`${r.wait.ready.replace(/ ·$/, '')}: ${r.wait.text}, over the ${S.cfg.limit} min limit.`); // a van that breaks: once a line under the row
   return out.filter(Boolean);
 }
 // What a screen reader hears on a row: the ride in a few short sentences, with the reasons from rowWhy.
@@ -4263,7 +4311,6 @@ function rowSaid(r) {
     `From ${from}, to ${d.code ? r.dflight || 'the airport' : d.name}`,
     `${r.vehicle}, ${r.driver && r.driver !== '—' ? `driver ${r.driver}` : 'no driver yet'}`,
     ...rowWhy(r).map(w => w.replace(/\.$/, '')),
-    r.wait ? `${r.wait.ready.replace(/ ·$/, '')}, ${r.wait.text}, limit ${S.cfg.limit}` : '',
     r.pvNote ? `If you approve: ${r.pvNote}` : '',
   ].filter(Boolean).join('. ') + '.';
 }
@@ -4416,18 +4463,6 @@ function pvSaid(r, was, came, gone) {
   else if (drvLate(r) > drvLate(was)) bits.push(`${r.driver} would be about ${drvLate(r)} min late`);
   return bits.join(' · ');
 }
-function pvNoteHTML(r, o) {
-  const k = gridCols().indexOf('party');
-  return `<div class="note pv-note cols ${o.sel ? 'sel' : ''}" role="row">${'<div></div>'.repeat(k)}
-    <div class="cell bracket-cell">${o.between ? bracketHTML('mid', r.broken) : ''}</div>
-    <div class="note-t" role="gridcell" style="grid-column:${k + 2} / -1">${ic('spark', 13)}<b>If you approve:</b> ${esc(r.pvNote)}</div></div>`;
-}
-function noteHTML(r, o) {
-  const k = gridCols().indexOf('party');
-  return `<div class="note cols ${o.sel ? 'sel' : ''}" role="row">${'<div></div>'.repeat(k)}
-    <div class="cell bracket-cell">${o.between ? bracketHTML('mid', r.broken) : ''}</div>
-    <div class="note-t" role="gridcell" style="grid-column:${k + 2} / -1"><span class="ready">${esc(r.wait.ready)}</span> <span class="wait">${esc(r.wait.text)} (limit ${S.cfg.limit})</span></div></div>`;
-}
 function emptyHTML() {
   const d = viewDate();
   let title = 'No rides here', text = 'Open Schedule to change what’s shown.';
@@ -4481,8 +4516,6 @@ function renderRows() {
         const sel = lm ? mailSel.has(r.id) : (open && S.openCard === r.card) || aiSel.has(r.id);
         const v = pvRow(r) || r, between = pos === 'top' || pos === 'mid';
         html += rowHTML(v, { pos, sel, open, tab: r.id === tabId });
-        if (live && v.wait && !v.hidden) html += noteHTML(v, { between, sel });
-        if (v.pvNote) html += pvNoteHTML(v, { between, sel });
         // Searching: why this row matched, when the row doesn't show it ("Booked by Michelle Reyes").
         if (S.q.trim() && !r.hidden) html += hitLineHTML(r, { between: pos === 'top' || pos === 'mid', sel });
         if (S.open === r.id) html += `<div role="row"><div role="gridcell">${quickHTML(r)}</div></div>`;
@@ -7960,7 +7993,7 @@ function renderToast() {
 
 function renderAll() {
   document.body.dataset.view = S.view; // lets a small laptop keep the board on one screen (see Laptop screens)
-  if (S.aiPv && (S.view !== 'grid' || !isLive())) aiUnpreview(true); // a suggestion shows on today's grid only; anywhere else it's put back
+  if (S.aiPv && (S.view !== 'grid' || !isLive())) { aiUnpreview(true); S.aiOpen = null; } // a suggestion shows on today's grid only; anywhere else it's closed
   updateHeader();
   // The timeline is the grid's other face: same assistant rail, same day and search bar.
   const grid = S.view === 'grid' || S.view === 'timeline', settings = S.view === 'settings', requests = S.view === 'requests';
@@ -8166,7 +8199,7 @@ document.addEventListener('click', e => {
     case 'mail-send-now': if (S.modal) { S.modal = null; renderModal(); } finishMail(v); break;
     case 'mail-gmail': toast('This would open Gmail. Not in the prototype yet.'); break;
     case 'row': {
-      if (S.aiPv && !isDraft(rideById(v))) aiUnpreview(); // a ride the suggestion would make opens with it still on show
+      if (S.aiPv && !isDraft(rideById(v))) { aiUnpreview(true); S.aiOpen = null; renderRail(); updateHeader(); } // opening a ride closes the suggestion; one it would make opens with it still on show
       const r = rideById(v);
       if (!r) break;
       if (isLive() && r.card && !S.resolved[r.card] && S.openCard !== r.card) { S.openCard = r.card; renderRail(); }
@@ -8195,10 +8228,12 @@ document.addEventListener('click', e => {
     case 'ai-open': aiSelect(v); break;
     case 'ai-show': aiPreview(v); break;
     case 'ai-unshow': aiUnpreview(); break;
-    case 'ai-approve': aiApprove(v); break;
+    case 'ai-decline': aiDecline(v); break;
+    case 'ai-undecline': { const o = S.aiOpen; aiUnpreview(true); S.aiDeclined.clear(); AI_CACHE.key = ''; S.aiOpen = o; renderRows(); renderRail(); updateHeader(); aiShowSoon(0, true); break; } // the list is frozen while a plan is on the grid: put it back, then show it again
+    case 'ai-approve': glowFade(() => aiApprove(v)); break;
     case 'tour-replay': tourStart(true); break;
     case 'ai-why': S.aiWhy[v] = !S.aiWhy[v]; renderRail(); break;
-    case 'ai-toggle': aiUnpreview(true); store.set('sp-ai', aiOn() ? 'off' : 'on'); AI_CACHE.key = ''; S.aiOpen = aiOn() ? (aiDecisions()[0] || {}).id || null : null; renderAll(); break;
+    case 'ai-toggle': aiUnpreview(true); store.set('sp-ai', aiOn() ? 'off' : 'on'); AI_CACHE.key = ''; S.aiOpen = aiOn() ? (aiDecisions()[0] || {}).id || null : null; renderAll(); aiShowSoon(); break;
     case 'h-copy': handCopy(); break;
     case 'h-reset': handReset(); break;
     case 'h-mode': store.set('sp-mode', v); location.reload(); break;
@@ -8503,22 +8538,19 @@ function gridKeys(e) {
   if (to && to !== row) { row.tabIndex = -1; to.tabIndex = 0; to.focus({ preventScroll: true }); to.scrollIntoView({ block: 'nearest' }); }
   return true;
 }
-// The decisions are a queue: J and K step through them, S shows the open one on the grid or puts it back, and A approves
-// it. A only approves a plan you've seen on the grid (S first), with the card in focus, and never on a held-down key:
-// after an approval focus moves to the next card, so a second A must not text the next set of people unseen.
+// The decisions are a queue: J and K step through them (each one plays on the grid), A approves the open one and D
+// declines it. Both need the card in focus and the plan on the grid, and never fire on a held-down key; A also waits a
+// beat after an approval, so a quick second A can't text the next set of people before their plan is on screen.
 function decisionKeys(e) {
   if (e.metaKey || e.ctrlKey || e.altKey || S.ctxMenu || S.menu || S.mega || !HAND || !aiOn() || !isLive() || !S.railOpen || S.view !== 'grid') return false;
   const k = e.key.toLowerCase(), list = aiDecisions();
   if ((k === 'j' || k === 'k') && list.length) {
     const i = list.findIndex(d => d.id === S.aiOpen), next = list[Math.max(0, Math.min(list.length - 1, i < 0 ? 0 : i + (k === 'j' ? 1 : -1)))];
     aiSelect(next.id);
-  } else if (k === 's' && S.aiOpen) {
-    S.aiPv === S.aiOpen ? aiUnpreview() : aiPreview(S.aiOpen);
-    rail.querySelector('.ai.lead .ai-card')?.focus({ preventScroll: true }); // the card redraws: keep the keyboard on it
-  }
-  else if (k === 'a' && S.aiOpen && e.target.closest?.('.ai.lead')) {
-    if (e.repeat) return true;
-    if (S.aiPv === S.aiOpen) aiApprove(S.aiOpen); else say('Press S to see it on the grid first, then A to approve.');
+  } else if ((k === 'a' || k === 'd') && S.aiOpen && e.target.closest?.('.ai.lead')) {
+    if (e.repeat || performance.now() - S.aiApprovedAt < 1200) return true;
+    if (S.aiPv !== S.aiOpen) say('It’s on its way to the grid. Look first, then decide.');
+    else if (k === 'a') glowFade(() => aiApprove(S.aiOpen)); else aiDecline(S.aiOpen);
   }
   else return false;
   e.preventDefault();
@@ -8530,6 +8562,7 @@ function say(text) {
   el.textContent = '';
   requestAnimationFrame(() => { el.textContent = text; });
 }
+rail.addEventListener('click', e => { if (e.target.closest('button, a, select, input, textarea')) return; const c = e.target.closest('.ai.lead'); if (c && S.aiPv !== c.dataset.aicard) aiSelect(c.dataset.aicard); });
 rowsEl.addEventListener('focusin', e => { const r = e.target.closest?.('.row[data-a="row"]'); if (r) S.gridFocus = r.dataset.v; });
 document.addEventListener('click', e => {
   const k = e.target.closest?.('.skip');
@@ -8556,7 +8589,7 @@ document.addEventListener('keydown', e => {
     else if (S.ctxMenu) { const id = S.ctxMenu.id; S.ctxMenu = null; renderOverlay(); rowsEl.querySelector(`.row[data-v="${id}"]`)?.focus(); }
     else if (S.menu) { S.menu = null; renderOverlay(); }
     else if (S.open) { const id = S.open; S.open = null; renderRows(); rowsEl.querySelector(`.row[data-v="${id}"]`)?.focus(); }
-    else if (S.aiPv) aiUnpreview();
+    else if (S.aiPv) aiClose();
     else if (S.mega) { const name = S.mega; closeMega(); document.querySelector(`.hdr [data-menu="${name}"]`)?.focus(); }
   }
   if (e.key === '/' && !typing && !S.modal) { e.preventDefault(); closeMega(); $('q')?.focus(); }
@@ -8660,13 +8693,8 @@ function introEnd(go) {
   I.anims.forEach(a => a.finish());
   if (go) I.then?.();
 }
-// For someone who skips the tour: the first decision glows once, and its Show me button calls for a click.
-function introSpot() {
-  const lead = rail.querySelector('.ai.lead');
-  if (!lead || onbStill()) return;
-  lead.classList.add('spot');
-  setTimeout(() => lead.classList.remove('spot'), 3400);
-}
+// For someone who skips the tour, and anyone coming back: the board ends on the first suggestion, played on the grid.
+function introSpot() { aiShowSoon(200); }
 
 buildHeader();
 renderThead();
@@ -8675,9 +8703,10 @@ document.fonts?.ready.then(() => { pillPlaced = false; placePill(pillRest()); sy
 
 // ---------- Sign-in and the 1-minute tour ----------
 // For someone who has never dispatched (a recruiter, a hiring manager). The product's own sign-in comes first, filled
-// in and read-only: nothing is typed, kept or sent. It signs in by itself, then offers a short tour or the board.
-// The tour dims everything but one part and acts it out on the real board, so it can't go out of date. It remembers
-// "tour seen" (localStorage) and "signed in" for this tab (sessionStorage). Help → "Replay the tour" plays it again.
+// in and read-only: nothing is typed, kept or sent. It signs in by itself, then asks on every new visit: the short
+// tour, the board, or "Don't show this again" (localStorage sp-ask). The tour dims everything but one part and acts it
+// out on the real board, so it can't go out of date. "Signed in" lasts for the tab (sessionStorage), so a reload goes
+// straight to the board. Help → "Replay the tour", or ?intro in the address, plays it again.
 const ses = {
   get: k => { try { return sessionStorage.getItem(k); } catch { return null; } },
   set: (k, v) => { try { sessionStorage.setItem(k, v); } catch { /* private window: the sign-in shows again on reload */ } },
@@ -8706,7 +8735,8 @@ const siChoiceHTML = () => `<span class="avatar xl">${ME.initials}</span>
     <h1 class="si-h" id="siTitle">Hi, ${esc(ME.name.split(' ')[0])}</h1>
     <p class="si-sub">${esc(ME.role)}</p>
     <button class="btn pri si-btn" data-si="tour">Take the 1-minute tour</button>
-    <button class="btn sec si-btn" data-si="skip">Skip, go to the board</button>`;
+    <button class="btn sec si-btn" data-si="skip">Skip, go to the board</button>
+    <button class="btn ghost si-btn si-never" data-si="never">Don’t show this again</button>`;
 function signInShow() {
   const el = Object.assign(document.createElement('div'), { className: 'si' });
   el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-labelledby', 'siTitle');
@@ -8724,7 +8754,7 @@ function signedIn() {
   if (!SI || SI.done) return;
   clearTimeout(SI.timer); SI.done = true;
   ses.set('sp-signed', 'yes');
-  if (store.get('sp-tour') === 'seen' && !/[?&]intro\b/.test(location.search)) { signInClose(); boardBuild(introSpot); return; } // back again: straight to the board
+  if (store.get('sp-ask') === 'never' && !/[?&]intro\b/.test(location.search)) { signInClose(); boardBuild(introSpot); return; } // they said don't ask again
   SI.card.innerHTML = siChoiceHTML();
   SI.card.classList.add('choice', 'swap');
   SI.card.querySelector('[data-si="tour"]').focus();
@@ -8741,6 +8771,7 @@ function siAct(k) {
   if (k === 'go') signedIn();
   else if (k === 'tour') { signInClose(); boardBuild(() => tourStart()); }
   else if (k === 'skip') { store.set('sp-tour', 'seen'); signInClose(); boardBuild(introSpot); }
+  else if (k === 'never') { store.set('sp-tour', 'seen'); store.set('sp-ask', 'never'); signInClose(); boardBuild(introSpot); } // Help → Replay the tour still plays it
 }
 
 // ----- The tour -----
@@ -8773,13 +8804,13 @@ const TOUR_STEPS = [
       if (S.aiPv) aiUnpreview(); // from the top, so Back plays it again
       S.aiOpen = d.id; renderRail(); renderRows();
       t.later(800, () => {
-        rail.querySelector(`[data-a="ai-show"][data-v="${d.id}"]`)?.classList.add('tour-press');
+        rail.querySelector(`[data-aicard="${d.id}"] .ai-card`)?.classList.add('tour-press');
         t.later(240, () => aiPreview(d.id));
       });
     },
     leave() { rail.querySelector('.tour-press')?.classList.remove('tour-press'); },
     title: () => 'The assistant suggests the fix',
-    body: () => `${HAND && aiDecisions().length ? 'Show me plays it on the grid; nothing is saved.' : 'When a late flight breaks a ride, the fix shows up here.'} Approve when it looks right; Undo takes it back.`,
+    body: () => `${HAND && aiDecisions().length ? 'Open a suggestion and it plays on the grid; nothing is saved.' : 'When a late flight breaks a ride, the fix shows up here.'} Approve when it looks right, or Decline; Undo takes it back.`,
     holes: t => {
       const card = t.dec && rail.querySelector(`[data-aicard="${t.dec}"]`);
       if (!card) return [rail];
@@ -8812,6 +8843,7 @@ const TOUR_STEPS = [
     holes: () => [trUnion(['.sms-conv', '.sms-ctx'].map(s => trRect($('smsPage').querySelector(s))))],
     anchor: () => $('smsPage').querySelector('.sms-compose') || $('smsPage').querySelector('.sms-conv') },
   { view: 'grid', side: 'bottom', next: 'Try it yourself',
+    enter() { const d = HAND && aiOn() ? aiDecisions()[0] : null; if (d && S.aiPv !== d.id) aiPreview(d.id); }, // end on the fix, on the grid
     title: () => 'Your turn',
     body: () => `${S.aiPv ? 'Approve the fix on the grid, or open any ride.' : 'Open any ride, or drag a family to another car.'} Replay this tour from Help.`,
     holes: () => [hdr.querySelector('[data-menu="help"]')], anchor: () => hdr.querySelector('[data-menu="help"]') },
@@ -8820,6 +8852,7 @@ function tourStart(fromHelp) {
   if (TOUR) return;
   closeMega();
   if (S.modal) closeModal();
+  if (S.aiPv) { aiUnpreview(true); S.aiOpen = null; } // the tour starts on the board as booked, and plays the fix itself
   S.menu = null; S.ctxMenu = null; renderOverlay();
   if (S.open) { S.open = null; renderRows(); }
   if (!isLive()) selectDate(TODAY);
@@ -8948,4 +8981,5 @@ addEventListener('keydown', e => {
   else if (e.key === 'ArrowLeft') { e.preventDefault(); tourGo(TOUR.i - 1); }
 }, true);
 if (document.querySelector('.intro') || ses.get('sp-signed') !== 'yes') signInShow();
+else introSpot(); // a reload in the same tab: straight to the board, with the first suggestion on the grid
 </script>

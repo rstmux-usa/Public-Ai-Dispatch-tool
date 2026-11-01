@@ -1732,12 +1732,16 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .src-n { display: inline-flex; align-items: center; gap: 4px; height: 18px; padding: 0 6px 0 5px; border-radius: 9px; background: var(--flap); color: var(--flap-text); font-weight: 600; font-size: 12px; line-height: 1; }
 .hdr .src-n { background: var(--hdr-text); color: #1b1a30; }
 .gm-mark { flex: none; display: block; }
-.sms-av { position: relative; }
-.src-b { position: absolute; right: -3px; bottom: -3px; display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; background: var(--panel); box-shadow: 0 0 0 1px var(--line); color: var(--text-2); }
 .src-t { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--text-3); }
 .via { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; color: var(--text-2); vertical-align: -1px; }
-.src-seg button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
-.src-seg b { font: 600 13px/1 var(--f-num); color: var(--text-3); }
+/* One filter row across the column, in words: the channel, or the drivers' texts. */
+.sms-lh .inbox-show { display: flex; justify-self: stretch; }
+.inbox-show button { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 8px; }
+.inbox-show b { font: 600 13px/1 var(--f-num); color: var(--text-3); }
+/* The list says what needs an answer: To answer, then Earlier, then what the assistant filed. */
+.sms-gh { margin: 12px 10px 4px; font-size: 14px; line-height: 20px; }
+.sms-grp:first-child .sms-gh { margin-top: 6px; }
+.sms-gh .cnt { font-size: 14px; }
 .sms-it b .org { display: inline; font-weight: 400; color: var(--text-3); -webkit-line-clamp: unset; }
 .em-thread { gap: 14px; }
 .em { display: grid; gap: 8px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
@@ -7507,7 +7511,7 @@ function inboxItems() {
   const q = S.sms.q.trim().toLowerCase(), src = S.sms.src, f = S.sms.f;
   const texts = src === 'gmail' ? [] : smsThreads()
     .filter(t => (f === 'all' || (f === 'unread' ? t.unread : t.kind === f)) && (!q || `${t.name} ${t.phone} ${t.msgs.map(m => m.text).join(' ')}`.toLowerCase().includes(q)))
-    .map(t => ({ id: t.id, src: 'sms', t, at: t.msgs.at(-1)?.t || '00:00', hot: !!t.unread, low: 0 }));
+    .map(t => ({ id: t.id, src: 'sms', t, at: t.msgs.at(-1)?.t || '00:00', hot: !!t.unread || (t.id === S.sms.held && t.id === S.sms.sel), low: 0 }));
   const mails = src === 'sms' || f === 'pax' || f === 'drv' ? [] : MAILS.concat(FILED)
     .filter(m => (f !== 'unread' || mailState(m.id) === 'open') && (!q || `${m.from} ${m.org || ''} ${m.addr} ${m.subject} ${m.body}`.toLowerCase().includes(q)))
     .map(m => ({ id: `mail:${m.id}`, src: 'gmail', m, at: m.at || '00:00', hot: mailState(m.id) === 'open', low: mailState(m.id) === 'filed' ? 1 : 0 }));
@@ -7527,28 +7531,30 @@ function inboxItemHTML(it) {
   if (it.src === 'sms') {
     const t = it.t, last = t.msgs.at(-1);
     return `<button class="sms-i ${on ? 'on' : ''} ${t.unread ? 'unread' : ''}" data-a="sms-sel" data-v="${t.id}" aria-current="${on}">
-      <span class="sms-av k-${t.kind}">${t.kind === 'grp' ? ic('users', 16) : t.kind === 'drv' ? ic('car', 16) : esc(initialsOf(t.name))}<span class="src-b" title="SMS">${ic('sms', 10)}</span></span>
+      <span class="sms-av k-${t.kind}">${t.kind === 'grp' ? ic('users', 16) : t.kind === 'drv' ? ic('car', 16) : esc(initialsOf(t.name))}</span>
       <span class="sms-it"><b>${esc(t.name)}</b><span>${last ? `${last.who === 'us' ? 'You: ' : last.who === 'auto' ? 'Auto: ' : ''}${esc(last.text)}` : 'No messages yet'}</span></span>
       <span class="sms-meta"><span class="num">${last ? last.t : ''}${t.unread ? ` <b class="sms-n num">${t.unread}</b>` : ''}</span><span class="src-t">${ic('sms', 12)}SMS</span></span></button>`;
   }
   const m = it.m, st = mailState(m.id);
   return `<button class="sms-i ${on ? 'on' : ''} ${st === 'open' ? 'unread' : ''}" data-a="sms-sel" data-v="${it.id}" aria-current="${on}">
-      <span class="sms-av">${esc(initialsOf(m.from))}<span class="src-b gm" title="Gmail">${gmailMark(10)}</span></span>
-      <span class="sms-it"><b>${esc(m.from)}${m.org ? `<span class="org"> · ${esc(m.org)}</span>` : ''}</b><span>${st === 'open' ? '' : `${MAIL_STATE[st]} · `}${esc(m.subject)}</span></span>
+      <span class="sms-av">${esc(initialsOf(m.from))}</span>
+      <span class="sms-it"><b>${esc(m.from)}${m.org ? `<span class="org"> · ${esc(m.org)}</span>` : ''}</b><span>${st === 'open' || st === 'filed' ? '' : `${MAIL_STATE[st]} · `}${esc(m.subject)}</span></span>
       <span class="sms-meta"><span class="num">${m.at || ''}</span><span class="src-t">${gmailMark(12)}Gmail</span></span></button>`;
 }
+// One filter row, like Customers: the channel, or the drivers' texts. There's no Unread filter: the list itself opens
+// with what needs an answer, and mail the assistant filed sits under its own heading at the bottom.
+const inboxShow = () => S.sms.f === 'drv' ? 'drv' : S.sms.src;
 function smsListHTML() {
-  const items = inboxItems().map(inboxItemHTML).join('');
-  const g = openMails().length, t = smsUnread();
-  const src = [['all', 'All', ''], ['gmail', 'Gmail', gmailMark(13), g], ['sms', 'SMS', ic('sms', 13), t]]
-    .map(([v, l, mark, n]) => `<button class="${S.sms.src === v ? 'on' : ''}" role="radio" aria-checked="${S.sms.src === v}" data-a="inbox-src" data-v="${v}">${mark}${l}${n ? `<b class="num">${n}</b>` : ''}</button>`).join('');
-  const who = (S.sms.src === 'gmail' ? [['all', 'All mail'], ['unread', 'To answer']] : [['all', 'Everyone'], ['unread', 'Unread'], ['pax', 'Passengers'], ['drv', 'Drivers']])
-    .map(([v, l]) => `<button class="${S.sms.f === v ? 'on' : ''}" role="radio" aria-checked="${S.sms.f === v}" data-a="sms-f" data-v="${v}">${l}</button>`).join('');
+  const items = inboxItems(), show = inboxShow();
+  const tabs = [['all', 'All'], ['gmail', 'Gmail', openMails().length], ['sms', 'SMS', smsUnread()], ['drv', 'Drivers']]
+    .map(([v, l, n]) => `<button class="${show === v ? 'on' : ''}" role="radio" aria-checked="${show === v}" data-a="inbox-show" data-v="${v}">${l}${n ? `<b class="num">${n}</b>` : ''}</button>`).join('');
+  const groups = [['To answer', items.filter(it => it.hot)], ['Earlier', items.filter(it => !it.hot && !it.low)], ['Filed by the assistant', items.filter(it => it.low)]]
+    .filter(([, list]) => list.length)
+    .map(([h, list]) => `<section class="sms-grp"><h3 class="sec-t sms-gh"><b>${h}</b><span class="cnt">${list.length}</span></h3>${list.map(inboxItemHTML).join('')}</section>`).join('');
   return `<header class="sms-lh"><h2>Inbox</h2>
-      <div class="seg src-seg" role="radiogroup" aria-label="Channel">${src}</div>
       <label class="field search">${ic('search', 15)}<span class="sr">Search the inbox</span><input id="smsQ" type="search" placeholder="Name, phone, email or words" value="${esc(S.sms.q)}" autocomplete="off"></label>
-      <div class="seg" role="radiogroup" aria-label="Show">${who}</div></header>
-    <div class="sms-scroll">${items || '<p class="sms-empty">Nothing matches.</p>'}</div>`;
+      <div class="seg inbox-show" role="radiogroup" aria-label="Show">${tabs}</div></header>
+    <div class="sms-scroll">${groups || '<p class="sms-empty">Nothing matches.</p>'}</div>`;
 }
 function smsConvHTML(th) {
   if (!th) return '<div class="rq-none"><b>Pick a conversation</b><span>Gmail requests and SMS with passengers, drivers and the airport greeter, in one place.</span></div>';
@@ -7637,11 +7643,12 @@ function mailCtxHTML(m) {
 function renderSms() {
   const el = $('smsPage');
   if (!el || el.hidden) return;
+  if (S.sms.held !== S.sms.sel) S.sms.held = null;
   const items = inboxItems();
   const exists = id => id && (id.startsWith('mail:') ? !!MAIL[id.slice(5)] : smsThreads().some(t => t.id === id));
   if (!exists(S.sms.sel) || !items.some(it => it.id === S.sms.sel)) S.sms.sel = items[0]?.id || null;
   const m = selMail(), th = m ? null : smsThreads().find(t => t.id === S.sms.sel);
-  if (th && th.unread) { th.unread = 0; smsBadge(); }
+  if (th && th.unread) { th.unread = 0; S.sms.held = th.id; smsBadge(); } // read now, but it stays under To answer until you open another
   const sc = el.querySelector('.sms-scroll')?.scrollTop || 0;
   el.innerHTML = `<aside class="sms-list" aria-label="Conversations">${smsListHTML()}</aside>
     <section class="sms-conv" aria-label="${m ? 'Email' : 'Conversation'}">${m ? mailConvHTML(m) : smsConvHTML(th)}</section>
@@ -8431,8 +8438,7 @@ document.addEventListener('click', e => {
     case 'da-decline': { const r = findAny(S.da.offer); S.da.offer = null; logChange(`${S.da.driver} declined ${r.party} (${fmt(r.pickup)})`); renderDriverApp(); toast(`${S.da.driver} declined. ${r.party} stays under No driver yet, flagged as declined.`); break; }
     // SMS inbox
     case 'sms-sel': S.sms.sel = v; renderSms(); break;
-    case 'sms-f': S.sms.f = v; renderSms(); break;
-    case 'inbox-src': S.sms.src = v; if (v === 'gmail' && (S.sms.f === 'pax' || S.sms.f === 'drv')) S.sms.f = 'all'; renderSms(); break;
+    case 'inbox-show': S.sms.src = v === 'drv' ? 'sms' : v; S.sms.f = v === 'drv' ? 'drv' : 'all'; renderSms(); break;
     case 'sms-send': smsSend($('smsText')?.value); break;
     case 'sms-quick': { const t = $('smsText'); if (t) { t.value = v; t.focus(); } break; }
     case 'sms-call': toast('Calling from the board needs the phone integration. The number is on the left.'); break;

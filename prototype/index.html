@@ -4061,9 +4061,9 @@ const MEGA = {
     const link = s => `<button class="mm-link" data-a="open-settings" data-v="${s.id}"><span class="ck">${ic(s.icon, 16)}</span><span>${s.name}</span></button>`;
     return `<div class="mm">
       <div class="mm-main set-grid">
-        <div class="set-card mm-item" style="--i:0"><h4>Shared van wait limit</h4><p>How long one party may wait for another before the tool flags it.</p>${segCtl('limit', [[20, '20 min'], [25, '25 min'], [30, '30 min']])}</div>
+        <div class="set-card mm-item" style="--i:0"><h4>Shared van wait limit</h4><p>How long one party may wait for another before the tool flags it.</p>${segCtl('limit', [[20, '20 min'], [25, '25 min'], [30, '30 min']], 'Wait limit')}</div>
         <div class="set-card mm-item" style="--i:1"><h4>Clock</h4><p>The board always runs on Seattle time. You can show your own time next to it.</p>${switchCtl('showLocal', `Also show my time${lt.zone ? ` (${esc(lt.zone)})` : ''}`)}</div>
-        <div class="set-card mm-item" style="--i:2"><h4>Row height</h4><p>Compact fits more rides on the screen.</p>${segCtl('compact', [[false, 'Comfortable'], [true, 'Compact']])}</div>
+        <div class="set-card mm-item" style="--i:2"><h4>Row height</h4><p>Compact fits more rides on the screen.</p>${segCtl('compact', [[false, 'Comfortable'], [true, 'Compact']], 'Row height')}</div>
       </div>
       <div class="mm-side">
         <div class="mm-col mm-item" style="--i:3"><h4>All settings</h4>${SET_SECTIONS.slice(0, 7).map(link).join('')}</div>
@@ -4085,7 +4085,7 @@ const MEGA = {
       <div class="mm-main">
         <div class="who mm-item" style="--i:0"><span class="avatar xl">${ME.initials}</span><b>${ME.name}</b><span>${ME.role}</span><span class="muted">${ME.shift} · signed in at ${ME.signedIn}</span></div>
         <div class="log mm-item" style="--i:1">
-          <div class="log-h"><h4>Changes today</h4><div class="seg" role="radiogroup">
+          <div class="log-h"><h4>Changes today</h4><div class="seg" role="radiogroup" aria-label="Whose changes">
             <button role="radio" aria-checked="${S.logScope === 'mine'}" class="${S.logScope === 'mine' ? 'on' : ''}" data-a="log-scope" data-v="mine">Mine</button>
             <button role="radio" aria-checked="${S.logScope === 'all'}" class="${S.logScope === 'all' ? 'on' : ''}" data-a="log-scope" data-v="all">Everyone</button>
           </div></div>
@@ -4804,7 +4804,7 @@ const SET_SECTIONS = [
   { id: 'company', name: 'Company', icon: 'building', group: 'Company', intro: 'Shows on confirmations, invoices and receipts.' },
   { id: 'users', name: 'Users & permissions', icon: 'shield', group: 'Company', intro: 'Who can sign in and what each role can do.' },
 ];
-const segCtl = (key, opts) => `<div class="seg" role="radiogroup">${opts.map(([v, l]) => { const on = S.cfg[key] === v; return `<button role="radio" aria-checked="${on}" class="${on ? 'on' : ''}" data-a="cfg" data-k="${key}" data-v="${v}">${l}</button>`; }).join('')}</div>`;
+const segCtl = (key, opts, aria) => `<div class="seg" role="radiogroup" aria-label="${esc(aria)}">${opts.map(([v, l]) => { const on = S.cfg[key] === v; return `<button role="radio" aria-checked="${on}" class="${on ? 'on' : ''}" data-a="cfg" data-k="${key}" data-v="${v}">${l}</button>`; }).join('')}</div>`;
 const switchCtl = (key, label, aria) => `<button class="switch" role="switch" aria-checked="${!!S.cfg[key]}" data-a="cfgt" data-k="${key}" ${label ? '' : `aria-label="${esc(aria || key)}"`}><span class="track"></span>${label ? `<span>${label}</span>` : ''}</button>`;
 const selCtl = (key, opts, aria) => `<select class="dd" data-cfg="${key}" aria-label="${esc(aria)}">${opts.map(o => { const [v, l] = Array.isArray(o) ? o : [o, o]; return `<option value="${esc(v)}" ${String(S.cfg[key]) === String(v) ? 'selected' : ''}>${esc(l)}</option>`; }).join('')}</select>`;
 const inpCtl = (key, cls, aria) => `<input class="inp ${cls}" data-cfg="${key}" value="${esc(S.cfg[key])}" aria-label="${esc(aria)}">`;
@@ -4848,9 +4848,9 @@ const SETS = {
   prefs() {
     const lt = localTime();
     return card('Display', '',
-      srow('Row height', 'Compact fits more rides on the screen.', segCtl('compact', [[false, 'Comfortable'], [true, 'Compact']])) +
+      srow('Row height', 'Compact fits more rides on the screen.', segCtl('compact', [[false, 'Comfortable'], [true, 'Compact']], 'Row height')) +
       srow('Clock', 'The board always runs on Seattle time.', switchCtl('showLocal', `Also show my time${lt.zone ? ` (${esc(lt.zone)})` : ''}`)) +
-      srow('Open addresses in', 'Clicking a pickup or drop-off opens directions.', segCtl('mapApp', [['Google Maps', 'Google Maps'], ['Apple Maps', 'Apple Maps'], ['Waze', 'Waze']]))) +
+      srow('Open addresses in', 'Clicking a pickup or drop-off opens directions.', segCtl('mapApp', [['Google Maps', 'Google Maps'], ['Apple Maps', 'Apple Maps'], ['Waze', 'Waze']], 'Open addresses in'))) +
       card('Parts of the day', 'The grid splits the day into four blocks. Turn one off to start it collapsed.',
         BLOCKS.map(b => srow(b.name, `${fmt(b.from)} – ${fmt(b.to)}`, `<button class="switch" role="switch" aria-checked="${!S.collapsed[b.id]}" data-a="blk" data-v="${b.id}" aria-label="Show ${b.name} open"><span class="track"></span></button>`)).join(''));
   },
@@ -4865,7 +4865,7 @@ const SETS = {
         <div class="moves"><button class="iconbtn" data-a="col-move" data-v="${id}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Move ${c.label} left" title="Move left">${ic('up', 16)}</button><button class="iconbtn" data-a="col-move" data-v="${id}" data-d="1" ${i === order.length - 1 ? 'disabled' : ''} aria-label="Move ${c.label} right" title="Move right">${ic('chev', 16)}</button></div>
       </li>`;
     }).join('');
-    return card('Row color', '', srow('Color by status', 'Tint only the status chip, or the whole row like a classic dispatch grid.', segCtl('rowColor', [['chip', 'Status chip only'], ['row', 'Whole row']]))) +
+    return card('Row color', '', srow('Color by status', 'Tint only the status chip, or the whole row like a classic dispatch grid.', segCtl('rowColor', [['chip', 'Status chip only'], ['row', 'Whole row']], 'Color by status'))) +
       card('Columns', `${shown} of ${order.length} shown.${S.fit.hide.length ? ` On this window, ${andList(S.fit.hide.map(id => COLS[id].label))} ${S.fit.hide.length === 1 ? 'is' : 'are'} tucked away to fit; ${S.fit.hide.length === 1 ? 'it comes' : 'they come'} back on a wider screen.` : ''} Drag a column, or use the arrows: the top of the list is the left side of the grid. You can also drag a column header on the grid.`,
         `<ul class="collist">${items}</ul>` + (w > 1040 ? noteLine(`These columns need ${w}px. On a 1440 screen with the decision rail open, the grid will scroll sideways.`, true) : ''),
         '<button class="btn ghost sm" data-a="cols-reset">Reset</button>');
@@ -4904,11 +4904,11 @@ const SETS = {
   },
   rules() {
     return card('Shared vans', 'When parties ride together, the van waits for the last one.',
-      srow('Wait limit', 'The longest one party may wait for another before the van becomes a decision.', segCtl('limit', [[20, '20 min'], [25, '25 min'], [30, '30 min']])) +
+      srow('Wait limit', 'The longest one party may wait for another before the van becomes a decision.', segCtl('limit', [[20, '20 min'], [25, '25 min'], [30, '30 min']], 'Wait limit')) +
       srow('Wait for takeoff before suggesting a fix', 'A delay announced at the gate can still change. Until takeoff it sits under Delayed at the gate.', switchCtl('waitTakeoff', '', 'Wait for takeoff'))) +
       card('On-time promise', 'Private rides only. Account groups like Lumora follow the shared van wait limit.',
         srow('Our chauffeur late means a free ride', 'Close-out charges nothing, and the assistant treats a driver heading there as urgent.', switchCtl('promiseOn', '', 'On-time promise')) +
-        srow('Free once we’re this late', 'Counted from the pickup time.', segCtl('promise', [[10, '10 min'], [15, '15 min'], [20, '20 min']]))) +
+        srow('Free once we’re this late', 'Counted from the pickup time.', segCtl('promise', [[10, '10 min'], [15, '15 min'], [20, '20 min']], 'Free once we’re this late'))) +
       card('Conflicts', '',
         srow('Warn when a driver or car is double-booked', 'Shows a reminder when you assign someone who already has an overlapping ride.', switchCtl('conflicts', '', 'Conflict warning')) +
         srow('Minimum time between a driver’s jobs', 'The tool won’t suggest swaps that leave less than this.', selCtl('minGap', mins([15, 30, 45, 60]), 'Minimum gap'))) +
@@ -4998,7 +4998,7 @@ const SETS = {
         srow('Never take card numbers by email', 'The assistant sends the secure card form instead. If someone types a full card number, it’s hidden and the email is flagged for deletion.', always('Always on'))) +
       card('Replies', '',
         srow('Sign replies as', '', selCtl('mailSign', [['me', 'The dispatcher who approves'], ['team', 'Dispatch team']], 'Sign replies as')) +
-        srow('Times in customer emails', 'Dispatch runs on 24-hour time. Most customers read 12-hour.', segCtl('mailClock', [['12', '7:45 pm'], ['24', '19:45']])));
+        srow('Times in customer emails', 'Dispatch runs on 24-hour time. Most customers read 12-hour.', segCtl('mailClock', [['12', '7:45 pm'], ['24', '19:45']], 'Times in customer emails')));
   },
   company() {
     const money = (key, aria) => `<span class="unit">$</span>${inpCtl(key, 'w-sm', aria)}`;
@@ -8625,6 +8625,38 @@ function gridKeys(e) {
   if (to && to !== row) { row.tabIndex = -1; to.tabIndex = 0; to.focus({ preventScroll: true }); to.scrollIntoView({ block: 'nearest' }); }
   return true;
 }
+// A set of segments is a radio group and one tab stop: Tab lands on the chosen one, and the arrow keys (Home and End
+// too) move along it and choose as they go.
+function radioKeys(e) {
+  const r = e.target.closest?.('[role="radio"]'), group = r?.closest('[role="radiogroup"]');
+  const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+  if (!group || (!step && e.key !== 'Home' && e.key !== 'End')) return false;
+  e.preventDefault();
+  const radios = [...group.querySelectorAll('[role="radio"]')].filter(x => !x.disabled && x.getAttribute('aria-disabled') !== 'true');
+  const i = radios.indexOf(r), to = radios[e.key === 'Home' ? 0 : e.key === 'End' ? radios.length - 1 : (i + step + radios.length) % radios.length];
+  if (!to || to === r) return true;
+  const { a, k, v } = to.dataset;
+  to.click();
+  // The click usually redraws the group, so find the chosen segment again.
+  const sel = `[role="radio"][data-a="${a}"][data-v="${CSS.escape(v)}"]${k ? `[data-k="${CSS.escape(k)}"]` : ''}`;
+  ([...document.querySelectorAll(sel)].find(x => x.offsetParent) || to).focus();
+  return true;
+}
+// Only the chosen segment of each group takes a tab stop. The groups redraw often, so this follows every redraw.
+function roveRadios() {
+  document.querySelectorAll('[role="radiogroup"]').forEach(g => {
+    const radios = [...g.querySelectorAll('[role="radio"]')];
+    const on = radios.find(r => r.getAttribute('aria-checked') === 'true') || radios.find(r => !r.disabled);
+    radios.forEach(r => { const t = r === on ? 0 : -1; if (r.tabIndex !== t) r.tabIndex = t; });
+  });
+}
+let roveQueued = false;
+new MutationObserver(() => {
+  if (roveQueued) return;
+  roveQueued = true;
+  queueMicrotask(() => { roveQueued = false; roveRadios(); });
+}).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-checked'] });
+roveRadios();
 // The decisions are a queue: J and K step through them (each one plays on the grid), S shows or hides the open one,
 // A approves it and D declines it. A and D need the card in focus and never fire on a held-down key. A also needs the
 // plan on the grid, and waits a beat after an approval, so a quick second A can't text the next set of people unseen.
@@ -8665,7 +8697,7 @@ document.addEventListener('click', e => {
 document.addEventListener('keydown', e => {
   if (onbBusy()) return; // the sign-in or the tour has the keyboard
   const typing = e.target.matches?.('input, select, textarea');
-  if (menuKeys(e) || gridKeys(e) || (!typing && !S.modal && decisionKeys(e))) return;
+  if (menuKeys(e) || gridKeys(e) || radioKeys(e) || (!typing && !S.modal && decisionKeys(e))) return;
   // The new reservation window: suggestion lists first, then the window itself.
   if (S.nr && TY && TY.el === e.target) {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); tyMove(e.key === 'ArrowDown' ? 1 : -1); return; }

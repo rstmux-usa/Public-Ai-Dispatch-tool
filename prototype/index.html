@@ -242,7 +242,7 @@ button.count:hover { background: var(--pill); }
 .grid { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--panel); }
 .table-wrap { flex: 1; min-height: 0; overflow: auto; }
 /* Once every column is at its widest, the leftover space splits evenly left and right instead of piling up at the end. */
-/* The left gutter is 8px wider: it holds the assistant's transfer arrow, clear of the grid's glowing edge. */
+/* The left gutter is 8px wider: it holds the assistant's transfer arrow, clear of the glowing rows. */
 .table { min-width: 1040px; --gut: max(16px, calc((100% - var(--grid-max, 100%)) / 2)); --gutL: calc(var(--gut) + 8px); }
 .cols { display: grid; grid-template-columns: var(--cols); padding: 0 var(--gut) 0 var(--gutL); align-items: center; }
 .thead { position: sticky; top: 40px; z-index: 2; height: 34px; background: var(--panel); border-bottom: 1px solid var(--line-strong); }
@@ -412,7 +412,7 @@ button.rs:hover { box-shadow: 0 0 0 3px var(--raised); }
 .ai { position: relative; }
 /* The glow means one thing: not saved yet. At rest the cards are plain, like every other card on the board; the open
    one has a firmer border. Only while its plan is on the grid does the open card wear the ring and halo, with the
-   grid's edge, the moving chips and the new-ride row. The glow fades in when a plan goes on the grid and fades out
+   rides it changes, the moving chips and the new-ride row. The glow fades in when a plan goes on the grid and fades out
    when it leaves (.in / .out), so it never pops. The one other time: when the board opens, and after an approval or a
    decline, the card on top glows for a moment and fades (.hint), to say "look here". Its plan waits for a click. */
 .ai-card { position: relative; display: flex; flex-direction: column; width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
@@ -542,8 +542,9 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .ai-arrows path, .ai-arrows circle { fill: currentColor; }
 .ai-arrows .ai-arrow-line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 /* ---------- AI glow (Oct 15) ----------
-   Whatever the assistant proposes glows in its colors until you approve or put it back: the grid's edge, the arrow,
-   the families that move, the conf # they land in, and a ride it would make. --gd keeps a redrawn glow in step. */
+   Whatever the assistant proposes glows in its colors until you approve or put it back: the rides it changes, the
+   arrow, the families that move, the conf # they land in, and a ride it would make. Never the whole screen: the glow
+   sits on the ride, so it says where the suggestion is. --gd keeps a redrawn glow in step. */
 @property --glow-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 @keyframes glowSpin { to { --glow-a: 360deg; } }
 @keyframes inkFlow { to { background-position: 200% 0; } }
@@ -556,12 +557,16 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 @keyframes chipGlow { to { box-shadow: 0 0 12px 1px rgba(245, 87, 127, 0.45), 0 0 4px rgba(139, 92, 246, 0.5); } }
 /* The conf # the families land in, or the ride whose driver changes. */
 .ai-t { color: var(--ai-ink); font-weight: 700; }
-/* A ride the suggestion would make. It isn't booked: it glows until you approve it, and opens filled in. */
-.row.draft, .row.draft.sel, .row.draft.open { position: relative; z-index: 1; background: var(--ai-bg); box-shadow: none; }
-.row.draft::before, .row.draft::after { content: ""; position: absolute; top: 2px; bottom: 2px; left: calc(var(--gutL) - 6px); right: calc(var(--gut) - 10px); border-radius: 7px; pointer-events: none; }
-.row.draft::before { box-shadow: 0 0 14px rgba(139, 92, 246, 0.35), -10px 0 16px -6px rgba(77, 124, 255, 0.45), 10px 0 16px -6px rgba(255, 150, 64, 0.4); animation: draftGlow 2.4s ease-in-out infinite alternate var(--gd, 0s); }
-.row.draft::after { padding: 1.5px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: glowSpin 4s linear infinite var(--gd, 0s); }
+/* The rides the suggestion changes, and a ride it would make (.draft, not booked: it opens filled in), wear a ring,
+   a wash of the AI colors and a soft halo until you approve or put it back. The wash sits under the text. */
+.row.draft, .row.draft.sel, .row.draft.open, .row.ai-row, .row.ai-row.sel, .row.ai-row.open { position: relative; z-index: 1; background: var(--panel); box-shadow: none; }
+.row.draft::before, .row.draft::after, .row.ai-row::before, .row.ai-row::after { content: ""; position: absolute; top: 2px; bottom: 2px; left: calc(var(--gutL) - 6px); right: calc(var(--gut) - 10px); border-radius: 7px; pointer-events: none; }
+.row.draft::before, .row.ai-row::before { z-index: -1; background: linear-gradient(90deg, rgba(77, 124, 255, 0.09), rgba(139, 92, 246, 0.11) 30%, rgba(245, 87, 127, 0.09) 70%, rgba(255, 150, 64, 0.11)); box-shadow: 0 0 14px rgba(139, 92, 246, 0.35), -10px 0 16px -6px rgba(77, 124, 255, 0.45), 10px 0 16px -6px rgba(255, 150, 64, 0.4); animation: draftGlow 2.4s ease-in-out infinite alternate var(--gd, 0s); }
+.row.draft::after, .row.ai-row::after { padding: 2px; background: conic-gradient(from var(--glow-a), var(--glow)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: glowSpin 4s linear infinite var(--gd, 0s); }
 @keyframes draftGlow { to { box-shadow: 0 0 20px 2px rgba(245, 87, 127, 0.32), -12px 0 18px -6px rgba(139, 92, 246, 0.45), 12px 0 18px -6px rgba(246, 192, 74, 0.45); } }
+.row.ai-row.in::before { animation: draftGlow 2.4s ease-in-out infinite alternate var(--gd, 0s), glowIn 0.6s ease-out; }
+.row.ai-row.in::after { animation: glowSpin 4s linear infinite var(--gd, 0s), glowIn 0.6s ease-out; }
+.row.ai-row.out::before, .row.ai-row.out::after, .row.draft.out::before, .row.draft.out::after { animation: glowOut 0.3s ease-in forwards; }
 .row.draft.enter { animation: draftIn 0.7s 0.45s cubic-bezier(.3, .7, .2, 1) both; }
 @keyframes draftIn { from { opacity: 0; clip-path: inset(50% 0); } }
 .draft-tag { display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 7px; border-radius: 11px; background: var(--panel); box-shadow: inset 0 0 0 1px #d9c8f5; font-weight: 600; font-size: 12px; white-space: nowrap; }
@@ -572,27 +577,8 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .qv h3.ai-h { display: flex; align-items: center; gap: 6px; }
 .qv h3.ai-h span { color: var(--ai-ink); }
 .qv-grid label.ai-f .inp, .qv-grid label.ai-f select { border-color: #cdb9f3; background-color: var(--panel); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08); }
-/* The grid's edge while a suggestion is on it, like Apple Intelligence's glow around the screen: a thin flowing
-   line, a soft band that fades inward, and a wide bloom that breathes. It means: not saved yet. */
-.grid { position: relative; }
-.ai-edge { position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; transition: opacity 0.6s ease; }
-.grid.ai-glow .ai-edge { opacity: 1; }
-.ai-edge i { position: absolute; inset: 0; overflow: hidden; }
-.ai-edge i::before { content: ""; position: absolute; left: 50%; top: 50%; width: 160vmax; height: 160vmax; margin: -80vmax 0 0 -80vmax; background: conic-gradient(var(--glow)); animation: edgeSpin 9s linear infinite paused; }
-.grid.ai-glow .ai-edge i::before { animation-play-state: running; }
-.ai-edge .ae-line { padding: 2.5px; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
-/* The bloom comes in from the top, right and bottom. The left edge, beside the assistant panel, keeps just the line,
-   so the transfer arrow next to it stays crisp. */
-.ai-edge .ae-soft, .ai-edge .ae-wide { -webkit-mask: linear-gradient(270deg, #000, transparent var(--e)), linear-gradient(180deg, #000, transparent var(--e)), linear-gradient(0deg, #000, transparent var(--e)); mask: linear-gradient(270deg, #000, transparent var(--e)), linear-gradient(180deg, #000, transparent var(--e)), linear-gradient(0deg, #000, transparent var(--e)); }
-.ai-edge .ae-soft { --e: 16px; opacity: 0.5; }
-.ai-edge .ae-soft::before { animation-duration: 13s; animation-direction: reverse; }
-.ai-edge .ae-wide { --e: 56px; opacity: 0.18; }
-.grid.ai-glow .ae-wide { animation: edgeBloom 1.4s ease-out, edgeBreathe 3.2s 1.4s ease-in-out infinite alternate; }
-@keyframes edgeSpin { to { transform: rotate(1turn); } }
-@keyframes edgeBloom { from { opacity: 0.55; } }
-@keyframes edgeBreathe { to { opacity: 0.3; } }
 @media (prefers-reduced-motion: reduce) {
-  .ai.lead.pv::before, .ai.lead.pv .ai-card::before, .ai.lead.hint::before, .ai.lead.hint .ai-card::before, .fc.ai-in, .fc.ai-in::before, .ai-t, .row.draft::before, .row.draft::after, .row.draft.enter, .ai-edge i::before, .grid.ai-glow .ae-wide { animation: none; }
+  .ai.lead.pv::before, .ai.lead.pv .ai-card::before, .ai.lead.hint::before, .ai.lead.hint .ai-card::before, .fc.ai-in, .fc.ai-in::before, .ai-t, .row.draft::before, .row.draft::after, .row.draft.enter, .row.ai-row::before, .row.ai-row::after { animation: none; }
 }
 /* ---------- Opening ----------
    So the page never flashes half-built: the sun comes up and the day is named while the board loads, then the sign-in
@@ -1656,7 +1642,7 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .sms-empty { margin: 12px; color: var(--text-3); }
 .sms-i { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: start; gap: 10px; width: 100%; padding: 10px; border-radius: 8px; text-align: left; }
 .sms-i:hover { background: var(--hover); }
-.sms-i.on { background: var(--raised); box-shadow: inset 3px 0 0 var(--flap); }
+.sms-i.on { background: var(--raised); }
 .sms-av { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--raised); color: var(--text-2); font-weight: 600; font-size: 12.5px; }
 .sms-i.on .sms-av { background: var(--panel); }
 .sms-av.k-drv, .sms-av.k-grp { border-radius: 10px; }
@@ -2005,7 +1991,6 @@ if (introUp) document.body.insertAdjacentHTML('afterbegin', `<div class="intro" 
         </div>
       </div>
       <div class="timeline" id="timeline" hidden></div>
-      <div class="ai-edge" aria-hidden="true"><i class="ae-wide"></i><i class="ae-soft"></i><i class="ae-line"></i></div>
     </section>
   </div>
   <div class="placeholder" id="placeholder" hidden></div>
@@ -3406,7 +3391,7 @@ function aiPreview(id) {
   aiFly(d.anim, () => {
     S.pvWas = new Map(LIVE.map(r => [r.id, structuredClone(r)])); // the board as booked, which the grid keeps showing
     HMOVES.push(...d.moves.map(m => Object.assign(structuredClone(m), { pv: true, grp: d.id })));
-    S.aiPv = id; S.draftEnter = true; S.pvIn = true; setTimeout(() => { S.pvIn = false; }, 700); handRebuild(); flash(d.touch); renderRows(); aiScrollTo(d.touch);
+    S.aiPv = id; S.draftEnter = true; S.pvIn = true; setTimeout(() => { S.pvIn = false; }, 700); handRebuild(); renderRows(); aiScrollTo(d.touch);
     say(`On the grid, not saved: ${d.title}. Escape puts it back.`);
   });
   renderRail(); updateHeader();
@@ -3423,10 +3408,10 @@ function aiSelect(id) {
   };
   S.aiPv && S.aiPv !== id ? glowFade(go) : go();
 }
-// The glow leaves the way it came: the card's ring fades and the grid's edge fades, then the board changes.
+// The glow leaves the way it came: the card's ring and the rides' rings fade, then the board changes.
 function glowFade(then) {
   const el = rail.querySelector('.ai.lead.pv');
-  tablewrap.parentElement.classList.remove('ai-glow');
+  rowsEl.querySelectorAll('.row.ai-row, .row.draft').forEach(r => r.classList.add('out'));
   if (!el || onbStill()) { then(); return; }
   el.classList.add('out');
   setTimeout(then, 280);
@@ -4487,8 +4472,8 @@ const bracketHTML = (pos, broken, label = '') => pos ? `<span class="bracket ${p
 function rowHTML(r, o) {
   const tint = S.cfg.rowColor === 'row' && !o.sel && r.ride !== 'assigned' && r.ride !== 'quote' ? `tint-${r.ride}` : '';
   const draft = isDraft(r);
-  const cls = ['row', 'cols', tint, r.ride === 'cancelled' && 'cx', o.sel && 'sel', S.open === r.id && 'open', 'clickable', S.flash.has(r.id) && 'flash', draft && 'draft', draft && S.draftEnter && 'enter'].filter(Boolean).join(' ');
-  const act = `data-a="row" data-v="${r.id}" role="row" tabindex="${o.tab ? 0 : -1}" aria-label="${esc(rowSaid(r))}" aria-expanded="${S.open === r.id}" title="${draft ? 'A new ride the assistant would make. Not booked yet: click to see it filled in' : 'Click to open · right-click for more'}"`;
+  const cls = ['row', 'cols', tint, r.ride === 'cancelled' && 'cx', o.sel && 'sel', S.open === r.id && 'open', 'clickable', S.flash.has(r.id) && 'flash', draft && 'draft', draft && S.draftEnter && 'enter', o.ai && 'ai-row', o.ai && S.pvIn && 'in'].filter(Boolean).join(' ');
+  const act = `data-a="row" data-v="${r.id}" role="row" tabindex="${o.tab ? 0 : -1}" aria-label="${esc(rowSaid(r))}" aria-expanded="${S.open === r.id}" title="${draft ? 'A new ride the assistant would make. Not booked yet: click to see it filled in' : o.ai ? `The assistant’s suggestion changes this ride${r.pvNote ? `: ${esc(r.pvNote)}` : ''}. Nothing is saved until you approve` : 'Click to open · right-click for more'}"`;
   const cells = gridCols().map(id => {
     const c = COLS[id];
     const pre = id === 'party' ? `<div class="cell bracket-cell" role="gridcell">${bracketHTML(o.pos, r.broken, o.pos === 'top' && r.g ? r.g[0] : '')}</div>` : '';
@@ -4539,8 +4524,6 @@ function emptyHTML() {
   return `<div class="empty"><b>${esc(title)}</b><span>${esc(text)}</span>${S.q.trim() ? '<button class="btn sec sm" data-a="clear-search">Clear search</button>' : ''}</div>`;
 }
 function renderRows() {
-  // A suggestion on show lights the grid's edge until it's approved or put back.
-  tablewrap.parentElement.classList.toggle('ai-glow', !!S.aiPv);
   rowsEl.style.setProperty('--gd', glowDelay());
   if (S.view === 'timeline') { renderTimeline(); return; } // every change that redraws the grid redraws the timeline instead
   const list = visibleRides(), live = isLive();
@@ -4575,7 +4558,7 @@ function renderRows() {
         const open = live && r.card && !S.resolved[r.card];
         const sel = lm ? mailSel.has(r.id) : (open && S.openCard === r.card) || aiSel.has(r.id);
         const v = pvRow(r) || r, between = pos === 'top' || pos === 'mid';
-        html += rowHTML(v, { pos, sel, open, tab: r.id === tabId });
+        html += rowHTML(v, { pos, sel, open, ai: aiSel.has(r.id), tab: r.id === tabId });
         // Searching: why this row matched, when the row doesn't show it ("Booked by Michelle Reyes").
         if (S.q.trim() && !r.hidden) html += hitLineHTML(r, { between: pos === 'top' || pos === 'mid', sel });
         if (S.open === r.id) html += `<div role="row"><div role="gridcell">${quickHTML(r)}</div></div>`;
@@ -7500,7 +7483,8 @@ function buildThreads() {
   pax('r447886', [{ who: 'them', t: '09:38', text: 'Flight’s running a little late, sorry! Should be on the ground by 10.' }, { who: 'us', t: '09:39', text: 'No problem at all, Jason is tracking the flight.' }]);
   pax('r448716', [{ who: 'them', t: '09:12', text: 'Thank you, great driver!' }]);
   pax('r448707');
-  return out.filter(Boolean);
+  // A thread waits under To answer from the moment it comes in until you text back. Reading it doesn't answer it.
+  return out.filter(Boolean).map(t => Object.assign(t, { ask: !!t.unread }));
 }
 const smsThreads = () => THREADS || (THREADS = buildThreads());
 const smsUnread = () => smsThreads().reduce((n, t) => n + (t.unread ? 1 : 0), 0);
@@ -7533,7 +7517,7 @@ function inboxItems() {
   const q = S.sms.q.trim().toLowerCase(), src = S.sms.src, f = S.sms.f;
   const texts = src === 'gmail' ? [] : smsThreads()
     .filter(t => (f === 'all' || (f === 'unread' ? t.unread : t.kind === f)) && (!q || `${t.name} ${t.phone} ${t.msgs.map(m => m.text).join(' ')}`.toLowerCase().includes(q)))
-    .map(t => ({ id: t.id, src: 'sms', t, at: t.msgs.at(-1)?.t || '00:00', hot: !!t.unread || (t.id === S.sms.held && t.id === S.sms.sel), low: 0 }));
+    .map(t => ({ id: t.id, src: 'sms', t, at: t.msgs.at(-1)?.t || '00:00', hot: !!t.ask, low: 0 }));
   const mails = src === 'sms' || f === 'pax' || f === 'drv' ? [] : MAILS.concat(FILED)
     .filter(m => (f !== 'unread' || mailState(m.id) === 'open') && (!q || `${m.from} ${m.org || ''} ${m.addr} ${m.subject} ${m.body}`.toLowerCase().includes(q)))
     .map(m => ({ id: `mail:${m.id}`, src: 'gmail', m, at: m.at || '00:00', hot: mailState(m.id) === 'open', low: mailState(m.id) === 'filed' ? 1 : 0 }));
@@ -7671,12 +7655,11 @@ function mailCtxHTML(m) {
 function renderSms() {
   const el = $('smsPage');
   if (!el || el.hidden) return;
-  if (S.sms.held !== S.sms.sel) S.sms.held = null;
   const items = inboxItems();
   const exists = id => id && (id.startsWith('mail:') ? !!MAIL[id.slice(5)] : smsThreads().some(t => t.id === id));
   if (!exists(S.sms.sel) || !items.some(it => it.id === S.sms.sel)) S.sms.sel = items[0]?.id || null;
   const m = selMail(), th = m ? null : smsThreads().find(t => t.id === S.sms.sel);
-  if (th && th.unread) { th.unread = 0; S.sms.held = th.id; smsBadge(); } // read now, but it stays under To answer until you open another
+  if (th && th.unread) { th.unread = 0; smsBadge(); } // read now, but it stays under To answer until you text back
   const sc = el.querySelector('.sms-scroll')?.scrollTop || 0;
   el.innerHTML = `<aside class="sms-list" aria-label="Conversations">${smsListHTML()}</aside>
     <section class="sms-conv" aria-label="${m ? 'Email' : 'Conversation'}">${m ? mailConvHTML(m) : smsConvHTML(th)}</section>
@@ -7691,6 +7674,7 @@ function smsSend(text) {
   text = (text || '').trim();
   if (!th || !text) return;
   th.msgs.push({ who: 'us', t: fmt(NOW), text });
+  th.ask = false;
   logChange(`Texted ${th.name.split(' · ')[0]}: “${text.length > 48 ? `${text.slice(0, 47)}…` : text}”`);
   renderSms();
   $('smsText')?.focus();
@@ -7701,7 +7685,7 @@ function smsSend(text) {
     setTimeout(() => {
       S.sms.typing = null;
       th.msgs.push({ who: 'them', t: fmt(NOW), text: reply });
-      if (S.view === 'sms' && S.sms.sel === th.id) renderSms(); else { th.unread = (th.unread || 0) + 1; smsBadge(); }
+      if (S.view === 'sms' && S.sms.sel === th.id) renderSms(); else { th.unread = (th.unread || 0) + 1; th.ask = true; smsBadge(); }
     }, 2600);
   }
 }

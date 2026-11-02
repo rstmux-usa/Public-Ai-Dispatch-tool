@@ -63,7 +63,8 @@ kbd { display: inline-grid; place-items: center; min-width: 18px; height: 18px; 
 .app { display: flex; flex-direction: column; height: 100%; }
 
 /* ---------- Header ---------- */
-.hdr { position: relative; z-index: 40; flex: none; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 24px; min-height: 56px; padding: 0 20px; background: var(--hdr-bg); color: var(--text); }
+/* The sides never shrink under their content: the tabs stay centered while there's room and move aside when there isn't. */
+.hdr { position: relative; z-index: 40; flex: none; display: grid; grid-template-columns: minmax(max-content, 1fr) auto minmax(max-content, 1fr); align-items: center; column-gap: 24px; min-height: 56px; padding: 0 20px; background: var(--hdr-bg); color: var(--text); }
 /* Dusk header: everything inside reads the light set, so counts, clock, icons and avatar follow without their own rules. */
 .hdr {
   --text: var(--hdr-text); --text-2: rgba(245, 243, 238, 0.80); --text-3: rgba(245, 243, 238, 0.62);
@@ -1750,20 +1751,23 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .sms-it b .org { display: inline; font-weight: 400; color: var(--text-3); -webkit-line-clamp: unset; }
 .em-thread { gap: 14px; }
 .em { display: grid; gap: 8px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
-.em.us { margin-left: 48px; background: var(--raised); }
+.em.us { margin-left: clamp(16px, 6%, 48px); background: var(--raised); }
 .em-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .em-h b { font-size: 16px; }
 .em-h .num { color: var(--text-3); }
 .em-to { color: var(--text-3); font-size: 13px; }
 .em-lbl { display: flex; align-items: center; gap: 6px; color: var(--text-2); font-weight: 600; font-size: 13px; }
 .em-note { display: flex; align-items: flex-start; gap: 8px; margin: 0; color: var(--text-2); }
+.em-thread > .em-note { padding: 0 4px; }
+.em-lbl.wait { color: var(--delayed); }
+.em-reply .ta.mta { background: var(--panel); }
 .sms-row.end { justify-content: flex-end; align-items: center; gap: 12px; }
 .sms-acts .btn .ic { margin-right: 4px; }
 /* The plan never hides: Approve makes the changes it lists. Narrower, it sits under the email. */
 @media (max-width: 1280px) { .smsview { grid-template-columns: 300px minmax(0, 1fr) 300px; } }
 @media (max-width: 1000px) {
   .smsview { grid-template-columns: 300px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
-  .sms-list { grid-row: 1 / 3; }
+  .sms-list { grid-row: 1 / 3; contain: size; } /* the list scrolls inside; the email and the plan set the height */
   .sms-ctx { grid-column: 2; border-left: 0; border-top: 1px solid var(--line); } /* the page scrolls here, so no inner scroll */
 }
 @media (max-width: 760px) {
@@ -1832,6 +1836,12 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 }
 /* Seven header items: tighten them before the header runs out of room. */
 @media (max-width: 1600px) { .nav-item { padding: 0 11px; } .hdr-new-x { display: none; } .hdr { column-gap: 16px; } }
+@media (max-width: 1320px) { .nav-item { padding: 0 8px; } .hdr { column-gap: 12px; } .hdr-l { gap: 12px; } }
+/* Narrower than one row holds, the tabs take a second row, lined up with the brand. */
+@media (max-width: 1260px) {
+  .hdr { grid-template-columns: 1fr auto; row-gap: 4px; padding-block: 8px; }
+  .nav { grid-column: 1 / -1; grid-row: 2; justify-self: start; margin-left: -8px; }
+}
 @media (max-width: 1000px) {
   .ed.nr { height: auto; max-height: calc(100vh - 32px); }
   .nr-body { display: flex; flex-direction: column; overflow: auto; }
@@ -1928,8 +1938,6 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 }
 @media (max-width: 1100px) {
   .app { height: auto; min-height: 100%; }
-  .hdr { grid-template-columns: 1fr auto; row-gap: 4px; padding-block: 8px; }
-  .nav { grid-column: 1 / -1; grid-row: 2; justify-self: start; margin-left: -16px; }
   .settings { flex-direction: column; }
   .set-nav { width: auto; display: flex; gap: 4px; padding: 10px 12px; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--line); }
   .set-nav h5 { display: none; }
@@ -7584,7 +7592,8 @@ function smsConvHTML(th) {
       <span class="muted sm">Sent as a text from ${esc(S.cfg.phone)}. Enter sends, Shift+Enter adds a line.</span>
     </footer>`;
 }
-// An email reads like Gmail: the message, then the reply. The reply goes out by email, from the dispatch Gmail.
+// An email reads like Gmail: the message, then the reply right under it in the same scroll, where the sent reply will
+// sit. Texts keep the composer pinned at the bottom, like a chat. The reply goes out by email, from the dispatch Gmail.
 function mailConvHTML(m) {
   const st = mailState(m.id), open = st === 'open', blocked = open && isBlocked(m), sent = S.mail[m.id];
   const msg = `<article class="em"><div class="em-h"><b>${esc(m.subject)}</b><span class="num">${m.at || ''}</span></div>
@@ -7592,16 +7601,16 @@ function mailConvHTML(m) {
       ${m.thread ? `<div class="mthread"><span class="mthread-h">${ic('reply', 14)}Earlier · ${esc(m.thread.from)} · ${m.thread.at}</span><p>${esc(m.thread.text)}</p></div>` : ''}</article>`;
   const out = sent ? `<article class="em us"><div class="em-h"><b>Re: ${esc(m.subject.replace(/^Re:\s*/, ''))}</b><span class="num">${sent.at}</span></div><span class="em-to">${MAIL_BOX} → ${esc(m.addr)} · sent via Gmail</span><div class="mbody">${esc(sent.text)}</div></article>` : '';
   let foot = '';
-  if (st === 'filed') foot = `<footer class="sms-compose"><p class="em-note">${ic('archive', 15)}<span>Filed by the assistant under the Gmail label <b>${esc(m.label)}</b>. Nothing to answer.</span></p></footer>`;
-  else if (blocked) foot = `<footer class="sms-compose"><div class="mwait">${ic('hourglass', 14)}<span>Waits on a decision</span></div>
+  if (st === 'filed') foot = `<p class="em-note">${ic('archive', 15)}<span>Filed by the assistant under the Gmail label <b>${esc(m.label)}</b>. Nothing to answer.</span></p>`;
+  else if (blocked) foot = `<section class="em us em-reply" aria-label="Reply"><span class="em-lbl wait">${ic('hourglass', 14)}Waits on a decision</span>
       <p class="em-note"><span>The answer depends on <b>${esc(CARD[m.decision].title)}</b>. Approve it first, and this reply follows the fix you choose.</span></p>
-      <div class="sms-row end"><button class="btn pri" data-a="open-card" data-v="${m.decision}">${ic('spark', 14)}Open the decision</button></div></footer>`;
-  else if (open) foot = `<footer class="sms-compose"><span class="em-lbl">${gmailMark(13)}Draft reply to ${esc(m.from)}</span>
+      <div class="sms-row end"><button class="btn pri" data-a="open-card" data-v="${m.decision}">${ic('spark', 14)}Open the decision</button></div></section>`;
+  else if (open) foot = `<section class="em us em-reply" aria-label="Reply"><span class="em-lbl">${gmailMark(13)}Draft reply to ${esc(m.from)}</span>
       <textarea class="inp ta mta" data-mdraft="${m.id}" rows="7" aria-label="Email reply to ${esc(m.from)}">${esc(S.mailDraft[m.id] ?? m.reply())}</textarea>
-      <div class="sms-row end"><span class="muted sm">Approving sends it through Gmail${m.changes().length ? ' and makes the changes shown' : ''}.</span><button class="btn pri" data-a="mail-approve" data-v="${m.id}">${ic('send', 14)}Approve and send email</button></div></footer>`;
+      <div class="sms-row end"><span class="muted sm">Approving sends it through Gmail${m.changes().length ? ' and makes the changes shown' : ''}.</span><button class="btn pri" data-a="mail-approve" data-v="${m.id}">${ic('send', 14)}Approve and send email</button></div></section>`;
   return `<header class="sms-ch"><div><b>${esc(m.from)}${m.org ? ` · ${esc(m.org)}` : ''}</b><span><span class="via">${gmailMark(12)}Gmail</span> · ${esc(m.addr)}</span></div>
       <button class="btn ghost sm" data-a="mail-open" data-v="${m.id}">${ic('external', 14)}Open in a window</button></header>
-    <div class="sms-thread em-thread">${msg}${out}</div>${foot}`;
+    <div class="sms-thread em-thread">${msg}${out}${foot}</div>`;
 }
 const smsRideCard = (r, kind) => `<section class="sms-ride">
       <div class="sms-ride-h"><span class="rs ${r.ride}">${chipInner(r.ride)}</span><span class="t3">Conf ${esc(codeOf(r))}</span></div>
@@ -8924,7 +8933,7 @@ const TOUR_STEPS = [
     title: () => 'The Inbox: email and texts',
     body: () => 'For each request, the assistant drafts the change and the reply. Nothing goes out until you approve.',
     holes: () => [trUnion(['.sms-conv', '.sms-ctx'].map(s => trRect($('smsPage').querySelector(s))))],
-    anchor: () => $('smsPage').querySelector('.sms-compose') || $('smsPage').querySelector('.sms-conv') },
+    anchor: () => $('smsPage').querySelector('.em-reply, .sms-compose') || $('smsPage').querySelector('.sms-conv') },
   { view: 'grid', side: 'bottom', next: 'Try it yourself',
     enter() { const d = HAND && aiOn() ? aiDecisions()[0] : null; if (d && S.aiPv !== d.id) aiPreview(d.id); }, // end on the fix, on the grid
     title: () => 'Your turn',

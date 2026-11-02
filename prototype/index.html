@@ -1698,24 +1698,29 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .sms-ctx { min-height: 0; overflow: auto; display: grid; align-content: start; gap: 12px; padding: 20px 16px; border-left: 1px solid var(--line); }
 .sms-ctx h3 { margin: 0; font-weight: 600; font-size: 15px; line-height: 20px; }
 /* The assistant's plan for an email reads like a decision card: the move, then what changes, divided by lines, not boxes. */
-.mp { display: grid; gap: 12px; }
-.mp-h { display: grid; gap: 2px; }
-.sms-ctx .mp-t { font-size: 18px; line-height: 24px; }
-.mp-by { display: flex; align-items: center; gap: 6px; color: var(--text-3); font-size: 13px; line-height: 18px; }
-.mp-by .ic { flex: none; }
-.mp-by.wait { color: var(--delayed); font-weight: 600; }
-.mp-by.done .ic { color: var(--ontime); }
-.mp-note, .mp-warn { display: flex; align-items: flex-start; gap: 8px; color: var(--text-2); }
-.mp-note .ic, .mp-warn .ic { flex: none; margin-top: 3px; color: var(--text-3); }
-.mp-warn .ic { color: var(--delayed); }
-.mp-chg { display: grid; gap: 10px; margin: 0; padding-top: 12px; border-top: 1px solid var(--line); }
-.mp-chg dt { color: var(--text-3); font-size: 13px; line-height: 18px; }
-.mp-chg dd { margin: 0; }
-.mp-chg .was { color: var(--text-2); }
-.mp-chg .arr { margin: 0 6px; color: var(--text-3); }
-.mp-chg b { font-weight: 600; color: var(--ai-ink); } /* proposed, not saved until Approve */
-.mp .why-btn { justify-self: start; margin-left: -10px; }
-.mp + h3 { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+.prep { display: grid; gap: 12px; }
+.prep-h { display: grid; gap: 2px; }
+.prep .prep-t { font-size: 18px; line-height: 24px; }
+.prep-by { display: flex; align-items: center; gap: 6px; color: var(--text-3); font-size: 13px; line-height: 18px; }
+.prep-by .ic { flex: none; }
+.prep-by.wait { color: var(--delayed); font-weight: 600; }
+.prep-by.done .ic { color: var(--ontime); }
+.prep-note, .prep-warn { display: flex; align-items: flex-start; gap: 8px; color: var(--text-2); }
+.prep-note .ic, .prep-warn .ic { flex: none; margin-top: 3px; color: var(--text-3); }
+.prep-warn .ic { color: var(--delayed); }
+.prep-note.ride { align-items: center; }
+.prep-note.ride .ic { margin-top: 0; }
+.prep-note.ride > span { flex: 1; min-width: 0; display: grid; }
+.prep-note.ride b { font-weight: 600; color: var(--text); }
+.prep-note.ride > span > span { font-size: 13px; line-height: 18px; }
+.prep-chg { display: grid; gap: 10px; margin: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.prep-chg dt { color: var(--text-3); font-size: 13px; line-height: 18px; }
+.prep-chg dd { margin: 0; }
+.prep-chg .was { color: var(--text-2); }
+.prep-chg .arr { margin: 0 6px; color: var(--text-3); }
+.prep-chg b { font-weight: 600; color: var(--ai-ink); } /* proposed, not saved until Approve */
+.prep .why-btn { justify-self: start; margin-left: -10px; }
+.prep + h3 { margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line); }
 .sms-ride { display: grid; gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; }
 .sms-ride-h { display: flex; align-items: center; justify-content: space-between; }
 .sms-ride-h .t3 { color: var(--text-3); font-size: 13px; }
@@ -3704,25 +3709,25 @@ const MAILS = [
   {
     id: 'm-csi', rank: 7, at: '08:12', from: 'Lena Ortiz', org: 'Cascadia Science Institute', addr: 'ap@cascadiascience.example',
     subject: 'Invoice for Dr. Kessler’s rides',
-    body: 'Good morning,\n\nPlease send one invoice for Dr. Martin Kessler’s rides this week to ap@cascadiascience.example. Our PO number is SSF-2291, and it must be on the invoice.\n\nThank you,\nLena Ortiz\nAccounts Payable · Cascadia Science Institute',
-    snippet: 'Please send one invoice for Dr. Martin Kessler’s rides this week. Our PO number is SSF-2291, and it must be on the invoice.',
+    body: 'Good morning,\n\nPlease send one invoice for Dr. Martin Kessler’s rides this week to ap@cascadiascience.example. Our PO number is CSI-2291, and it must be on the invoice.\n\nThank you,\nLena Ortiz\nAccounts Payable · Cascadia Science Institute',
+    snippet: 'Please send one invoice for Dr. Martin Kessler’s rides this week. Our PO number is CSI-2291, and it must be on the invoice.',
     rides: KESSLER, search: 'Kessler', icon: 'file', attach: ['INV-1043.pdf'],
-    fix: () => `Invoice 3 rides, ${usd(invTotal())}, PO SSF-2291`,
+    fix: () => `Invoice 3 rides, ${usd(invTotal())}, PO CSI-2291`,
     compact: () => `Invoice INV-1043 · 3 rides · ${usd(invTotal())}`,
     due: () => '',
-    changes: () => [['Invoice', '', `INV-1043 · 3 rides · ${usd(invTotal())}`], ['PO number', '', 'SSF-2291'], ['Bill to', '', 'Cascadia Science Institute, net 30'], ['Sends', '', kesslerDone() ? 'Right away' : 'When the 12:00 airport ride is Done']],
+    changes: () => [['Invoice', '', `INV-1043 · 3 rides · ${usd(invTotal())}`], ['PO number', '', 'CSI-2291'], ['Bill to', '', 'Cascadia Science Institute, net 30'], ['Sends', '', kesslerDone() ? 'Right away' : 'When the 12:00 airport ride is Done']],
     checks: () => [
-      'Found 3 rides for Dr. Kessler this week, all today: Silver Cloud to the Foundation at 06:30, back at 09:30, and to SEA at 12:00.',
+      'Found 3 rides for Dr. Kessler this week, all today: Silver Cloud to the Institute at 06:30, back at 09:30, and to SEA at 12:00.',
       kesslerDone() ? 'All three rides are done.' : { t: 'The 12:00 airport ride isn’t done yet, so the invoice waits for it and picks up any wait time.', warn: true },
-      'The three rides switch to Invoice, billed to the Foundation.',
+      'The three rides switch to Invoice, billed to the Institute.',
     ],
-    reply: () => `Hello Lena,\n\nAttached is invoice INV-1043 for Dr. Kessler’s three rides on September 4, with PO SSF-2291. Total: ${usd(invTotal())}, due in 30 days.\n\nThank you,\n${sig()}`,
+    reply: () => `Hello Lena,\n\nAttached is invoice INV-1043 for Dr. Kessler’s three rides on September 4, with PO CSI-2291. Total: ${usd(invTotal())}, due in 30 days.\n\nThank you,\n${sig()}`,
     apply() { for (const r of KESSLER.map(findRide)) Object.assign(r, { payment: 'Invoice', due: false }); },
     wait: () => !kesslerDone(), sendWhenDone: 'r448494',
-    waitTitle: 'Invoice INV-1043 is ready', waitMeta: 'Goes to the Foundation when the 12:00 ride is Done',
+    waitTitle: 'Invoice INV-1043 is ready', waitMeta: 'Goes to the Institute when the 12:00 ride is Done',
     later: { toast: () => 'Invoice INV-1043 sent to the Cascadia Science Institute.', log: 'Sent invoice INV-1043 to the Cascadia Science Institute' },
     toast: () => kesslerDone() ? 'Invoice INV-1043 sent to the Cascadia Science Institute.' : 'Invoice INV-1043 is ready. It goes out when Dr. Kessler’s 12:00 ride is Done.',
-    doneTitle: 'Invoiced the Cascadia Science Institute', doneMeta: () => `INV-1043 · 3 rides · ${usd(invTotal())} · PO SSF-2291`,
+    doneTitle: 'Invoiced the Cascadia Science Institute', doneMeta: () => `INV-1043 · 3 rides · ${usd(invTotal())} · PO CSI-2291`,
   },
 ];
 // Mail the assistant filed on its own: nothing to do, labeled in Gmail and kept out of the way.
@@ -4673,15 +4678,18 @@ function mailChangesHTML(m) {
   const ch = m.changes();
   return ch.length ? `<div class="plan mchg">${ch.map(([k, a, b]) => `<div class="pl"><span class="k">${esc(k)}</span><span class="v">${a ? `<span class="was">${esc(a)}</span><span class="arr">→</span>` : ''}<b>${esc(b)}</b></span></div>`).join('')}</div>` : '';
 }
+// The ride an email is about, in two lines: which ride and when, then the route and who drives.
+function mailRideLines(m, rs) {
+  const r = rs[0], d = m.day || TODAY;
+  return rs.length > 1 ? [`${rs.length} rides · ${r.party}`, `${dayWord(d)} at ${rs.map(x => fmt(x.pickup)).join(', ')}`]
+    : [`Conf ${codeOf(r)} · ${dayWord(d)} ${fmt(r.pickup)}`, `${stopName(r.pu, r.flight)} → ${stopName(r.do, r.dflight)} · ${r.driver && r.driver !== '—' ? r.driver : 'No driver yet'} · ${r.vehicle} · ${r.pax} pax`];
+}
 function mailResHTML(m) {
   if (m.noMatch) return `<div class="mres none">${ic('search', 16)}<span class="mres-t"><b>No match</b><span title="${esc(m.noMatch())}">${esc(m.noMatch())}</span></span></div>`;
-  const rs = mailRides(m), d = m.day || TODAY;
+  const rs = mailRides(m);
   if (!rs.length && m.newRes) { const [a, b] = m.newRes(); return `<div class="mres none">${ic('tag', 16)}<span class="mres-t"><b>${esc(a)}</b><span>${esc(b)}</span></span></div>`; }
   if (!rs.length) return '';
-  const r = rs[0];
-  const top = rs.length > 1 ? `${rs.length} rides · ${r.party}` : `Conf ${codeOf(r)} · ${dayWord(d)} ${fmt(r.pickup)}`;
-  const sub = rs.length > 1 ? `${dayWord(d)} at ${rs.map(x => fmt(x.pickup)).join(', ')}`
-    : `${stopName(r.pu, r.flight)} → ${stopName(r.do, r.dflight)} · ${r.driver && r.driver !== '—' ? r.driver : 'No driver yet'} · ${r.vehicle} · ${r.pax} pax`;
+  const [top, sub] = mailRideLines(m, rs);
   return `<button class="mres" data-a="mail-ride" data-v="${m.id}" title="Show on the grid">${ic('calendar', 16)}<span class="mres-t"><b>${esc(top)}</b><span title="${esc(sub)}">${esc(sub)}</span></span>${ic('right', 14)}</button>`;
 }
 const fromHTML = (m, line) => `<div class="mfrom"><span class="mav" aria-hidden="true">${initialsOf(m.from)}</span><div class="mfrom-t"><b>${esc(m.from)}${m.org ? `<span class="org"> · ${esc(m.org)}</span>` : ''}</b><span>${esc(line)}</span></div><span class="mtime num">${m.at}</span></div>`;
@@ -4728,7 +4736,8 @@ function mailTabHTML() {
       <p class="muted sm">${S.cfg.mailFile ? 'Nothing to do. Labeled in Gmail and kept out of the way.' : 'Filing is off in Settings, so these stay in the Gmail inbox. Nothing to do.'}</p><div class="fitems">${filed}</div></section>
     <section class="sec"><div class="sec-t">${ic('history', 15)}<b>Done</b><span class="cnt">${done.length}</span></div>${done.length ? `<div class="cards">${done.map(doneHTML).join('')}</div>` : '<p class="muted">Approved replies and what they changed land here.</p>'}</section>`;
 }
-// The full email in a window: the message on the left, what the assistant prepared and the editable reply on the right.
+// The full email in a window: the message on the left; on the right the assistant's plan, the same as in the Inbox
+// with the ride named in it, then the editable reply.
 function mailWinHTML(m) {
   const st = mailState(m.id), open = st === 'open', blocked = open && isBlocked(m), sent = S.mail[m.id];
   const msg = `<section class="ed-card">${fromHTML(m, `${m.addr} → ${MAIL_BOX}`)}
@@ -4736,13 +4745,10 @@ function mailWinHTML(m) {
     ${m.thread ? `<div class="mthread"><span class="mthread-h">${ic('reply', 14)}Earlier · ${esc(m.thread.from)} · ${m.thread.at}</span><p>${esc(m.thread.text)}</p></div>` : ''}</section>`;
   let side, foot;
   if (m.filed) {
-    side = `<section class="ed-card"><div class="ailabel">${ic('spark', 14)}<span>Filed by the assistant</span></div><p>${esc(m.why)}</p><p class="muted sm">Gmail label: ${esc(m.label)}</p></section>`;
+    side = `<section class="ed-card"><h3>Why it was filed</h3><p>${esc(m.why)}</p><p class="muted sm">Gmail label: ${esc(m.label)}</p></section>`;
     foot = '<span class="spacer"></span><button class="btn sec" data-a="ed-close">Close</button>';
   } else {
-    const label = blocked ? `<div class="mwait">${ic('hourglass', 14)}<span>Waits on a decision</span></div>`
-      : `<div class="ailabel">${ic('spark', 14)}<span>${open ? 'Prepared by the assistant' : st === 'waiting' ? 'Approved · waiting' : 'Done'}</span></div>`;
-    const prep = `<section class="ed-card">${label}<div class="fix">${ic(m.icon, 16)}<span>${esc(m.fix())}</span></div>
-      ${mailResHTML(m)}${open ? mailChangesHTML(m) + mailChecksHTML(m) : `<p class="t3">${esc(val(st === 'waiting' ? m.waitMeta : m.doneMeta))}</p>`}</section>`;
+    const prep = `<section class="ed-card prep" aria-label="What the assistant prepared">${mailPlanHTML(m, true)}</section>`;
     const subj = /^Re:/.test(m.subject) ? m.subject : `Re: ${m.subject}`;
     const reply = `<section class="ed-card"><h3>${open ? 'Reply' : st === 'waiting' && m.sendWhenDone ? 'Reply · goes out with the invoice' : 'Reply sent'}</h3>
       <div class="mhead"><span>To</span><b>${esc(m.from)} &lt;${esc(m.addr)}&gt;</b><span>Subject</span><b>${esc(subj)}</b></div>
@@ -4750,7 +4756,7 @@ function mailWinHTML(m) {
       ${attHTML(m.attach)}</section>`;
     side = prep + reply;
     foot = open
-      ? `<span class="muted sm">${blocked ? `Approve “${esc(CARD[m.decision].title)}” first. The reply follows it.` : 'Approving sends this reply and makes the change on the board.'}</span>
+      ? `<span class="muted sm">${blocked ? `Approve “${esc(CARD[m.decision].title)}” first. The reply follows it.` : `Approving sends it through Gmail${m.changes().length ? ' and makes the changes shown' : ''}.`}</span>
         <button class="btn sec" data-a="ed-close">Cancel</button>
         ${blocked ? `<button class="btn pri" data-a="open-card" data-v="${m.decision}">Open the decision</button>` : `<button class="btn pri" data-a="mail-approve" data-v="${m.id}">Approve and send</button>`}`
       : `<span class="spacer"></span>${st === 'waiting' && m.sendWhenDone ? `<button class="btn sec" data-a="mail-send-now" data-v="${m.id}">Send now</button>` : ''}<button class="btn ${st === 'waiting' && m.sendWhenDone ? 'ghost' : 'sec'}" data-a="ed-close">Close</button>`;
@@ -5424,7 +5430,11 @@ function renderModal() {
 function closeModal() {
   const id = S.modal && S.modal.id, mail = S.modal && S.modal.kind === 'mail';
   S.modal = null; renderModal();
-  if (mail) { renderRail(); rail.querySelector(`[data-mail="${id}"] button, [data-v="${id}"]`)?.focus(); return; } // the rail shows any edit to the draft
+  if (mail) { // the rail and the Inbox show any edit to the draft
+    renderRail(); renderSms();
+    (rail.querySelector(`[data-mail="${id}"] button, [data-v="${id}"]`) || $('smsPage')?.querySelector(`[data-a="mail-open"][data-v="${id}"]`))?.focus();
+    return;
+  }
   if (id) rowsEl.querySelector(`.row[data-v="${id}"]`)?.focus();
 }
 
@@ -7613,31 +7623,34 @@ function smsCtxHTML(th) {
 }
 // The move is the heading and the assistant is named once, under it. What changes reads old → new, the new value in
 // the assistant's violet until Approve. Anything that needs a look stays in view; the other reasons wait behind Details.
-// The ride it found isn't repeated here: its card follows.
-function mailPlanHTML(m) {
-  const st = mailState(m.id), open = st === 'open', blocked = open && isBlocked(m), why = !!S.mailWhy[m.id];
+// In the Inbox the ride's card follows, so the ride is named here only in the email window (withRide).
+function mailPlanHTML(m, withRide) {
+  const st = mailState(m.id), open = st === 'open', blocked = open && isBlocked(m), why = !!S.mailWhy[m.id], rs = mailRides(m);
   const title = open ? m.fix() : val(st === 'waiting' ? m.waitTitle : m.doneTitle) || m.fix();
-  const by = blocked ? `<p class="mp-by wait">${ic('hourglass', 14)}<span>Waits on a decision</span></p>`
-    : open ? '<p class="mp-by">Prepared by the assistant</p>'
-    : st === 'waiting' ? `<p class="mp-by">${ic('hourglass', 14)}<span>${esc(val(m.waitMeta))}</span></p>`
-    : `<p class="mp-by done">${ic('checkc', 14)}<span>${esc(val(m.doneMeta))}</span></p>`;
-  if (!open) return `<div class="mp-h"><h3 class="mp-t">${esc(title)}</h3>${by}</div>`;
-  const newRes = !mailRides(m).length && m.newRes ? m.newRes()[0] : '';
-  const note = m.noMatch ? `<p class="mp-note">${ic('search', 15)}<span>${esc(m.noMatch())}</span></p>`
-    : newRes ? `<p class="mp-note">${ic('tag', 15)}<span>${esc(newRes)}</span></p>` : '';
+  const by = blocked ? `<p class="prep-by wait">${ic('hourglass', 14)}<span>Waits on a decision</span></p>`
+    : open ? '<p class="prep-by">Prepared by the assistant</p>'
+    : st === 'waiting' ? `<p class="prep-by">${ic('hourglass', 14)}<span>${esc(val(m.waitMeta))}</span></p>`
+    : `<p class="prep-by done">${ic('checkc', 14)}<span>${esc(val(m.doneMeta))}</span></p>`;
+  const head = `<div class="prep-h"><h3 class="prep-t">${esc(title)}</h3>${by}</div>`;
+  const ride = withRide && rs.length ? (([a, b]) => `<div class="prep-note ride">${ic('calendar', 15)}<span><b>${esc(a)}</b><span>${esc(b)}</span></span>
+    <button class="btn ghost sm" data-a="mail-ride" data-v="${m.id}">Show on the grid</button></div>`)(mailRideLines(m, rs)) : '';
+  if (!open) return head + ride;
+  const newRes = !rs.length && m.newRes ? m.newRes()[0] : '';
+  const note = m.noMatch ? `<p class="prep-note">${ic('search', 15)}<span>${esc(m.noMatch())}</span></p>`
+    : newRes ? `<p class="prep-note">${ic('tag', 15)}<span>${esc(newRes)}</span></p>` : ride;
   const ch = m.changes();
-  const chg = ch.length ? `<dl class="mp-chg">${ch.map(([k, a, b]) => `<div><dt>${esc(k)}</dt><dd>${a ? `<span class="was">${esc(a)}</span><span class="arr" aria-hidden="true">→</span><span class="sr">becomes</span>` : ''}<b>${esc(b)}</b></dd></div>`).join('')}</dl>` : '';
+  const chg = ch.length ? `<dl class="prep-chg">${ch.map(([k, a, b]) => `<div><dt>${esc(k)}</dt><dd>${a ? `<span class="was">${esc(a)}</span><span class="arr" aria-hidden="true">→</span><span class="sr">becomes</span>` : ''}<b>${esc(b)}</b></dd></div>`).join('')}</dl>` : '';
   const checks = m.checks().map(c => typeof c === 'string' ? { t: c } : { t: c.t, warn: true });
-  const warn = blocked ? '' : checks.filter(c => c.warn).map(c => `<p class="mp-warn">${ic('info', 15)}<span>${esc(c.t)}</span></p>`).join('');
+  const warn = blocked ? '' : checks.filter(c => c.warn).map(c => `<p class="prep-warn">${ic('info', 15)}<span>${esc(c.t)}</span></p>`).join('');
   const plain = checks.filter(c => !c.warn);
   const details = plain.length ? `${why ? `<div class="why"><ul>${plain.map(c => `<li>${esc(c.t)}</li>`).join('')}</ul></div>` : ''}
     <button class="btn ghost sm why-btn ${why ? 'open' : ''}" data-a="mail-why" data-v="${m.id}" aria-expanded="${why}">Details ${ic('right', 14)}</button>` : '';
-  return `<div class="mp-h"><h3 class="mp-t">${esc(title)}</h3>${by}</div>${note}${chg}${warn}${details}`;
+  return `${head}${note}${chg}${warn}${details}`;
 }
 function mailCtxHTML(m) {
   if (mailState(m.id) === 'filed') return `<h3>Why it was filed</h3><p>${esc(m.why)}</p>`;
   const rides = mailRides(m);
-  return `<section class="mp" aria-label="What the assistant prepared">${mailPlanHTML(m)}</section>
+  return `<section class="prep" aria-label="What the assistant prepared">${mailPlanHTML(m)}</section>
     ${rides.length ? `<h3>${rides.length > 1 ? `${rides.length} rides` : 'The ride'}</h3>${rides.map(r => smsRideCard(r, 'mail')).join('')}` : ''}`;
 }
 function renderSms() {
@@ -8173,6 +8186,8 @@ function mailRideDone(rideId) {
   return MAILS.filter(m => m.sendWhenDone === rideId && mailState(m.id) === 'waiting').map(m => finishMail(m.id, true)).join(' ');
 }
 function openMailCard(id) {
+  // The board's panel has no Email tab, so the email opens in the Inbox, beside what the assistant prepared.
+  if (HAND) { S.sms.sel = `mail:${id}`; S.sms.src = 'all'; S.sms.f = 'all'; S.sms.q = ''; closeModal(); S.view = 'sms'; S.menu = null; closeMega(); renderAll(); return; }
   if (mailState(id) !== 'open') { S.modal = { kind: 'mail', id }; renderModal(); return; }
   S.openMail = id; S.railTab = 'email';
   if (!S.railOpen) { S.railOpen = true; renderCtx(); }
@@ -8258,7 +8273,7 @@ document.addEventListener('click', e => {
     case 'mail-card': if (S.modal) closeModal(); openMailCard(v); break;
     case 'mail-open': S.modal = { kind: 'mail', id: v }; S.ctxMenu = null; S.menu = null; renderOverlay(); renderModal(); break;
     case 'mail-approve': if (S.modal) { S.modal = null; renderModal(); } approveMail(v); break;
-    case 'mail-why': S.mailWhy[v] = !S.mailWhy[v]; renderRail(); renderSms(); break;
+    case 'mail-why': S.mailWhy[v] = !S.mailWhy[v]; renderRail(); renderSms(); if (S.modal) { renderModal(); $('dlg').querySelector('[data-a="mail-why"]')?.focus(); } break;
     case 'mail-ride': showMailRide(v); break;
     case 'mail-send-now': if (S.modal) { S.modal = null; renderModal(); } finishMail(v); break;
     case 'mail-gmail': toast('This would open Gmail. Not in the prototype yet.'); break;

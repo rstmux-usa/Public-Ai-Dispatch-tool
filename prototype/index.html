@@ -1671,7 +1671,7 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .sms-conv { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--board); }
 .sms-ch { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel); }
 .sms-ch > div { flex: 1; display: grid; min-width: 0; }
-.sms-ch b { font-weight: 600; font-size: 17px; }
+.sms-ch h2 { font-weight: 600; font-size: 17px; }
 .sms-ch span { color: var(--text-3); font-size: 13px; }
 .sms-ch .btn .ic { margin-right: 4px; }
 .sms-thread { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding: 20px 24px; }
@@ -1753,7 +1753,7 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
 .em { display: grid; gap: 8px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .em.us { margin-left: clamp(16px, 6%, 48px); background: var(--raised); }
 .em-h { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.em-h b { font-size: 16px; }
+.em-h h3 { margin: 0; font-size: 16px; }
 .em-h .num { color: var(--text-3); }
 .em-to { color: var(--text-3); font-size: 13px; }
 .em-lbl { display: flex; align-items: center; gap: 6px; color: var(--text-2); font-weight: 600; font-size: 13px; }
@@ -1956,9 +1956,13 @@ button.nr-ai:hover { box-shadow: 0 4px 12px rgba(19, 32, 48, 0.10); }
   .ctx .search { width: 100%; margin-left: 0; }
 }
 @media (max-width: 640px) {
-  .hdr { grid-template-columns: 1fr; padding-inline: 16px; }
+  .hdr { grid-template-columns: minmax(0, 1fr); padding-inline: 16px; }
   .hdr-r { justify-content: flex-start; flex-wrap: wrap; margin-left: -6px; }
-  .nav { grid-row: auto; }
+  /* The tabs scroll sideways rather than widen the page. */
+  .nav { grid-row: auto; justify-self: stretch; min-width: 0; overflow-x: auto; margin-inline: -16px; padding-inline: 8px; scrollbar-width: none; }
+  .nav::-webkit-scrollbar { display: none; }
+  .em-reply .sms-row.end { flex-wrap: wrap; }
+  .em-reply .sms-row.end .muted { flex-basis: 100%; }
   .counts { gap: 14px; }
   .daycard { width: 140px; }
   .mm-cal, .log, .help-col, .set-card { width: 100%; }
@@ -7572,7 +7576,9 @@ function smsListHTML() {
   return `<header class="sms-lh"><h2>Inbox</h2>
       <label class="field search">${ic('search', 15)}<span class="sr">Search the inbox</span><input id="smsQ" type="search" placeholder="Name, phone, email or words" value="${esc(S.sms.q)}" autocomplete="off"></label>
       <div class="seg inbox-show" role="radiogroup" aria-label="Show">${tabs}</div></header>
-    <div class="sms-scroll">${groups || '<p class="sms-empty">Nothing matches.</p>'}</div>`;
+    <div class="sms-scroll">${groups || (S.sms.q.trim() ? `<div class="empty"><b>Nothing matches “${esc(S.sms.q.trim())}”</b>
+      <span>Search looks at names, phone numbers, email addresses and the words in each message.</span>
+      <button class="btn sec sm" data-a="sms-clear">Clear search</button></div>` : '<p class="sms-empty">Nothing matches.</p>')}</div>`;
 }
 function smsConvHTML(th) {
   if (!th) return '<div class="rq-none"><b>Pick a conversation</b><span>Gmail requests and SMS with passengers, drivers and the airport greeter, in one place.</span></div>';
@@ -7583,7 +7589,7 @@ function smsConvHTML(th) {
   }).join('');
   const typing = S.sms.typing === th.id ? '<div class="sms-m them"><div class="sms-b sms-typing" aria-label="Typing"><i></i><i></i><i></i></div></div>' : '';
   const quick = smsQuick(th).map(q => `<button class="sms-q" data-a="sms-quick" data-v="${esc(q)}">${esc(q)}</button>`).join('');
-  return `<header class="sms-ch"><div><b>${esc(th.name)}</b><span class="num"><span class="via">${ic('sms', 12)}SMS</span> · ${esc(th.phone)} · ${KIND[th.kind]}</span></div>
+  return `<header class="sms-ch"><div><h2>${esc(th.name)}</h2><span class="num"><span class="via">${ic('sms', 12)}SMS</span> · ${esc(th.phone)} · ${KIND[th.kind]}</span></div>
       <button class="btn ghost sm" data-a="sms-call">${ic('phone', 14)}Call</button></header>
     <div class="sms-thread" id="smsThread"><span class="sms-day">Today · ${dayLabel(TODAY)}</span>${bubbles}${typing}</div>
     <footer class="sms-compose">
@@ -7596,10 +7602,10 @@ function smsConvHTML(th) {
 // sit. Texts keep the composer pinned at the bottom, like a chat. The reply goes out by email, from the dispatch Gmail.
 function mailConvHTML(m) {
   const st = mailState(m.id), open = st === 'open', blocked = open && isBlocked(m), sent = S.mail[m.id];
-  const msg = `<article class="em"><div class="em-h"><b>${esc(m.subject)}</b><span class="num">${m.at || ''}</span></div>
+  const msg = `<article class="em"><div class="em-h"><h3>${esc(m.subject)}</h3><span class="num">${m.at || ''}</span></div>
       <span class="em-to">${esc(m.addr)} → ${MAIL_BOX}</span><div class="mbody">${esc(m.body)}</div>${attHTML(m.attach)}
       ${m.thread ? `<div class="mthread"><span class="mthread-h">${ic('reply', 14)}Earlier · ${esc(m.thread.from)} · ${m.thread.at}</span><p>${esc(m.thread.text)}</p></div>` : ''}</article>`;
-  const out = sent ? `<article class="em us"><div class="em-h"><b>Re: ${esc(m.subject.replace(/^Re:\s*/, ''))}</b><span class="num">${sent.at}</span></div><span class="em-to">${MAIL_BOX} → ${esc(m.addr)} · sent via Gmail</span><div class="mbody">${esc(sent.text)}</div></article>` : '';
+  const out = sent ? `<article class="em us"><div class="em-h"><h3>Re: ${esc(m.subject.replace(/^Re:\s*/, ''))}</h3><span class="num">${sent.at}</span></div><span class="em-to">${MAIL_BOX} → ${esc(m.addr)} · sent via Gmail</span><div class="mbody">${esc(sent.text)}</div></article>` : '';
   let foot = '';
   if (st === 'filed') foot = `<p class="em-note">${ic('archive', 15)}<span>Filed by the assistant under the Gmail label <b>${esc(m.label)}</b>. Nothing to answer.</span></p>`;
   else if (blocked) foot = `<section class="em us em-reply" aria-label="Reply"><span class="em-lbl wait">${ic('hourglass', 14)}Waits on a decision</span>
@@ -7608,7 +7614,7 @@ function mailConvHTML(m) {
   else if (open) foot = `<section class="em us em-reply" aria-label="Reply"><span class="em-lbl">${gmailMark(13)}Draft reply to ${esc(m.from)}</span>
       <textarea class="inp ta mta" data-mdraft="${m.id}" rows="7" aria-label="Email reply to ${esc(m.from)}">${esc(S.mailDraft[m.id] ?? m.reply())}</textarea>
       <div class="sms-row end"><span class="muted sm">Approving sends it through Gmail${m.changes().length ? ' and makes the changes shown' : ''}.</span><button class="btn pri" data-a="mail-approve" data-v="${m.id}">${ic('send', 14)}Approve and send email</button></div></section>`;
-  return `<header class="sms-ch"><div><b>${esc(m.from)}${m.org ? ` · ${esc(m.org)}` : ''}</b><span><span class="via">${gmailMark(12)}Gmail</span> · ${esc(m.addr)}</span></div>
+  return `<header class="sms-ch"><div><h2>${esc(m.from)}${m.org ? ` · ${esc(m.org)}` : ''}</h2><span><span class="via">${gmailMark(12)}Gmail</span> · ${esc(m.addr)}</span></div>
       <button class="btn ghost sm" data-a="mail-open" data-v="${m.id}">${ic('external', 14)}Open in a window</button></header>
     <div class="sms-thread em-thread">${msg}${out}${foot}</div>`;
 }
@@ -8463,6 +8469,7 @@ document.addEventListener('click', e => {
     // SMS inbox
     case 'sms-sel': S.sms.sel = v; renderSms(); break;
     case 'inbox-show': S.sms.src = v === 'drv' ? 'sms' : v; S.sms.f = v === 'drv' ? 'drv' : 'all'; renderSms(); break;
+    case 'sms-clear': S.sms.q = ''; renderSms(); $('smsQ')?.focus(); break;
     case 'sms-send': smsSend($('smsText')?.value); break;
     case 'sms-quick': { const t = $('smsText'); if (t) { t.value = v; t.focus(); } break; }
     case 'sms-call': toast('Calling from the board needs the phone integration. The number is on the left.'); break;

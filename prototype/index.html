@@ -118,14 +118,13 @@ button.count:hover { background: var(--pill); }
 .mm { display: flex; justify-content: center; gap: 56px; max-width: 1320px; margin: 0 auto; padding: 32px 40px 44px; }
 .mm-main { display: flex; align-items: flex-start; gap: 28px; min-width: 0; }
 .mm-side { display: flex; gap: 40px; padding-left: 56px; border-left: 1px solid var(--line); }
-.mm-col { display: flex; flex-direction: column; gap: 2px; min-width: 150px; }
+.mm-col { flex: none; display: flex; flex-direction: column; gap: 2px; min-width: 150px; } /* never squeezed below its widest row, so every count sits in one column */
 .mm h4 { margin-bottom: 8px; padding-left: 8px; font-weight: 600; font-size: 11px; line-height: 16px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
-.mm-link { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 34px; white-space: nowrap; padding: 6px 10px 6px 6px; border-radius: 4px; font-weight: 500; font-size: 15px; line-height: 20px; color: var(--text); transition: background-color 0.2s ease; }
+.mm-link { display: flex; align-items: center; gap: 6px; width: 100%; min-height: 34px; white-space: nowrap; padding: 6px 8px; border-radius: 6px; font-weight: 500; font-size: 15px; line-height: 20px; color: var(--text); transition: background-color 0.2s ease; }
 .mm-link:hover { background: var(--pill); }
-.mm-link.on { font-weight: 600; }
-.mm-link .ck { width: 16px; display: grid; place-items: center; flex: none; }
-.mm-link .n { margin-left: auto; padding-left: 16px; color: var(--text-3); font-size: 15px; }
-.mm-link > span:nth-child(2) { display: inline-flex; align-items: center; gap: 8px; }
+.mm-link.on { background: var(--raised); font-weight: 600; } /* the chosen option is a filled button, like the day cards and the Settings list */
+.mm-link .n { margin-left: auto; padding-left: 16px; color: var(--text-3); font-size: 15px; text-align: right; }
+.mm-link > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
 .mm.enter .mm-item { animation: mmIn 0.5s var(--ease-panel) both; animation-delay: calc(var(--i, 0) * 70ms + 60ms); }
 @keyframes mmIn { from { opacity: 0; transform: translateY(-12px); } }
 
@@ -535,7 +534,6 @@ body.h-dragging, body.h-dragging * { cursor: grabbing !important; }
 .ai-card.x:focus-visible { outline-offset: 3px; }
 .hm-undo { flex: none; align-self: flex-start; margin: -4px -6px 0 0; }
 .ai-res { display: inline-flex; align-items: center; gap: 3px; }
-.cf { margin-left: 4px; color: var(--text-3); font: 500 12px/20px var(--f-num); white-space: nowrap; }
 /* The transfer, drawn in the grid's 24px left margin beside the pickup times, under the pinned headers. */
 #rows { position: relative; }
 .ai-arrows { position: absolute; left: 0; top: 0; z-index: 1; overflow: visible; color: var(--selected-bar); pointer-events: none; }
@@ -842,6 +840,7 @@ button.mres:hover { border-color: var(--line-strong); background: var(--hover); 
 .mm-clear:hover { color: var(--text); }
 .hbtn.cur { background: var(--pill); }
 .mm-link .ic { color: var(--text-3); }
+.mm-link.on .ic { color: var(--text); }
 
 /* ---------- Settings page ---------- */
 .settings { flex: 1; min-height: 0; display: flex; background: var(--panel); }
@@ -3189,8 +3188,8 @@ function aiVan(R) {
   if (!B.length || !stay.length) return null;
   const firstF = R.fam.find(f => curbAt(f) === sp.first), firstC = famCode(firstF) || `${firstF[0]}’s family`, stayAt = spread(stay).ready;
   const share = shareTargets(R, B)[0], own = optOwn(B, R), cls = classFor(sumPax(B));
-  const head = `${codesShort(B)} ${are(B)} late (${lateSaid(B)}), so ${codesShort(stay)} ${stay.length > 1 ? 'go' : 'goes'} at ${fmt(stayAt)}.`;
-  const why0 = `${firstC} would wait ${sp.wait} min for ${codesShort(B)}. Our limit is ${S.cfg.limit}.`;
+  const head = `${codesShort(B)} ${are(B)} late (${lateSaid(B)}).`;
+  const why0 = `${firstC} would wait ${sp.wait} min for ${codesShort(B)}. Our limit is ${S.cfg.limit}, so ${codesShort(stay)} ${stay.length > 1 ? 'go' : 'goes'} at ${fmt(stayAt)}.`;
   const leave = `${firstC} waits ${sp.wait} min`;
   let d;
   if (share) {
@@ -3198,7 +3197,7 @@ function aiVan(R) {
     const moves = B.map(f => ({ t: 'fam', from: R.id, fam: f[0], to: T.id }));
     d = { id: `van-${R.id}`, kind: 'share', moves, touch: [R.id, T.id], anim: B.map(f => f[0]),
       title: `${codesShort(B)} ${B.length > 1 ? 'ride' : 'rides'} with ${tCodes}`, from: B, to: T.fam, story: head,
-      why: [why0, `${tCodes} (${cf(T)}) is ${job}: ${T.pax} of ${share.seats} seats used.`, `With ${codesShort(B)} on board it leaves at ${fmt(share.ready)}, and the longest wait is ${share.wait} min.`, `All Lumora colleagues going to the ${PL[R.do].name}, so they can share. No family is split.`],
+      why: [why0, `${tCodes} is ${job}: ${T.pax} of ${share.seats} seats used.`, `With ${codesShort(B)} on board it leaves at ${fmt(share.ready)}, and the longest wait is ${share.wait} min.`, `All Lumora colleagues going to the ${PL[R.do].name}, so they can share. No family is split.`],
       options: [{ label: T.aff ? 'Affiliate' : 'In-house', text: `${codesShort(B)} ride with ${tCodes}`, cost: '$0', pick: true },
         own.d ? { label: 'In-house', text: `Own ${own.cls.toLowerCase()} with ${own.d.d}`, cost: '$0 · extra run' } : null, ...optLadder(B, cls, leave)].filter(Boolean),
       cost: `$0, no extra car`, arrows: [[R.id, T.id]] };
@@ -3231,7 +3230,7 @@ function aiLate(J) {
         title: `${pc} ${P.fam.length > 1 ? 'ride' : 'rides'} with ${tCodes}`, from: P.fam, to: T.fam,
         story: `${pc} ${are(P.fam)} late (${lateSaid(P.fam)}), so ${J.driver} would be ${mins} min late for ${jSaid}. ${tCodes}’s ${carKind(T)} has room.`,
         why: [`${J.driver} picks up ${pc} at ${fmt(P.pickup)} and is back at SEA about ${back}: ${mins} min late for ${jSaid} at ${fmt(J.pickup)}. ${limitSaid(J)}`,
-          `${tCodes} (${cf(T)}) is ${carName(T)} at ${fmt(T.pickup)}: ${x.pax} of ${x.seats} seats with ${pc}.`,
+          `${tCodes} is ${carName(T)} at ${fmt(T.pickup)}: ${x.pax} of ${x.seats} seats with ${pc}.`,
           `Everyone is ready by ${fmt(x.ready)}, and the longest wait is ${x.wait} min.`,
           `${J.driver} then makes ${jSaid} at ${fmt(J.pickup)} on time. All Lumora colleagues to the ${PL[P.do].name}; no family is split.`],
         options: [{ label: T.aff ? 'Affiliate' : 'In-house', text: `${pc} ride with ${tCodes}`, cost: '$0', pick: true },
@@ -3481,8 +3480,7 @@ function aiApprove(id, ed) {
   flash(d.touch);
   S.aiOpen = null; aiDecisions(); S.aiOpen = (AI_CACHE.list[0] || {}).id || null;
   renderRows(); renderRail(); renderCtx(); updateHeader();
-  const confs = [...new Set(d.touch.map(findRide).filter(r => r && !r.hidden).map(cf))];
-  toast(`${title} (${confs.join(', ')}). ${told.length ? `Texted ${andList(told)}.` : ''}${upTo.length ? ` ${andList(upTo)} got the upgrade text.` : ''}`, handUndo);
+  toast(`${title}. ${told.length ? `Texted ${andList(told)}.` : ''}${upTo.length ? ` ${andList(upTo)} got the upgrade text.` : ''}`, handUndo);
   S.aiApprovedAt = performance.now();
   railFocus();
   aiHintSoon(1100); // the next one glows a moment; it plays when clicked
@@ -3522,13 +3520,15 @@ function aiTo(d) {
 }
 function aiCardHTML(d) {
   const why = !!S.aiWhy[d.id], pv = S.aiPv === d.id;
-  // Each side carries its conf number: the reservation the families leave, and the one they join.
-  const [fromId, toId] = d.arrows ? d.arrows[0] : [d.touch[0], null], cfOf = id => id ? `<span class="cf">${esc((d.codes && d.codes[id]) || codeOf(findRide(id)))}</span>` : '';
-  const move = `<div class="ai-move"><span class="ai-res">${d.from ? aiChips(d.from, d.kind === 'driver' ? '' : 'breaks') : `<span class="ai-own">${esc(rideSaid(findRide(d.touch[0])).replace(/’s ride$/, ''))}</span>`}${cfOf(fromId)}</span><span class="ai-arrow" aria-label="to">→</span><span class="ai-res">${aiTo(d)}${cfOf(toId)}</span></div>`;
+  // The group codes are enough to find a ride on the grid, so the conf codes wait in the details: the reservation
+  // the families leave, and the one they join.
+  const [fromId, toId] = d.arrows ? d.arrows[0] : [d.touch[0], null], confOf = id => (d.codes && d.codes[id]) || codeOf(findRide(id));
+  const confs = `Conf: ${confOf(fromId)}${toId ? ` → ${confOf(toId)}` : ''}`;
+  const move = `<div class="ai-move"><span class="ai-res">${d.from ? aiChips(d.from, d.kind === 'driver' ? '' : 'breaks') : `<span class="ai-own">${esc(rideSaid(findRide(d.touch[0])).replace(/’s ride$/, ''))}</span>`}</span><span class="ai-arrow" aria-label="to">→</span><span class="ai-res">${aiTo(d)}</span></div>`;
   const tell = aiTell(d);
   const meta = `<p class="ai-meta">${esc(d.cost)}</p>`;
   const body = `${move}<p class="ai-story">${esc(d.story)}</p>${meta}`;
-  const details = why ? `<div class="why"><ul>${d.why.map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''; // the reasons; who hears about it is on the card itself
+  const details = why ? `<div class="why"><ul>${[...d.why, confs].map(w => `<li>${esc(w)}</li>`).join('')}</ul></div>` : ''; // the reasons; who hears about it is on the card itself
   // Before Approve, the card names everyone it texts. Nobody hears about anything until then.
   const sends = tell.length ? `<p class="ai-tell">${ic('sms', 14)}<span>Approve texts ${andList(tell.map(x => `<b>${esc(x.name)}</b>`))}.</span></p>` : '';
   const hintAt = !pv && S.aiHint?.id === d.id ? performance.now() - S.aiHint.at : HINT_MS; // a redraw mid-glow carries on
@@ -3549,8 +3549,8 @@ function aiRailHTML() {
   const list = aiDecisions(), open = list.find(d => d.id === S.aiOpen) ? S.aiOpen : null;
   const cards = list.length ? `<div class="cards">${list.map(d => d.id === open ? aiCardHTML(d) : aiCompact(d)).join('')}</div>` : '<p class="muted">All clear. New problems show up here with a suggested fix.</p>';
   const gates = aiGate().map(({ code, f, hit, T }) => `<div class="gate-card"><div class="gate-h"><b class="num">${code}</b><span class="spacer"></span><span class="gate-d">+${f.late} min, at the gate</span></div>
-    <p>${hit ? `If it leaves like that, ${esc(codesShort(hit.B))} (${cf(hit.R)}) would make ${esc(famCode(hit.first) || hit.first[0])} wait ${hit.sp.wait} min. Ready once it takes off: ${esc(T ? `${codesShort(hit.B)} ride with ${codesShort(T.t.fam)}, ${cf(T.t)} (${T.pax} of ${T.seats} seats)` : `${codesShort(hit.B)} get their own car`)}.` : 'Nothing breaks even if it leaves this late.'} Nothing changes until it takes off.</p></div>`).join('');
-  const heads = aiHeads().map(r => `<div class="ai"><div class="ai-card h">${ic('spark', 16)}<p>${esc(`${r.driver} is about ${drvLate(r)} min late for ${rideSaid(r)} (${cf(r)}), after ${r.lateWhy}. ${promised(r) ? `That’s ${S.cfg.promise - drvLate(r)} min before our on-time promise makes the ride free, so keep an eye on it.` : `That’s inside the ${S.cfg.limit} min limit, so nothing to change.`}`)}</p></div></div>`).join('');
+    <p>${hit ? `If it leaves like that, ${esc(codesShort(hit.B))} would make ${esc(famCode(hit.first) || hit.first[0])} wait ${hit.sp.wait} min. Ready once it takes off: ${esc(T ? `${codesShort(hit.B)} ride with ${codesShort(T.t.fam)} (${T.pax} of ${T.seats} seats)` : `${codesShort(hit.B)} get their own car`)}.` : 'Nothing breaks even if it leaves this late.'} Nothing changes until it takes off.</p></div>`).join('');
+  const heads = aiHeads().map(r => `<div class="ai"><div class="ai-card h">${ic('spark', 16)}<p>${esc(`${r.driver} is about ${drvLate(r)} min late for ${rideSaid(r)}, after ${r.lateWhy}. ${promised(r) ? `That’s ${S.cfg.promise - drvLate(r)} min before our on-time promise makes the ride free, so keep an eye on it.` : `That’s inside the ${S.cfg.limit} min limit, so nothing to change.`}`)}</p></div></div>`).join('');
   const declined = S.aiDeclined.size ? `<p class="ai-declined">${S.aiDeclined.size} declined<button class="btn ghost sm" data-a="ai-undecline">Show again</button></p>` : '';
   return `<section class="sec"><div class="sec-t big" tabindex="-1"><b>Decisions</b><span class="cnt">${list.length}</span></div>${cards}${declined}</section>
     ${gates ? `<section class="sec"><div class="sec-t">${ic('clock', 15)}<b>Waiting for takeoff</b></div>${gates}</section>` : ''}
@@ -3975,7 +3975,7 @@ function dayCard(d, v, i) {
     ${sel ? '<span class="now">Showing now</span>' : ''}
   </button>`;
 }
-const mmLink = (act, v, label, on, n) => `<button class="mm-link ${on ? 'on' : ''}" data-a="${act}" data-v="${v}" aria-pressed="${on}"><span class="ck">${on ? ic('check', 14) : ''}</span><span>${label}</span>${n != null ? `<span class="n num">${n}</span>` : ''}</button>`;
+const mmLink = (act, v, label, on, n) => `<button class="mm-link ${on ? 'on' : ''}" data-a="${act}" data-v="${v}" aria-pressed="${on}"><span>${label}</span>${n != null ? `<span class="n num">${n}</span>` : ''}</button>`;
 // Filters for the grid: time of day, driver, car and pickup place. Options come from the day being viewed.
 const anyFilter = () => S.tod !== 'all' || S.driverF !== 'all' || S.vehicle !== 'all' || S.puF !== 'all' || S.source !== 'all';
 const puKey = r => r.pu === 'SEA' ? 'SEA' : r.pu;
@@ -4037,7 +4037,7 @@ const MEGA = {
         </div></div>
       </div>
       <div class="mm-side">
-        <div class="mm-col mm-item" style="--i:3"><h4>New here?</h4><button class="mm-link" data-a="tour-replay"><span class="ck">${ic('help', 16)}</span><span>Replay the tour</span></button></div>
+        <div class="mm-col mm-item" style="--i:3"><h4>New here?</h4><button class="mm-link" data-a="tour-replay"><span>${ic('help', 16)}Replay the tour</span></button></div>
         <div class="mm-col mm-item" style="--i:3"><h4>Shortcuts</h4><div class="keys">
           <div><kbd>/</kbd>Search rides</div><div><kbd>N</kbd>New reservation</div>
           <div><kbd>↑</kbd><kbd>↓</kbd>Move between rides</div><div><kbd>Enter</kbd>Open a ride</div><div><kbd>Shift</kbd><kbd>F10</kbd>A ride’s menu</div>
@@ -4049,7 +4049,7 @@ const MEGA = {
   },
   settings() {
     const lt = localTime();
-    const link = s => `<button class="mm-link" data-a="open-settings" data-v="${s.id}"><span class="ck">${ic(s.icon, 16)}</span><span>${s.name}</span></button>`;
+    const link = s => `<button class="mm-link" data-a="open-settings" data-v="${s.id}"><span>${ic(s.icon, 16)}${s.name}</span></button>`;
     return `<div class="mm">
       <div class="mm-main set-grid">
         <div class="set-card mm-item" style="--i:0"><h4>Shared van wait limit</h4><p>How long one party may wait for another before the tool flags it.</p>${segCtl('limit', [[20, '20 min'], [25, '25 min'], [30, '30 min']], 'Wait limit')}</div>
